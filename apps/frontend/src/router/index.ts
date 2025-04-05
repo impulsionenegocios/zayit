@@ -1,12 +1,51 @@
+// src/router/index.ts
 import { createRouter, createWebHistory } from 'vue-router'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { useAuthStore } from '@/stores/auth'
 
-import Login from '@/pages/auth/LoginPage.vue'
-import Home from '@/pages/HomePage.vue'
+import AuthRoutes from './Auth'
+import AdminRoutes from './Admin'
+import CompanyRoutes from './Company'
+
+import NotFoundPage from '@/pages/errors/NotFoundPage.vue'
 
 const routes = [
-  { path: '/', name: 'Home', component: Home, meta: { requiresAuth: true } },
-  { path: '/login', name: 'Login', component: Login },
+  ...AuthRoutes,
+  ...AdminRoutes,
+  ...CompanyRoutes,
+  {
+    path: '/dashboard',
+    name: 'DashboardRedirect',
+    redirect: () => {
+      const auth = useAuthStore()
+      const role = auth.perfil?.role
+  
+      if (role === 'superadmin') return '/superadmin'
+      if (role === 'company') return '/company'
+      if (role === 'user') return '/user'
+      return '/login'
+    },
+  },  
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFoundPage,
+  },
+  {
+    path: '/',
+    redirect: () => {
+      const auth = useAuthStore()
+      const role = auth.perfil?.role
+  
+      if (!auth.user) return '/login'
+  
+      if (role === 'superadmin') return '/superadmin'
+      if (role === 'company') return '/company'
+      if (role === 'user') return '/user'
+  
+      return '/login' // fallback
+    },
+  }
+  
 ]
 
 export const router = createRouter({
@@ -14,20 +53,18 @@ export const router = createRouter({
   routes,
 })
 
-// Guard com verificação assíncrona do Firebase Auth
-router.beforeEach((to, _from, next) => {
-  const auth = getAuth()
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+router.beforeEach((to, _, next) => {
+  const auth = useAuthStore()
+  const isAuth = !!auth.user
+  const requiredRole = to.meta?.role
 
-  const unregisterAuthObserver = onAuthStateChanged(auth, (user) => {
-    unregisterAuthObserver()
+  if (to.meta.requiresAuth && !isAuth) {
+    return next('/login')
+  }
 
-    if (requiresAuth && !user) {
-      next('/login')
-    } else if (to.path === '/login' && user) {
-      next('/')
-    } else {
-      next()
-    }
-  })
+  if (requiredRole && auth.perfil?.role !== requiredRole) {
+    return next('/login')
+  }
+
+  return next()
 })

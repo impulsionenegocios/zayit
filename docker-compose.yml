@@ -13,11 +13,12 @@ services:
   frontend:
     build:
       context: ./apps/frontend
-      dockerfile: Dockerfile
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules           # 👈 evita conflitos com node_modules do host
     ports:
-      - "3000:80"
-    networks:
-      - app-network
+      - "3000:5173"                 # 👈 redireciona porta do host 3000 → Vite 5173
+    command: pnpm run dev           # 👈 roda Vite em modo dev (hot reload)
 
 networks:
   app-network:

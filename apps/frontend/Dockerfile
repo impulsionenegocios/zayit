@@ -1,15 +1,10 @@
-# Etapa de build
-FROM node:18-alpine AS build
+FROM node:18-alpine
 
 WORKDIR /app
+
 COPY . .
-RUN corepack enable && pnpm install && pnpm run build
 
-# Etapa de produção
-FROM nginx:alpine
+RUN corepack enable && pnpm install
 
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 3000
+CMD ["pnpm", "run", "dev"]
