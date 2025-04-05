@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+
+# Firebase (específico)
+firebase/
+
+# Node
+node_modules/
+dist/
+pnpm-lock.yaml
+
+# OS
+.DS_Store
+
+# Docker
+*.log
+*.env
+
+# Vite build
+apps/frontend/dist/
+
+# IDEs
+.vscode/
+.idea/
