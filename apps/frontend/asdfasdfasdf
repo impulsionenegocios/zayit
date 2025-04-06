@@ -1,0 +1,20 @@
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  content: [
+    './index.html',
+    './src/**/*.{vue,js,ts,jsx,tsx}', // pega todos os arquivos Vue e TS
+  ],
+  theme: {
+    extend: {
+      // aqui você pode customizar cores, fontes, espaçamentos, etc.
+      colors: {
+        primary: '#1e40af',
+        secondary: '#9333ea',
+      },
+    },
+  },
+  plugins: [],
+}
+
+export default config
