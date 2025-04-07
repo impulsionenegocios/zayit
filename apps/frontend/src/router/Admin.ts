@@ -1,5 +1,5 @@
 // src/router/Admin.ts
-import SuperAdminLayout from '@/layouts/AdminLayout.vue'
+import SuperAdminLayout from '@/layouts/AdminLayout.vue';
 
 export default [
   {
@@ -12,6 +12,11 @@ export default [
         name: 'SuperAdminDashboard',
         component: () => import('@/pages/admin/DashboardPage.vue'),
       },
+      {
+        path: 'clientes',
+        name: 'Clientes',
+        component: () => import('@/pages/admin/clientes/ClientesPage.vue'),
+      },
     ],
   },
-]
+];

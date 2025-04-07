@@ -1,5 +1,5 @@
 // src/router/Company.ts
-import CompanyLayout from '@/layouts/CompanyLayout.vue'
+import CompanyLayout from '@/layouts/CompanyLayout.vue';
 
 export default [
   {
@@ -14,4 +14,4 @@ export default [
       },
     ],
   },
-]
+];

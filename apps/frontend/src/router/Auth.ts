@@ -1,4 +1,4 @@
-import LoginPage from '@/pages/auth/LoginPage.vue'
+import LoginPage from '@/pages/auth/LoginPage.vue';
 
 export default [
   {
@@ -6,4 +6,4 @@ export default [
     name: 'Login',
     component: LoginPage,
   },
-]
+];

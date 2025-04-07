@@ -1,12 +1,12 @@
-@import "tailwindcss";
-@import "../../node_modules/flowbite/src/themes/default.css"; 
+@import 'tailwindcss';
+@import '../../node_modules/flowbite/src/themes/default.css';
 @plugin "../../node_modules/flowbite/plugin";
 @source "../../node_modules/flowbite";
 @theme {
-    --color-black: #080708;
-    --color-surface: #0f0f1d;
-    --color-zayit-green: #36D869;
-    --color-zayit-pink: #DC3DA8;
-    --color-zayit-blue: #7C26EC;
-    --color-card: #121223;
-  }
+  --color-black: #080708;
+  --color-surface: #0f0f1d;
+  --color-zayit-green: #36d869;
+  --color-zayit-pink: #dc3da8;
+  --color-zayit-blue: #7c26ec;
+  --color-card: #121223;
+}
