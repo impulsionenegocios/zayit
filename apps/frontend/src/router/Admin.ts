@@ -5,7 +5,7 @@ export default [
   {
     path: '/superadmin',
     component: SuperAdminLayout,
-    meta: { requiresAuth: true, role: 'superadmin' },
+    meta: { requiresAuth: true, role: 'superadmin', Breadcrumb: 'Dashboard' },
     children: [
       {
         path: '',

@@ -138,51 +138,49 @@
       </aside>
      <!-- Conteúdo principal -->
       <div class="flex-1 mt-16 overflow-y-auto md:ml-80 bg-surface rounded-2xl md:mr-4 md:mb-4 lg:mr-8 lg:mb-8">
+        <Breadcrumb />
         <router-view />
       </div>
 
     </div>
   </div>
 </template>
-<script>
-export default {
-  name: 'SidebarLayout',
-  data() {
-    return {
-      sidebarOpen: false, // Controla a visibilidade do sidebar em mobile
-      dropdownOpen: false, // Controla a visibilidade do dropdown
-    };
-  },
-  methods: {
-    toggleSidebar() {
-      this.sidebarOpen = !this.sidebarOpen;
-    },
-    closeSidebar() {
-      this.sidebarOpen = false;
-    },
-    toggleDropdown() {
-      this.dropdownOpen = !this.dropdownOpen;
-    },
-    // Fecha a sidebar se o clique for fora dela e fora do botão de toggle
-    handleClickOutside(event) {
-      const sidebar = this.$el.querySelector('#default-sidebar');
-      if (
-        this.sidebarOpen &&
-        sidebar &&
-        !sidebar.contains(event.target) &&
-        !event.target.closest('[aria-controls="default-sidebar"]')
-      ) {
-        this.closeSidebar();
-      }
-    },
-  },
-  mounted() {
-    document.addEventListener('click', this.handleClickOutside);
-  },
-  beforeDestroy() {
-    document.removeEventListener('click', this.handleClickOutside);
-  },
-};
+<script setup lang="ts">
+import Breadcrumb from '@/components/layout/Breadcrumb.vue'
+import {ref, onMounted, onBeforeUnmount} from 'vue'
+
+const sidebarOpen = ref(false)
+const dropdownOpen = ref(false)
+
+const toggleSidebar = () => {
+  sidebarOpen.value = !sidebarOpen.value
+}
+
+const closeSidebar = () => {
+  sidebarOpen.value = false
+}
+
+const toggleDropdown = () => {
+  dropdownOpen.value = !dropdownOpen.value
+}
+const handleClickOutside = (event: MouseEvent) => {
+  const sidebar = documento.querySelect('#default-sidebar')
+
+  if(
+    sidebarOpen.value && sidebar && !sidebar.contains(event.target as Node) && !(event.target as HTMLElement).closest('[aria-controls="default-sidebar"]')
+
+  ) {
+    closeSidebar()
+  }
+}
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped>
