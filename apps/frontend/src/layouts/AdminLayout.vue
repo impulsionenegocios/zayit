@@ -1,12 +1,12 @@
 <template>
   <div>
-    <!--TOPBAR-->
+    <!-- Topbar -->
     <div class="h-16 fixed bg-black md:px-8 items-center flex justify-between w-full z-50">
       <div class="flex gap-4">
         <button
           @click="toggleSidebar"
           aria-controls="default-sidebar"
-          type="button"
+          :aria-expanded="sidebarOpen"
           class="md:hidden inline-flex items-center p-2 mt-2 ml-3 text-sm rounded-lg focus:outline-none focus:ring-2 text-gray-400 hover:bg-gray-700 focus:ring-gray-600"
         >
           <span class="sr-only">Abrir sidebar</span>
@@ -19,36 +19,36 @@
           </svg>
         </button>
         <router-link to="/">
-          <img class="h-12 cursor-pointer" src="@/assets/images/logo.png" alt="Voltar ao inicio" />
+          <img class="h-12 cursor-pointer" src="@/assets/images/logo.png" alt="Voltar ao início" />
         </router-link>
       </div>
       <div class="flex gap-8">
-        <div>oi</div>
-        <div>oi</div>
-        <div>oi</div>
+        <div>Perfil</div>
+        <div>Notificações</div>
       </div>
     </div>
-    <!-- Overlay para fechar a sidebar ao clicar fora (somente mobile) -->
+
+    <!-- Overlay -->
     <transition name="fade">
       <div
         v-if="sidebarOpen"
-        class="fixed inset-0 bg-black opacity-50 md:hidden"
+        class="fixed inset-0 bg-black opacity-50 md:hidden z-40"
         @click="closeSidebar"
       ></div>
     </transition>
-    <!-- Container com h-screen para sidebar e conteúdo principal -->
+
+    <!-- Container -->
     <div class="flex h-screen">
       <aside
         id="default-sidebar"
         :class="[
-          'fixed top-0 left-0 mt-16 z-40 w-72 2xl:w-80 h-screen transition-transform ',
-          sidebarOpen ? 'translate-x-0 ' : '-translate-x-full ',
-          'md:translate-x-0 ',
+          'fixed top-0 left-0 mt-16 z-40 w-72 2xl:w-80 h-screen transition-transform',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+          'md:translate-x-0',
         ]"
         aria-label="Sidenav"
       >
         <div class="relative overflow-y-auto py-5 px-3 h-full bg-black">
-          <!-- Botão de fechar para mobile -->
           <button
             @click="closeSidebar"
             class="md:hidden absolute top-4 right-4 p-2 text-gray-500 hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
@@ -62,7 +62,6 @@
               ></path>
             </svg>
           </button>
-          <!-- Conteúdo da sidebar -->
           <ul class="space-y-2">
             <li>
               <a
@@ -81,13 +80,12 @@
                 <span class="ml-3">Overview</span>
               </a>
             </li>
-            <!-- Exemplo de item com dropdown animado -->
             <li>
               <div>
                 <button
                   @click="toggleDropdown"
+                  :aria-expanded="dropdownOpen"
                   class="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  type="button"
                 >
                   <svg
                     aria-hidden="true"
@@ -116,7 +114,6 @@
                     ></path>
                   </svg>
                 </button>
-                <!-- Dropdown com transição -->
                 <transition
                   name="dropdown"
                   enter-active-class="transition duration-300 ease-out"
@@ -124,9 +121,11 @@
                 >
                   <ul v-show="dropdownOpen" class="py-2 space-y-2">
                     <li>
-                      <router-link :to="{ name: 'Clientes' }" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                      <router-link
+                        :to="{ name: 'Clientes' }"
+                        class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                      >
                         Ver Clientes
-
                       </router-link>
                     </li>
                   </ul>
@@ -136,19 +135,30 @@
           </ul>
         </div>
       </aside>
-     <!-- Conteúdo principal -->
+
+      <!-- Conteúdo principal -->
       <div class="flex-1 mt-16 overflow-y-auto md:ml-80 bg-surface rounded-2xl md:mr-4 md:mb-4 lg:mr-8 lg:mb-8">
-        <Breadcrumb />
+        <!-- Barra de navegação com título, breadcrumb e botão -->
+        <nav class="flex items-center justify-between p-4">
+          <div class="flex items-center space-x-4">
+            <span class="text-2xl text-gray-100">{{ route.name }}</span>
+            <Breadcrumb />
+          </div>
+          <!-- Slot para o botão customizado por página -->
+          <slot name="action-button"></slot>
+        </nav>
         <router-view />
       </div>
-
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import Breadcrumb from '@/components/layout/Breadcrumb.vue'
-import {ref, onMounted, onBeforeUnmount} from 'vue'
+import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const sidebarOpen = ref(false)
 const dropdownOpen = ref(false)
 
@@ -163,28 +173,9 @@ const closeSidebar = () => {
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value
 }
-const handleClickOutside = (event: MouseEvent) => {
-  const sidebar = documento.querySelect('#default-sidebar')
-
-  if(
-    sidebarOpen.value && sidebar && !sidebar.contains(event.target as Node) && !(event.target as HTMLElement).closest('[aria-controls="default-sidebar"]')
-
-  ) {
-    closeSidebar()
-  }
-}
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
 </script>
 
 <style scoped>
-/* Animação do dropdown */
 .dropdown-enter-active,
 .dropdown-leave-active {
   transition: all 0.3s ease;
@@ -194,8 +185,6 @@ onBeforeUnmount(() => {
   opacity: 0;
   transform: translateY(-10px);
 }
-
-/* Animação fade para o overlay */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
