@@ -20,9 +20,9 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  label?: string
-  forLabel?: string
-  hint?: string
-  error?: string
-}>()
+  label?: string;
+  forLabel?: string;
+  hint?: string;
+  error?: string;
+}>();
 </script>

@@ -19,22 +19,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps<{
-  title: string
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'outline' | 'ghost'
-  loading?: boolean
-  disabled?: boolean
-  type?: 'submit' | 'button'
-}>()
+  title: string;
+  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'outline' | 'ghost';
+  loading?: boolean;
+  disabled?: boolean;
+  type?: 'submit' | 'button';
+}>();
 
 const emit = defineEmits<{
-  (e: 'click', event: MouseEvent): void
-}>()
+  (e: 'click', event: MouseEvent): void;
+}>();
 
 const variantClass = computed(() => {
-  const v = props.variant || 'primary'
-  return `btn-${v}`
-})
+  const v = props.variant || 'primary';
+  return `btn-${v}`;
+});
 </script>

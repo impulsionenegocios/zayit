@@ -1,44 +1,44 @@
-import { reactive, ref, toRaw } from 'vue'
-import { z } from 'zod'
+import { reactive, ref, toRaw } from 'vue';
+import { z } from 'zod';
 
 export function useZodForm<T extends z.ZodRawShape>(
   schema: z.ZodObject<T>,
-  defaultValues?: Partial<z.infer<typeof schema>>
+  defaultValues?: Partial<z.infer<typeof schema>>,
 ) {
-  type FormData = z.infer<typeof schema>
+  type FormData = z.infer<typeof schema>;
 
   const form = reactive<FormData>({
     ...(defaultValues || {}),
-  } as FormData)
+  } as FormData);
 
-  const errors = ref<Partial<Record<keyof FormData, string>>>({})
-  const isSubmitting = ref(false)
+  const errors = ref<Partial<Record<keyof FormData, string>>>({});
+  const isSubmitting = ref(false);
 
   function validate(): boolean {
-    const result = schema.safeParse(form)
+    const result = schema.safeParse(form);
 
     if (!result.success) {
-      const fieldErrors: typeof errors.value = {}
+      const fieldErrors: typeof errors.value = {};
       for (const issue of result.error.issues) {
-        const field = issue.path[0] as keyof FormData
-        fieldErrors[field] = issue.message
+        const field = issue.path[0] as keyof FormData;
+        fieldErrors[field] = issue.message;
       }
-      errors.value = fieldErrors
-      return false
+      errors.value = fieldErrors;
+      return false;
     }
 
-    errors.value = {}
-    return true
+    errors.value = {};
+    return true;
   }
 
   async function handleSubmit(callback: (data: FormData) => Promise<void> | void) {
-    if (!validate()) return
+    if (!validate()) return;
 
-    isSubmitting.value = true
+    isSubmitting.value = true;
     try {
-      await callback(toRaw(form) as FormData)
+      await callback(toRaw(form) as FormData);
     } finally {
-      isSubmitting.value = false
+      isSubmitting.value = false;
     }
   }
 
@@ -48,5 +48,5 @@ export function useZodForm<T extends z.ZodRawShape>(
     isSubmitting,
     validate,
     handleSubmit,
-  }
+  };
 }

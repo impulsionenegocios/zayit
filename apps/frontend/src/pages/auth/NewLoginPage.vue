@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {ref} from 'vue'
-import { z } from 'zod'
-import BaseInput from '@/components/ui/forms/BaseInput.vue'
-import FormControl from '@/components/ui/forms/FormControl.vue'
-import PrimaryButton from '@/components/ui/ActionButton.vue'
-import { useZodForm } from '@/composables/forms/useZodForm'
+import { ref } from 'vue';
+import { z } from 'zod';
+import BaseInput from '@/components/ui/forms/BaseInput.vue';
+import FormControl from '@/components/ui/forms/FormControl.vue';
+import PrimaryButton from '@/components/ui/ActionButton.vue';
+import { useZodForm } from '@/composables/forms/useZodForm';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 
@@ -15,24 +15,22 @@ const password = ref('');
 const loginSchema = z.object({
   email: z.string().email('E-mail inválido'),
   password: z.string().min(6, 'Senha muito curta'),
-})
+});
 
-const { form, errors, validate } = useZodForm(loginSchema)
-
+const { form, errors, validate } = useZodForm(loginSchema);
 
 const handleLogin = async () => {
-    if(validate()) {
-        try {
-    await auth.login(email.value, password.value);
-    router.push('/'); // redireciona pro painel ou home
-  } catch (err) {
-    console.error('Erro no login', err);
-    // mostrar erro na UI se quiser
-  }
+  if (validate()) {
+    try {
+      await auth.login(email.value, password.value);
+      router.push('/'); // redireciona pro painel ou home
+    } catch (err) {
+      console.error('Erro no login', err);
+      // mostrar erro na UI se quiser
     }
-}
+  }
+};
 </script>
-
 
 <template>
   <section class="bg-gray-900 min-h-screen flex items-center justify-center px-4">

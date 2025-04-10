@@ -3,7 +3,6 @@
   @apply relative inline-flex items-center justify-center px-6 py-2 min-w-32 rounded-3xl text-white font-medium transition-all duration-300 ease-in-out cursor-pointer overflow-hidden disabled:cursor-not-allowed;
 }
 
-
 /* === COMPLEMENTOS E LÓGICA DE INTERAÇÃO (pseudo-elementos e hover) === */
 @layer components {
   .btn > * {
@@ -13,31 +12,31 @@
   .btn-success {
     background: var(--gradient-success);
   }
-  
+
   .btn-primary {
-  background: var(--gradient-primary);
-}
+    background: var(--gradient-primary);
+  }
 
   .btn-secondary {
-  background: var(--gradient-secondary);
-}
+    background: var(--gradient-secondary);
+  }
 
   .btn-danger {
-  background: var(--gradient-danger);
-}
+    background: var(--gradient-danger);
+  }
 
   .btn-outline {
-  @apply border border-white text-white bg-transparent;
-}
+    @apply border border-white text-white bg-transparent;
+  }
 
   .btn-ghost {
-  @apply bg-transparent text-white;
-}
+    @apply bg-transparent text-white;
+  }
 
   .btn-loading {
-  pointer-events: none;
-  opacity: 0.7;
-}
+    pointer-events: none;
+    opacity: 0.7;
+  }
   .btn-success::before,
   .btn-primary::before,
   .btn-secondary::before,

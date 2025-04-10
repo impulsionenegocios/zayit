@@ -1,45 +1,47 @@
 <script setup lang="ts">
-import {ref} from 'vue'
-import { z } from 'zod'
-import BaseInput from '@/components/ui/forms/BaseInput.vue'
-import FormControl from '@/components/ui/forms/FormControl.vue'
-import PrimaryButton from '@/components/ui/ActionButton.vue'
-import { useZodForm } from '@/composables/forms/useZodForm'
+import { ref } from 'vue';
+import { z } from 'zod';
+import BaseInput from '@/components/ui/forms/BaseInput.vue';
+import FormControl from '@/components/ui/forms/FormControl.vue';
+import PrimaryButton from '@/components/ui/ActionButton.vue';
+import { useZodForm } from '@/composables/forms/useZodForm';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 
 const router = useRouter();
 const auth = useAuthStore();
-const formError = ref<string | null>(null)
+const formError = ref<string | null>(null);
 const loginSchema = z.object({
   email: z.string().email('E-mail inválido'),
   password: z.string().min(6, 'Senha muito curta'),
-})
+});
 
 const { form, errors, validate } = useZodForm(loginSchema, {
   email: '',
-  password: ''
-})
-
+  password: '',
+});
+const isSubmitting = ref(false);
 
 const handleLogin = async () => {
-  formError.value = null
-  if (!validate()) return
+  formError.value = null;
+  if (!validate()) return;
+
+  isSubmitting.value = true;
 
   try {
-    await auth.login(form.email, form.password)
-    router.push('/')
+    await auth.login(form.email, form.password);
+    router.push('/');
   } catch (err) {
     if (err instanceof Error) {
-      formError.value = err.message
+      formError.value = err.message;
     } else {
-      formError.value = 'Erro desconhecido.'
+      formError.value = 'Erro desconhecido.';
     }
+  } finally {
+    isSubmitting.value = false;
   }
-}
-
+};
 </script>
-
 
 <template>
   <section class="bg-gray-900 min-h-screen flex items-center justify-center px-4">
@@ -81,7 +83,13 @@ const handleLogin = async () => {
         <p v-if="formError" class="text-red-500 text-sm text-center">
           {{ formError }}
         </p>
-        <PrimaryButton title="Fazer Login" class="w-full" type="submit"/>
+        <PrimaryButton
+          title="Fazer Login"
+          class="w-full"
+          type="submit"
+          :loading="isSubmitting"
+          :disabled="isSubmitting"
+        />
       </form>
     </div>
   </section>

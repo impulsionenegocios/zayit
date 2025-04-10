@@ -16,7 +16,7 @@ export default [
         path: 'clientes',
         name: 'Clientes',
         component: () => import('@/pages/admin/clientes/ClientesPage.vue'),
-        meta: { breadcrumb: 'Clientes' }
+        meta: { breadcrumb: 'Clientes' },
       },
     ],
   },
