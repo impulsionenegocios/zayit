@@ -10,34 +10,27 @@ import { useAuthStore } from '@/stores/auth';
 
 const router = useRouter();
 const auth = useAuthStore();
-const formError = ref<string | null>(null)
+const email = ref('');
+const password = ref('');
 const loginSchema = z.object({
   email: z.string().email('E-mail inválido'),
   password: z.string().min(6, 'Senha muito curta'),
 })
 
-const { form, errors, validate } = useZodForm(loginSchema, {
-  email: '',
-  password: ''
-})
+const { form, errors, validate } = useZodForm(loginSchema)
 
 
 const handleLogin = async () => {
-  formError.value = null
-  if (!validate()) return
-
-  try {
-    await auth.login(form.email, form.password)
-    router.push('/')
+    if(validate()) {
+        try {
+    await auth.login(email.value, password.value);
+    router.push('/'); // redireciona pro painel ou home
   } catch (err) {
-    if (err instanceof Error) {
-      formError.value = err.message
-    } else {
-      formError.value = 'Erro desconhecido.'
-    }
+    console.error('Erro no login', err);
+    // mostrar erro na UI se quiser
   }
+    }
 }
-
 </script>
 
 
@@ -78,10 +71,8 @@ const handleLogin = async () => {
           </label>
           <a href="#" class="text-primary-500 hover:underline">Esqueceu a senha?</a>
         </div>
-        <p v-if="formError" class="text-red-500 text-sm text-center">
-          {{ formError }}
-        </p>
-        <PrimaryButton title="Fazer Login" class="w-full" type="submit"/>
+
+        <PrimaryButton title="Fazer Login" class="w-full" />
       </form>
     </div>
   </section>

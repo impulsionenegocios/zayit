@@ -8,7 +8,9 @@ import {
   getAuth,
   type User,
 } from 'firebase/auth';
-import axios from '@/lib/axios'; // <- seu axios com interceptor se tiver
+import { FirebaseError } from 'firebase/app'
+
+import axios from '@/lib/axios'; 
 
 import { auth } from '@/firebase';
 
@@ -20,20 +22,36 @@ export const useAuthStore = defineStore(
     const loading = ref(true);
 
     const login = async (email: string, password: string) => {
-      const res = await signInWithEmailAndPassword(auth, email, password);
-      user.value = res.user;
-
-      // Obter o idToken e buscar dados do perfil no backend
-      const token = await res.user.getIdToken();
-
-      const response = await axios.get('/auth/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      perfil.value = response.data.perfil;
-    };
+      try {
+        const res = await signInWithEmailAndPassword(auth, email, password)
+        user.value = res.user
+    
+        const token = await res.user.getIdToken()
+        const response = await axios.get('/auth/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+    
+        perfil.value = response.data.perfil
+      } catch (err) {
+        if (err instanceof FirebaseError) {
+          // Trate erros específicos do Firebase Auth
+          switch (err.code) {
+            case 'auth/user-not-found':
+              throw new Error('E-mail não encontrado.')
+            case 'auth/invalid-credential':
+              throw new Error('Email ou Senha Incorretos.')
+            case 'auth/too-many-requests':
+              throw new Error('Muitas tentativas. Tente novamente em breve.')
+            default:
+              throw new Error('Erro ao fazer login. Tente novamente.')
+          }
+        }
+    
+        throw err // se for outro tipo de erro
+      }
+    }
 
     const logout = async () => {
       await signOut(auth);

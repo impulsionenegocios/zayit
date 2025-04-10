@@ -1,0 +1,19 @@
+ @layer components {
+    .input-base {
+      @apply w-full px-4 py-2 text-white rounded-lg bg-transparent border border-white/20 placeholder-white/40 outline-none transition duration-300;
+    }
+    .input-base:focus {
+      border-color: var(--color-zayit-blue);
+    }
+  
+    .input-base:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  
+    .input-base:read-only {
+      border-style: dashed;
+      opacity: 0.8;
+    }
+  }
+  

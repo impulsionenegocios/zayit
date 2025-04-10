@@ -1,4 +1,22 @@
 {
   "files": [],
-  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": {
+    "target": "ES2020",          // ou ES2015+, pode até ser ESNext
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM"],    // isso resolve o erro de Object.assign e Promise
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "types": ["vue", "./src/types/jsx-shim"],
+    "paths": {
+      "@/*": ["./src/*"],  
+      "@shared/*": ["../../packages/shared/src/*"]
+    }
+  }
 }

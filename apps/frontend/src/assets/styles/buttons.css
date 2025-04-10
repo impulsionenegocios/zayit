@@ -1,0 +1,102 @@
+/* === UTILITÁRIOS TAILWIND (com variants automáticas) === */
+@utility btn {
+  @apply relative inline-flex items-center justify-center px-6 py-2 min-w-32 rounded-3xl text-white font-medium transition-all duration-300 ease-in-out cursor-pointer overflow-hidden disabled:cursor-not-allowed;
+}
+
+
+/* === COMPLEMENTOS E LÓGICA DE INTERAÇÃO (pseudo-elementos e hover) === */
+@layer components {
+  .btn > * {
+    position: relative;
+    z-index: 10;
+  }
+  .btn-success {
+    background: var(--gradient-success);
+  }
+  
+  .btn-primary {
+  background: var(--gradient-primary);
+}
+
+  .btn-secondary {
+  background: var(--gradient-secondary);
+}
+
+  .btn-danger {
+  background: var(--gradient-danger);
+}
+
+  .btn-outline {
+  @apply border border-white text-white bg-transparent;
+}
+
+  .btn-ghost {
+  @apply bg-transparent text-white;
+}
+
+  .btn-loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+  .btn-success::before,
+  .btn-primary::before,
+  .btn-secondary::before,
+  .btn-danger::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    z-index: 0;
+    transition: opacity 0.5s ease-in-out;
+  }
+
+  .btn-success::before {
+    background-color: #36d869;
+  }
+
+  .btn-primary::before {
+    background-color: #3b82f6;
+  }
+
+  .btn-secondary::before {
+    background-color: #4b5563;
+  }
+
+  .btn-danger::before {
+    background-color: #ef4444;
+  }
+
+  .btn-success:hover::before,
+  .btn-primary:hover::before,
+  .btn-secondary:hover::before,
+  .btn-danger:hover::before {
+    opacity: 1;
+  }
+
+  .btn-outline:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .btn-ghost:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-top-color: white;
+    border-radius: 9999px;
+    animation: spin 1s linear infinite;
+    z-index: 20;
+  }
+}
+
+/* === ANIMAÇÃO DO SPINNER === */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

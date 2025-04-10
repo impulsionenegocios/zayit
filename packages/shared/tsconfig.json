@@ -1,0 +1,16 @@
+// packages/shared/tsconfig.json
+{
+    "compilerOptions": {
+      "target": "ES2021",
+      "module": "ESNext",
+      "moduleResolution": "Node",
+      "esModuleInterop": true,
+      "strict": true,
+      "baseUrl": ".",
+      "paths": {},
+      "declaration": true,
+      "outDir": "dist"
+    },
+    "include": ["src"]
+  }
+  

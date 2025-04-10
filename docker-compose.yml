@@ -1,24 +1,27 @@
 services:
   backend:
     build:
-      context: ./apps/backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    volumes:
+      - ./apps/backend:/apps/backend
     ports:
       - "8000:8000"
-    volumes:
-      - ./apps/backend:/app
     networks:
       - app-network
 
   frontend:
     build:
-      context: ./apps/frontend
+      context: .
+      dockerfile: apps/frontend/Dockerfile
     volumes:
-      - ./apps/frontend:/app
-      - /app/node_modules           # 👈 evita conflitos com node_modules do host
+      - ./apps/frontend:/app/apps/frontend   # Mapeia a pasta correta
+      - /app/apps/frontend/node_modules       # Garante que os node_modules internos não sejam sobrescritos
     ports:
-      - "3000:5173"                 # 👈 redireciona porta do host 3000 → Vite 5173
-    command: pnpm run dev           # 👈 roda Vite em modo dev (hot reload)
+      - "3000:5173"   # Mapeia a porta 5173 do container para 3000 no host
+    # Não precisa de command aqui, pois o CMD do Dockerfile já chama 'pnpm run dev'
+    networks:
+      - app-network
 
 networks:
   app-network:

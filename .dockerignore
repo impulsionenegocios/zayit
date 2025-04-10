@@ -1,0 +1,12 @@
+# Ignora caches, pacotes e diretórios desnecessários
+node_modules
+.pnpm-store
+.pnp.*
+*.log
+dist
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.git

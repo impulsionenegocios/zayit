@@ -129,9 +129,29 @@
 </template>
 
 <script setup lang="ts">
-import PrimaryButton from '@/components/ui/button/Primary.vue'
+import { ref,  onUnmounted, h } from 'vue'
+import { useActionButton } from '@/stores/layout/actionButton';
+const actionButton = useActionButton()
 
-const addClient = () => {
-  console.log('Adicionar novo cliente')
-}
+const name = ref('')
+console.log(name)
+
+import { usePageActionButton } from '@/composables/usePageActionButton.ts'
+import { Icon } from '@iconify/vue'
+
+usePageActionButton(
+  {
+    title: 'Adicionar Cliente',
+    variant: 'success',
+    onClick: () => alert('clicou'),
+    loading: false,
+  },
+  {
+    icon: () => h(Icon, { icon: 'mdi:plus' }),
+  }
+)
+onUnmounted(() => {
+  actionButton.component = null
+})
+
 </script>

@@ -1,5 +1,4 @@
 // src/router/Admin.ts
-import Breadcrumb from '@/components/layout/Breadcrumb.vue';
 import SuperAdminLayout from '@/layouts/AdminLayout.vue';
 
 export default [
@@ -10,7 +9,7 @@ export default [
     children: [
       {
         path: '',
-        name: 'SuperAdminDashboard',
+        name: 'Dashboard',
         component: () => import('@/pages/admin/DashboardPage.vue'),
       },
       {

@@ -1,0 +1,6 @@
+@layer components {
+    .form-control {
+      @apply w-full mb-4;
+    }
+  }
+  
