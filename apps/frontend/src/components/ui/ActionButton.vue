@@ -1,7 +1,7 @@
 <template>
   <button
     :type="props.type ?? 'button'"
-    class="btn"
+    class="btn min-h-10"
     :class="[variantClass, loading && 'btn-loading']"
     :disabled="disabled || loading"
     @click="emit('click', $event)"
@@ -13,7 +13,7 @@
 
     <!-- Título -->
     <span class="relative z-10">
-      {{ loading ? 'Carregando...' : title }}
+      {{ loading ? '' : title }}
     </span>
   </button>
 </template>
