@@ -133,10 +133,7 @@ import { ref,  onUnmounted, h } from 'vue'
 import { useActionButton } from '@/stores/layout/actionButton';
 const actionButton = useActionButton()
 
-const name = ref('')
-console.log(name)
-
-import { usePageActionButton } from '@/composables/usePageActionButton.ts'
+import { usePageActionButton } from '@/composables/usePageActionButton'
 import { Icon } from '@iconify/vue'
 
 usePageActionButton(
