@@ -4,13 +4,13 @@
       <li
         v-for="(crumb, index) in breadcrumbs"
         :key="index"
-        class="inline-flex items-center justify-center"
+        class="inline-flex items-center justify-center mt-2"
         :aria-current="index === breadcrumbs.length - 1 ? 'page' : undefined"
       >
         <template v-if="index === 0">
           <span class="inline-flex items-center text-sm font-medium text-gray-400">
-            <template v-if="crumb.path">
-              <RouterLink :to="crumb.path" class="dark:hover:text-zayit-blue">
+            <template v-if="crumb.path" class="transition-all duration-500">
+              <RouterLink :to="crumb.path" class="hover:text-zayit-blue transition-all duration-500">
                 {{ crumb.label }}
               </RouterLink>
             </template>

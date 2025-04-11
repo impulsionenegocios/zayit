@@ -207,19 +207,48 @@
       </div>
     </div>
   </section>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <section>
+    <FormControl label="Cliente" forLabel="cliente">
+  <BaseCombobox
+    v-model="selectedUser"
+    :options="userOptions"
+    placeholder="Selecione um cliente"
+  />
+</FormControl>
+
+
+  </section>
 </template>
 <script setup lang="ts">
 import { ref, onUnmounted, h } from 'vue';
 import { useActionButton } from '@/stores/layout/actionButton';
-const actionButton = useActionButton();
-
 import { usePageActionButton } from '@/composables/usePageActionButton';
 import { Icon } from '@iconify/vue';
+import FormGrid from '@/components/ui/forms/FormGrid.vue';
+import FormControl from '@/components/ui/forms/FormControl.vue';
+import BaseInput from '@/components/ui/forms/BaseInput.vue';
+import FormSection from '@/components/ui/forms/FormSection.vue';
+import BaseCombobox from '@/components/ui/forms/BaseCombobox.vue';
+const form = ref()
+const actionButton = useActionButton();
 
 usePageActionButton(
   {
     title: 'Adicionar Cliente',
-    variant: 'success',
+    variant: 'primary',
     onClick: () => alert('clicou'),
     loading: false,
   },
@@ -230,4 +259,10 @@ usePageActionButton(
 onUnmounted(() => {
   actionButton.component = null;
 });
+
+const userOptions = [
+  { label: 'João Silva', value: 'joao' },
+  { label: 'Maria Souza', value: 'maria' },
+]
+const selectedUser = ref(null)
 </script>

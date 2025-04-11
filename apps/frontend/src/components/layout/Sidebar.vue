@@ -1,5 +1,6 @@
 <!-- src/components/layout/Sidebar.vue -->
 <template>
+  <!-- Overlay (apenas em mobile) que fecha a sidebar ao clicar fora -->
   <transition name="fade">
     <div
       v-if="open"
@@ -11,92 +12,70 @@
   <aside
     id="default-sidebar"
     :class="[
-      'fixed top-0 left-0 mt-16 z-40 w-72 2xl:w-80 h-screen transition-transform',
+      'fixed top-0 left-0 z-40 w-72 2xl:w-80 h-screen transition-transform mt-16 md:mt-0',
       open ? 'translate-x-0' : '-translate-x-full',
-      'md:translate-x-0',
+      'md:translate-x-0'
     ]"
     aria-label="Sidenav"
   >
-    <div class="relative overflow-y-auto py-5 px-3 h-full bg-black">
-      <button
-        @click="$emit('close')"
-        class="md:hidden absolute top-4 right-4 p-2 text-gray-500 hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-      >
-        <span class="sr-only">Fechar sidebar</span>
-        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fill-rule="evenodd"
-            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-            clip-rule="evenodd"
-          ></path>
-        </svg>
-      </button>
+    <div class="relative h-full overflow-y-auto py-5 px-3 bg-black">
+      <!-- Cabeçalho interno para desktop (logo) -->
+      <div class="items-center justify-between mb-4 hidden md:flex">
+        <router-link to="/">
+          <img
+            class="h-12 cursor-pointer"
+            src="@/assets/images/logo.png"
+            alt="Voltar ao início"
+          />
+        </router-link>
+      </div>
 
+      <!-- Menu de navegação gerado via v-for -->
       <ul class="space-y-2">
-        <li>
-          <router-link
-            to="/superadmin"
-            class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-          >
-            <svg
-              aria-hidden="true"
-              class="w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-              fill="currentColor"
-              viewBox="0 0 20 20"
+        <li v-for="(item, index) in menuItems" :key="index">
+          <!-- Item sem subitens -->
+          <div v-if="!item.subitems">
+            <router-link
+              :to="item.to"
+              class="flex items-center p-2 text-base font-normal rounded-lg hover:bg-gray-100 hover:text-black transition-all duration-300 group"
+              :class="isActive(item.to) ? 'sidebar-active hover:!text-white' : ''"
             >
-              <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-              <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
-            </svg>
-            <span class="ml-3">Overview</span>
-          </router-link>
-        </li>
+              <Icon :icon="item.icon" />
+              <span class="ml-3">{{ item.label }}</span>
+            </router-link>
+          </div>
 
-        <li>
-          <div>
+          <!-- Item com dropdown (subitens) -->
+          <div v-else>
             <button
-              @click="dropdownOpen = !dropdownOpen"
-              :aria-expanded="dropdownOpen"
-              class="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              @click="toggleDropdown(index)"
+              :aria-expanded="item.dropdownOpen"
+              class="flex items-center p-2 w-full text-base font-normal rounded-lg group hover:bg-gray-100 hover:text-black transition-all duration-300"
+              :class="isDropdownActive(item) ? 'sidebar-active hover:!text-white' : ''"
             >
-              <svg
-                aria-hidden="true"
-                class="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
-              <span class="flex-1 ml-3 text-left whitespace-nowrap">Clientes</span>
-              <svg
-                aria-hidden="true"
-                class="w-6 h-6 transition-transform duration-200"
-                :class="dropdownOpen ? 'rotate-180' : ''"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
+              <Icon :icon="item.icon" />
+              <span class="flex-1 ml-3 text-left whitespace-nowrap">
+                {{ item.label }}
+              </span>
+              <Icon :icon="item.dropdownIcon" />
             </button>
+
             <transition
               name="dropdown"
               enter-active-class="transition duration-300 ease-out"
               leave-active-class="transition duration-200 ease-in"
             >
-              <ul v-show="dropdownOpen" class="py-2 space-y-2">
-                <li>
+              <ul v-show="item.dropdownOpen" class="py-2 space-y-2">
+                <li
+                  v-for="(subitem, subIndex) in item.subitems"
+                  :key="subIndex"
+                >
                   <router-link
-                    :to="{ name: 'Clientes' }"
-                    class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    :to="subitem.to"
+                    class="flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-300 group hover:bg-gray-100 hover:text-black"
+                    :class="isActive(subitem.to) ? 'sidebar-active hover:!text-white' : ''"
                   >
-                    Ver Clientes
+                    {{ subitem.label }}
                   </router-link>
                 </li>
               </ul>
@@ -109,15 +88,55 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { Icon } from '@iconify/vue'
 
-defineProps<{
-  open: boolean;
-}>();
+// Declaração das props e emit do componente
+const props = defineProps<{ open: boolean }>()
+const emit = defineEmits<{ (e: 'close'): void }>()
 
-defineEmits<{
-  (e: 'close'): void;
-}>();
+// Acessa a rota atual para comparação
+const route = useRoute()
 
-const dropdownOpen = ref(false);
+// Definição do array de itens do menu
+const menuItems = ref([
+  {
+    label: 'Overview',
+    icon: 'ic:round-dashboard',
+    to: '/superadmin'
+  },
+  {
+    label: 'Clientes',
+    icon: 'mdi-account-tie',
+    dropdownOpen: false,
+    dropdownIcon: 'lsicon:down-outline',
+    subitems: [
+      {
+        label: 'Ver Clientes',
+        to: { name: 'Clientes' }
+      }
+    ]
+  }
+])
+
+function isActive(to: string | { name: string }): boolean {
+  if (typeof to === 'string') {
+    return route.path === to
+  } else if (to && 'name' in to) {
+    return route.name === to.name
+  }
+  return false
+}
+
+// Se o item tiver subitens, verifica se algum deles está ativo
+function isDropdownActive(item: any): boolean {
+  if (!item.subitems) return false
+  return item.subitems.some((sub: any) => isActive(sub.to))
+}
+
+// Função para alternar o estado aberto/fechado do dropdown por índice
+function toggleDropdown(index: number) {
+  menuItems.value[index].dropdownOpen = !menuItems.value[index].dropdownOpen
+}
 </script>

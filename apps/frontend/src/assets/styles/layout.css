@@ -1,0 +1,5 @@
+@layer components {
+    .sidebar-active  {
+        background: var(--gradient-primary);
+    }
+}
