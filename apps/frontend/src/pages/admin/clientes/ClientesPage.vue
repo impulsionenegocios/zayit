@@ -222,12 +222,12 @@
 
   <section>
     <FormControl label="Cliente" forLabel="cliente">
-  <BaseCombobox
-    v-model="selectedUser"
-    :options="userOptions"
-    placeholder="Selecione um cliente"
-  />
-</FormControl>
+    <BaseCombobox
+      v-model="selectedUser"
+      :options="userOptions"
+      placeholder="Selecione um cliente"
+    />
+  </FormControl>
 
 
   </section>

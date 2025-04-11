@@ -1,55 +1,41 @@
 <template>
-    <!-- Adicionamos um wrapper para poder detectar clique fora -->
-    <div class="combobox-wrapper">
-      <Combobox v-model="model" :disabled="disabled">
-        <div class="relative">
-          <!-- Input -->
-          <ComboboxInput
-            class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            :displayValue="displayLabel"
-            @change="onInputChange"
-            @focus="openDropdown"
-            @click="openDropdown"
-            :placeholder="placeholder"
-          />
-    
-          <!-- Options dropdown -->
-          <ComboboxOptions
-            v-show="isOpen"
-            class="absolute z-50 mt-1 w-full bg-surface border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-auto focus:outline-none"
+    <div ref="wrapperRef" class="relative">
+      <div class="relative">
+        <!-- Input -->
+        <input
+          type="text"
+          class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          :placeholder="placeholder"
+          v-model="query"
+          @focus="isOpen = true"
+          @click="isOpen = true"
+        />
+  
+        <!-- Dropdown -->
+        <ul
+          v-show="isOpen"
+          class="absolute z-50 mt-1 w-full bg-surface border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-auto"
+        >
+          <li
+            v-for="option in filteredOptions"
+            :key="option.value"
+            @click="selectOption(option)"
+            class="px-4 py-2 cursor-pointer hover:bg-gray-700 text-white"
           >
-            <template v-if="filteredOptions.length">
-              <ComboboxOption
-                v-for="option in filteredOptions"
-                :key="option.value"
-                :value="option"
-                class="px-4 py-2 cursor-pointer hover:bg-gray-700 text-white"
-              >
-                {{ option.label }}
-              </ComboboxOption>
-            </template>
-            <div v-else class="px-4 py-2 text-sm text-white/60">
-              Nenhuma opção encontrada
-            </div>
-          </ComboboxOptions>
-        </div>
-      </Combobox>
+            {{ option.label }}
+          </li>
+          <li v-if="!filteredOptions.length" class="px-4 py-2 text-sm text-white/60">
+            Nenhuma opção encontrada
+          </li>
+        </ul>
+      </div>
     </div>
   </template>
   
   <script setup lang="ts">
-  import {
-    Combobox,
-    ComboboxInput,
-    ComboboxOption,
-    ComboboxOptions,
-  } from '@headlessui/vue'
-  import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
+  import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
   
-  type Option = {
-    label: string
-    value: string | number
-  }
+  type Option = { label: string; value: string | number }
   
   const props = defineProps<{
     modelValue: Option | null
@@ -62,16 +48,10 @@
     (e: 'update:modelValue', value: Option | null): void
   }>()
   
-  // Usamos um computed para criar proxy reativo para v-model
-  const model = computed({
-    get: () => props.modelValue,
-    set: (val) => emit('update:modelValue', val),
-  })
-  
   const query = ref('')
   const isOpen = ref(false)
+  const wrapperRef = ref<HTMLElement | null>(null)
   
-  // Filtra as opções com base no query
   const filteredOptions = computed(() => {
     if (!query.value) return props.options
     return props.options.filter((o) =>
@@ -79,24 +59,22 @@
     )
   })
   
-  // displayLabel: recebe o item e retorna o label
-  const displayLabel = (item: unknown) => {
-    const option = item as Option | null
-    return option?.label ?? ''
+  function selectOption(option: Option) {
+    emit('update:modelValue', option)
+    query.value = option.label
+    isOpen.value = false
   }
   
-  function onInputChange(event: Event) {
-    query.value = (event.target as HTMLInputElement).value
-  }
+  watch(
+    () => props.modelValue,
+    (val) => {
+      query.value = val?.label ?? ''
+    },
+    { immediate: true }
+  )
   
-  function openDropdown() {
-    isOpen.value = true
-  }
-  
-  // Fecha o dropdown ao clicar fora do wrapper
-  function handleClickOutside(event: MouseEvent) {
-    const target = event.target as HTMLElement
-    if (!target.closest('.combobox-wrapper')) {
+  function handleClickOutside(e: MouseEvent) {
+    if (wrapperRef.value && !wrapperRef.value.contains(e.target as Node)) {
       isOpen.value = false
     }
   }
@@ -107,14 +85,5 @@
   onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside)
   })
-  
-  // Se o model mudar, atualiza o query
-  watch(
-    () => props.modelValue,
-    (val) => {
-      query.value = val?.label ?? ''
-    },
-    { immediate: true }
-  )
   </script>
   

@@ -37,7 +37,7 @@
           <div v-if="!item.subitems">
             <router-link
               :to="item.to"
-              class="flex items-center p-2 text-base font-normal rounded-lg hover:bg-gray-100 hover:text-black transition-all duration-300 group"
+              class="flex items-center p-2 text-base font-normal rounded-lg hover:bg-gray-100 h-12 hover:text-black transition-all duration-300 group"
               :class="isActive(item.to) ? 'sidebar-active hover:!text-white' : ''"
             >
               <Icon :icon="item.icon" />
@@ -50,7 +50,7 @@
             <button
               @click="toggleDropdown(index)"
               :aria-expanded="item.dropdownOpen"
-              class="flex items-center p-2 w-full text-base font-normal rounded-lg group hover:bg-gray-100 hover:text-black transition-all duration-300"
+              class="flex items-center p-2 w-full text-base font-normal rounded-lg group hover:bg-gray-100 h-12 hover:text-black transition-all duration-300"
               :class="isDropdownActive(item) ? 'sidebar-active hover:!text-white' : ''"
             >
               <Icon :icon="item.icon" />
@@ -65,14 +65,14 @@
               enter-active-class="transition duration-300 ease-out"
               leave-active-class="transition duration-200 ease-in"
             >
-              <ul v-show="item.dropdownOpen" class="py-2 space-y-2">
+              <ul v-show="item.dropdownOpen" class="py-2 space-y-2  ml-11">
                 <li
                   v-for="(subitem, subIndex) in item.subitems"
                   :key="subIndex"
                 >
                   <router-link
                     :to="subitem.to"
-                    class="flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-300 group hover:bg-gray-100 hover:text-black"
+                    class="flex items-center p-2 pl-6 w-full text-base font-normal rounded-lg transition duration-300 group h-12 hover:bg-gray-100 hover:text-black"
                     :class="isActive(subitem.to) ? 'sidebar-active hover:!text-white' : ''"
                   >
                     {{ subitem.label }}
