@@ -14,8 +14,13 @@
   --color-zayit-blue: #7c26ec;
   --color-card: #121223;
 
-  --gradient-primary:  linear-gradient(180deg,rgba(124, 38, 236, 1) 30%, rgba(216, 121, 242, 1) 100%);
+  --gradient-primary: linear-gradient(
+    180deg,
+    rgba(124, 38, 236, 1) 30%,
+    rgba(216, 121, 242, 1) 100%
+  );
   --gradient-secondary: linear-gradient(to right, #6b7280, #4b5563); /* cinza */
   --gradient-danger: linear-gradient(to right, #ef4444, #b91c1c); /* vermelho */
   --gradient-success: linear-gradient(to bottom, #36d869, #cbffdb); /* verde */
 }
+

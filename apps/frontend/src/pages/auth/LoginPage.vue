@@ -90,6 +90,7 @@ const handleLogin = async () => {
           :loading="isSubmitting"
           :disabled="isSubmitting"
         />
-      </form>    </div>
+      </form>
+    </div>
   </section>
 </template>

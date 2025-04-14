@@ -5,13 +5,14 @@ import { useAuthStore } from '@/stores/auth';
 import AuthRoutes from './Auth';
 import AdminRoutes from './Admin';
 import CompanyRoutes from './Company';
-
+import Docs from './Docs';
 import NotFoundPage from '@/pages/errors/NotFoundPage.vue';
 
 const routes = [
   ...AuthRoutes,
   ...AdminRoutes,
   ...CompanyRoutes,
+  ...Docs,
   {
     path: '/dashboard',
     name: 'DashboardRedirect',

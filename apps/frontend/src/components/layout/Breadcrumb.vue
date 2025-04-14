@@ -10,7 +10,10 @@
         <template v-if="index === 0">
           <span class="inline-flex items-center text-sm font-medium text-gray-400">
             <template v-if="crumb.path" class="transition-all duration-500">
-              <RouterLink :to="crumb.path" class="hover:text-zayit-blue transition-all duration-500">
+              <RouterLink
+                :to="crumb.path"
+                class="hover:text-zayit-blue transition-all duration-500"
+              >
                 {{ crumb.label }}
               </RouterLink>
             </template>
