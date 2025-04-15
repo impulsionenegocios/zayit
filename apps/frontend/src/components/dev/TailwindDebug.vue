@@ -3,6 +3,7 @@
     <div class="hidden">
       <div
         class="
+          px-0 px-1 px-2 px-3 px-4 px-5 px-6 px-8 px-10
           grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 grid-cols-5 grid-cols-6
           sm:grid-cols-1 sm:grid-cols-2 sm:grid-cols-3 sm:grid-cols-4 sm:grid-cols-5 sm:grid-cols-6
           md:grid-cols-1 md:grid-cols-2 md:grid-cols-3 md:grid-cols-4 md:grid-cols-5 md:grid-cols-6

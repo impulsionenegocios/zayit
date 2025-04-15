@@ -129,6 +129,18 @@ const menuItems = ref([
         label: 'Form Layout',
         to: { name: 'Docs Layout' },
       },
+      {
+        label: 'Toasts',
+        to: { name: 'Docs Toasts' },
+      },
+      {
+        label: 'Modal',
+        to: { name: 'Docs Modal' },
+      },
+      {
+        label: 'Table',
+        to: { name: 'Docs Table' },
+      },
     ],
   },
 ]);

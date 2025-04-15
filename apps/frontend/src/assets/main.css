@@ -6,21 +6,28 @@
 @import '@/assets/styles/forms/input.css';
 @import '@/assets/styles/forms/form.css';
 @import '@/assets/styles/layout.css';
+@import '@/assets/styles/toasts.css';
 @theme {
   --color-black: #080708;
   --color-surface: #0f0f1d;
   --color-zayit-green: #36d869;
+  --color-zayit-success: #36d869;
   --color-zayit-pink: #dc3da8;
-  --color-zayit-blue: #7c26ec;
+  --color-zayit-blue: #6f4bdb;
+  --color-zayit-purple: #c029f3;
+  --color-zayit-info: #2e5df0;
+  --color-zayit-danger: #f94d4d;
+  --color-zayit-warning: #ff934f;
   --color-card: #121223;
 
   --gradient-primary: linear-gradient(
     180deg,
-    rgba(124, 38, 236, 1) 30%,
+    #6f4bdb 30%,
     rgba(216, 121, 242, 1) 100%
   );
-  --gradient-secondary: linear-gradient(to right, #6b7280, #4b5563); /* cinza */
+  --gradient-secondary: linear-gradient(to right, #6f4bdb, #4b5563); /* cinza */
   --gradient-danger: linear-gradient(to right, #ef4444, #b91c1c); /* vermelho */
   --gradient-success: linear-gradient(to bottom, #36d869, #cbffdb); /* verde */
 }
+
 

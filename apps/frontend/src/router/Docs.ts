@@ -25,6 +25,24 @@ export default [
         component: () => import('@/pages/docs/layout.vue'),
         meta: { breadcrumb: 'Layout e Containers' },
       },
+      {
+        path: 'toast',
+        name: 'Docs Toasts',
+        component: () => import('@/pages/docs/toast.vue'),
+        meta: { breadcrumb: 'Toast' },
+      },
+      {
+        path: 'modal',
+        name: 'Docs Modal',
+        component: () => import('@/pages/docs/modal.vue'),
+        meta: { breadcrumb: 'Modal' },
+      },
+      {
+        path: 'tables',
+        name: 'Docs Table',
+        component: () => import('@/pages/docs/table.vue'),
+        meta: { breadcrumb: 'Modal' },
+      },
       // Adicione outras páginas aqui
     ],
   },

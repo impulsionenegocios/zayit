@@ -1,8 +1,8 @@
 <template>
   <button
     :type="props.type ?? 'button'"
-    class="btn min-h-10"
-    :class="[variantClass, loading && 'btn-loading']"
+    class="btn-action min-h-10"
+    :class="[variantClass, loading && 'btn-action-loading']"
     :disabled="disabled || loading"
     @click="emit('click', $event)"
   >
@@ -35,6 +35,6 @@ const emit = defineEmits<{
 
 const variantClass = computed(() => {
   const v = props.variant || 'primary';
-  return `btn-${v}`;
+  return `btn-action-${v}`;
 });
 </script>

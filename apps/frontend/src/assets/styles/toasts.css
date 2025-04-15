@@ -1,0 +1,17 @@
+@layer components {
+.btn-toast {
+    @apply px-8 min-h-12 rounded-3xl font-semibold text-white shadow-sm cursor-pointer;
+  }
+  .btn-toast-green {
+    @apply bg-zayit-success ;
+  }
+  .btn-toast-red {
+    @apply bg-zayit-danger ;
+  }
+  .btn-toast-blue {
+    @apply bg-zayit-info ;
+  }
+  .btn-toast-yellow {
+    @apply bg-zayit-warning;
+  }
+}
