@@ -1,9 +1,11 @@
+<!-- src/components/layout/BaseTable.vue -->
 <template>
   <section class="p-3 sm:p-5">
     <div class="mx-auto">
       <div class="bg-card relative shadow-md sm:rounded-lg overflow-hidden">
-        <!-- Header -->
+        <!-- Header: Busca + Ações -->
         <div class="flex flex-col md:flex-row items-center justify-between gap-4 p-4">
+          <!-- Busca -->
           <div class="w-full md:w-1/2">
             <input
               v-model="search"
@@ -12,6 +14,7 @@
               class="w-full p-2 pl-10 rounded-lg border bg-gray-700 border-gray-600 text-white placeholder-gray-400"
             />
           </div>
+          <!-- Ações em massa -->
           <div class="flex gap-2 items-center">
             <span v-if="selected.length" class="text-sm text-white">
               {{ selected.length }} selecionado(s)
@@ -32,9 +35,10 @@
             <thead class="text-xs uppercase bg-gray-700 text-gray-400">
               <tr>
                 <th class="px-4 py-3">
+                  <!-- Checkbox do cabeçalho com BaseCheckbox -->
                   <BaseCheckbox
-                    @change="toggleAll"
-                    :checked="isAllSelected"
+                    :modelValue="isAllSelected"
+                    @update:modelValue="toggleAll"
                     class="accent-zayit-blue"
                   />
                 </th>
@@ -47,13 +51,15 @@
                     {{ header.label }}
                   </slot>
                 </th>
-                <th class="px-4 py-3"><span class="sr-only">Ações</span></th>
+                <th class="px-4 py-3">
+                  <span class="sr-only">Ações</span>
+                </th>
               </tr>
             </thead>
 
-            <!-- Loading -->
+            <!-- Loading (Skeleton Loader) -->
             <tbody v-if="loading">
-              <tr v-for="i in 5" :key="i" class="animate-pulse bg-gray-800">
+              <tr v-for="i in 5" :key="'skeleton-' + i" class="animate-pulse bg-gray-800">
                 <td v-for="n in headers.length + 2" :key="n" class="px-4 py-3">
                   <div class="h-4 bg-gray-600 rounded w-full"></div>
                 </td>
@@ -68,9 +74,11 @@
                 class="border-b border-gray-700 hover:bg-gray-800"
               >
                 <td class="px-4 py-3">
+                  <!-- Checkbox da linha -->
                   <BaseCheckbox
+                    :modelValue="selected.includes(item.id)"
                     :value="item.id"
-                    v-model="selected"
+                    @update:modelValue="value => toggleItem(value as boolean, item.id)"
                     class="accent-zayit-blue"
                   />
                 </td>
@@ -89,7 +97,6 @@
                   </slot>
                 </td>
               </tr>
-
               <tr v-if="!paginaAtual.length">
                 <td colspan="100%" class="px-4 py-6 text-center text-white text-sm">
                   Nenhum resultado encontrado.
@@ -99,7 +106,7 @@
           </table>
         </div>
 
-        <!-- Paginação -->
+        <!-- Paginação integrada -->
         <div v-if="pages > 1" class="flex justify-end p-4 gap-2">
           <button class="btn" :disabled="pagina === 1" @click="pagina--">Anterior</button>
           <button class="btn" :disabled="pagina === pages" @click="pagina++">Próximo</button>
@@ -112,9 +119,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import BaseCheckbox from '../ui/forms/BaseCheckbox.vue'
+
 const props = defineProps<{
-  items: Record<string, any>[]
-  perPage?: number
+  items: Record<string, any>[],
+  perPage?: number,
   loading?: boolean
 }>()
 
@@ -122,25 +130,29 @@ const emit = defineEmits<{
   (e: 'bulkDelete', ids: (string | number)[]): void
 }>()
 
+// Busca e seleção
 const search = ref('')
 const selected = ref<(string | number)[]>([])
 
+// Gerando os cabeçalhos a partir da primeira linha
 const headers = computed(() => {
   if (!props.items.length) return []
   return Object.keys(props.items[0])
     .filter((key) => key !== 'id')
     .map((key) => ({
       key,
-      label: key.charAt(0).toUpperCase() + key.slice(1),
+      label: key.charAt(0).toUpperCase() + key.slice(1)
     }))
 })
 
+// Filtrando os itens conforme a busca
 const filteredData = computed(() => {
-  return props.items.filter((item) =>
+  return props.items.filter(item =>
     JSON.stringify(item).toLowerCase().includes(search.value.toLowerCase())
   )
 })
 
+// Paginação
 const pagina = ref(1)
 const porPagina = computed(() => props.perPage ?? 10)
 const inicio = computed(() => (pagina.value - 1) * porPagina.value)
@@ -148,19 +160,33 @@ const fim = computed(() => inicio.value + porPagina.value)
 const paginaAtual = computed(() => filteredData.value.slice(inicio.value, fim.value))
 const pages = computed(() => Math.ceil(filteredData.value.length / porPagina.value))
 
+// Verifica se todos os itens da página estão selecionados
 const isAllSelected = computed(() =>
   !!(
     paginaAtual.value.length &&
-    paginaAtual.value.every((item) => selected.value.includes(item.id))
+    paginaAtual.value.every(item => selected.value.includes(item.id))
   )
 )
 
-function toggleAll(event: Event) {
-  const checked = (event.target as HTMLInputElement).checked
-  if (checked) {
-    selected.value = paginaAtual.value.map((item) => item.id)
+// Função para alternar a seleção de todos da página
+function toggleAll(value: boolean | (string | number)[]) {
+  // Se for array, converte para booleano (nesse caso deve ser um booleano mesmo, mas segurança)
+  const newVal = typeof value === 'boolean' ? value : Boolean(value)
+  if (newVal) {
+    selected.value = paginaAtual.value.map(item => item.id)
   } else {
     selected.value = []
+  }
+}
+
+// Função para alternar seleção de um item individual
+function toggleItem(newVal: boolean, id: string | number) {
+  if (newVal) {
+    if (!selected.value.includes(id)) {
+      selected.value.push(id)
+    }
+  } else {
+    selected.value = selected.value.filter(item => item !== id)
   }
 }
 </script>
