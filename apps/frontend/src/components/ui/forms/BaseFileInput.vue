@@ -4,7 +4,7 @@
       class="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-lg cursor-pointer bg-surface text-white hover:border-zayit-blue transition"
       :class="[
         error ? 'border-red-500' : 'border-gray-600',
-        disabled || isLoading ? 'opacity-50 cursor-not-allowed' : '',
+        disabled || isLoading ? 'opacity-50 cursor-not-allowed' : ''
       ]"
       @dragover.prevent="isDragging = true"
       @dragleave.prevent="isDragging = false"
@@ -30,10 +30,21 @@
           {{ acceptText }}
         </p>
 
-        <div v-if="isLoading" class="mt-3 text-white text-sm text-center animate-pulse">
+        <div
+          v-if="isLoading"
+          class="mt-3 text-white text-sm text-center animate-pulse"
+        >
           Compactando imagem...
         </div>
       </div>
+
+      <!-- Exibe erros de validação -->
+      <ul
+        v-if="fileErrors.length"
+        class="mt-2 text-sm text-red-400 list-disc pl-4"
+      >
+        <li v-for="(err, i) in fileErrors" :key="i">{{ err }}</li>
+      </ul>
 
       <!-- Preview estilo FilePond -->
       <div
@@ -72,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { useFileUpload } from '@/composables/forms/useFileUpload';
 
 const props = defineProps<{
@@ -85,17 +96,22 @@ const props = defineProps<{
   autoUpload?: boolean;
   uploadUrl?: string;
   uploadFieldName?: string;
-}>();
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: File | File[] | null): void
+}>()
 
 const acceptText = computed(() => {
   if (props.accept?.includes('image')) return 'PNG, JPG, JPEG, WebP, etc';
   if (props.accept?.includes('pdf')) return 'PDF até 5MB';
   return 'Arquivos permitidos';
-});
+})
 
 const {
   files,
   previewUrls,
+  fileErrors,
   isDragging,
   isLoading,
   canUpload,
@@ -111,5 +127,16 @@ const {
   autoUpload: props.autoUpload,
   uploadUrl: props.uploadUrl,
   uploadFieldName: props.uploadFieldName,
-});
+  accept: props.accept,
+})
+
+// ✨ Aqui a mágica acontece
+watch(files, () => {
+  if (props.multiple) {
+    emit('update:modelValue', files.value)
+  } else {
+    emit('update:modelValue', files.value[0] || null)
+  }
+})
 </script>
+

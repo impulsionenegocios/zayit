@@ -1,4 +1,4 @@
-import { ref, computed, onBeforeUnmount } from 'vue';
+import { ref, computed, onBeforeUnmount, watch } from 'vue';
 import imageCompression from 'browser-image-compression';
 import api from '@/lib/axios';
 
@@ -9,6 +9,7 @@ export type UseFileUploadOptions = {
   autoUpload?: boolean;
   uploadUrl?: string;
   uploadFieldName?: string;
+  accept?: string; // opção para validação de tipos permitidos
 };
 
 export function useFileUpload(options: UseFileUploadOptions = {}) {
@@ -19,23 +20,59 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     autoUpload = false,
     uploadUrl = '',
     uploadFieldName = 'file',
+    accept,
   } = options;
 
   const files = ref<File[]>([]);
   const blobUrls = ref<string[]>([]);
   const uploadedFiles = ref<any[]>([]);
   const uploadProgress = ref<number[]>([]);
+  const fileErrors = ref<string[]>([]);
 
   const isDragging = ref(false);
   const isLoading = ref(false);
   const canUpload = ref(true);
 
   const previewUrls = computed(() => {
+    // Revoga URLs anteriores para evitar vazamentos de memória
     blobUrls.value.forEach((url) => URL.revokeObjectURL(url));
     const newUrls = files.value.map((file) => URL.createObjectURL(file));
     blobUrls.value = newUrls;
     return newUrls;
   });
+
+  // Tamanho máximo: 5MB
+  const MAX_SIZE_MB = 5;
+
+  // Validação de tipo de arquivo.
+  // Se "accept" for fornecido, valida comparando com os tipos permitidos.
+  // Adicionalmente, rejeita arquivos PSD (imagem do Photoshop).
+  function validateFileType(file: File): boolean {
+    // Rejeitar PSD mesmo que o MIME comece com "image/"
+    if (file.type === 'image/vnd.adobe.photoshop') {
+      return false;
+    }
+    if (!accept) return true; // Sem restrição se não houver
+    const allowedTypes = accept.split(',').map((t) => t.trim());
+    for (const type of allowedTypes) {
+      if (type === '*') return true;
+      if (type.endsWith('/*')) {
+        const prefix = type.split('/')[0];
+        if (file.type.startsWith(prefix + '/')) return true;
+      } else if (file.type === type) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Validação de tamanho: para arquivos PDF ou demais que não sejam imagens, tamanho <= 5MB.
+  function validateFileSize(file: File): boolean {
+    if (file.type.includes('pdf') || !file.type.startsWith('image/')) {
+      return file.size <= MAX_SIZE_MB * 1024 * 1024;
+    }
+    return true;
+  }
 
   async function handleFileChange(event: Event) {
     if (!canUpload.value || isLoading.value) return;
@@ -53,8 +90,32 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
   async function processFiles(fileList: File[]) {
     isLoading.value = true;
     canUpload.value = false;
+    fileErrors.value = []; // Limpa erros anteriores
 
-    const processed = compress ? await compressFiles(fileList) : fileList;
+    // Valida e filtra arquivos válidos
+    const validFiles: File[] = [];
+    for (const file of fileList) {
+      if (!validateFileType(file)) {
+        fileErrors.value.push(`"${file.name}" tem tipo inválido.`);
+        continue;
+      }
+      if (!validateFileSize(file)) {
+        fileErrors.value.push(`"${file.name}" excede ${MAX_SIZE_MB}MB.`);
+        continue;
+      }
+      validFiles.push(file);
+    }
+
+    if (validFiles.length === 0) {
+      isLoading.value = false;
+      setTimeout(() => {
+        canUpload.value = true;
+      }, delayAfterUpload);
+      return;
+    }
+
+    // Processa os arquivos: compressão se necessário
+    const processed = compress ? await compressFiles(validFiles) : validFiles;
     files.value = multiple ? processed : [processed[0]];
 
     if (autoUpload && uploadUrl) {
@@ -67,8 +128,9 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     }, delayAfterUpload);
   }
 
-  async function compressFiles(fileList: File[]) {
+  async function compressFiles(fileList: File[]): Promise<File[]> {
     const promises = fileList.map(async (file) => {
+      // Apenas tenta comprimir se for imagem que não seja PSD
       if (!file.type.startsWith('image/')) return file;
       try {
         const compressed = await imageCompression(file, {
@@ -79,10 +141,10 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
         return compressed;
       } catch (err) {
         console.error('Erro ao comprimir imagem:', err);
+        // Se ocorrer erro na compressão, retorna o arquivo original
         return file;
       }
     });
-
     return await Promise.all(promises);
   }
 
@@ -99,7 +161,9 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
       try {
         const { data } = await api.post(uploadUrl, form, {
           onUploadProgress: (e) => {
-            uploadProgress.value[index] = Math.round((e.loaded * 100) / (e.total || 1));
+            uploadProgress.value[index] = Math.round(
+              (e.loaded * 100) / (e.total || 1)
+            );
           },
         });
         uploadedFiles.value[index] = data;
@@ -155,6 +219,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     previewUrls,
     uploadedFiles,
     uploadProgress,
+    fileErrors,
     isDragging,
     isLoading,
     canUpload,

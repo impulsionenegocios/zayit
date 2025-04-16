@@ -60,6 +60,11 @@ export function useClienteForm(idCliente?: string) {
     if (values.password) data.append('password', values.password)
     data.append('role', 'company')
     if (values.logo) data.append('logo', values.logo)
+      console.log('📦 Dados do FormData:')
+for (const [key, value] of (data as any).entries()) {
+  console.log(`${key}:`, value)
+}
+
 
     try {
       if (idCliente) {

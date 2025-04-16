@@ -5,7 +5,7 @@ from firebase.client import db
 from utils.storage import salvar_logo_local
 from schemas.cliente import ClienteBase
 from typing import List
-
+import os
 router = APIRouter(prefix="/clientes", tags=["clientes"])
 
 def map_form_to_schema(
@@ -29,7 +29,6 @@ async def criar_cliente(
         logo_url = None
         if logo:
             logo_url = salvar_logo_local(logo, uid)
-
         db.collection("users").document(uid).set({
             "id": uid,
             "name": cliente.name,

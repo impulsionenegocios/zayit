@@ -1,7 +1,7 @@
 import api from '@/lib/axios'
 
 export async function getClientes() {
-  return api.get('/clientes')
+  return api.get('/clientes/')
 }
 
 export async function getClientePorId(id: string) {
@@ -9,7 +9,7 @@ export async function getClientePorId(id: string) {
 }
 
 export async function criarCliente(payload: FormData | object) {
-  return api.post('/clientes', payload)
+  return api.post('/clientes/', payload)
 }
 
 export async function atualizarCliente(id: string, payload: FormData | object) {

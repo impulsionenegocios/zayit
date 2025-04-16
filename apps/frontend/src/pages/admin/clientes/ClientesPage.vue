@@ -1,12 +1,12 @@
 <template>
-  <BaseTable :items="clientes" :perPage="10" @bulkDelete="handleDelete">
+  <BaseTable :items="clientes" :perPage="10" @bulkDelete="handleDelete" :loading="tableLoading">
     <template #actions="{ item }">
       <button @click="editarCliente(item as Cliente)">Editar</button>
     </template>
   </BaseTable>
 </template>
 <script setup lang="ts">
-import { h, watch  } from 'vue'
+import { h, watch, ref  } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Cliente } from '@/types'
 import BaseTable from '@/components/layout/BaseTable.vue'
@@ -14,7 +14,7 @@ import { usePageActionButton } from '@/composables/usePageActionButton'
 import { Icon } from '@iconify/vue'
 import { useClienteList } from '@/composables/clientes/useClienteList'
 import { useTokenRef } from '@/utils/authToken'
-
+const tableLoading = ref<boolean>(true)
 const router = useRouter()
 const { clientes, carregando, fetchClientes } = useClienteList()
 
@@ -43,10 +43,20 @@ const tokenRef = useTokenRef()
 
 watch(
   tokenRef,
-  (token) => {
-    if (token) fetchClientes()
+  async (token) => {
+    if (!token) return
+
+    try {
+      await fetchClientes()
+    } catch (error) {
+      console.error('Erro ao buscar clientes:', error)
+    } finally {
+      tableLoading.value = false
+    }
   },
   { immediate: true }
 )
+
+
 </script>
 

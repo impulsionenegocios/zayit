@@ -5,6 +5,8 @@ services:
       dockerfile: apps/backend/Dockerfile
     volumes:
       - ./apps/backend:/apps/backend
+      - ./apps/backend/static:/app/apps/backend/static
+
     ports:
       - "8000:8000"
     networks:

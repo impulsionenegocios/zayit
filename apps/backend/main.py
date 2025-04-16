@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from api.routes import auth  
 from api.routes import clientes  
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 origins = [
@@ -18,6 +19,8 @@ app.add_middleware(
 # Incluindo as rotas definidas no arquivo auth.py
 app.include_router(auth.router)
 app.include_router(clientes.router)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 def root():
