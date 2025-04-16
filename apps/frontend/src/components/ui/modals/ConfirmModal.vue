@@ -42,17 +42,17 @@
 </template>
 
 <script setup lang="ts">
-import BaseModal from './BaseModal.vue'
+import BaseModal from './BaseModal.vue';
 
 const props = defineProps<{
-  title: string
-  message: string
-}>()
+  title: string;
+  message: string;
+}>();
 
 const emit = defineEmits<{
-  (e: 'close', result: boolean): void
-}>()
+  (e: 'close', result: boolean): void;
+}>();
 
-const cancel = () => emit('close', false)
-const confirm = () => emit('close', true)
+const cancel = () => emit('close', false);
+const confirm = () => emit('close', true);
 </script>

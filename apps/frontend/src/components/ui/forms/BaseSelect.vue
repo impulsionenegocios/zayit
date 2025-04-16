@@ -36,39 +36,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineProps, defineEmits } from 'vue'
+import { ref, computed, defineProps, defineEmits } from 'vue';
 
 type SelectOption = {
-  label: string
-  value: string | number
-}
+  label: string;
+  value: string | number;
+};
 
 const props = defineProps<{
-  modelValue: string | number | null
-  options: SelectOption[]
-  placeholder?: string
-  disabled?: boolean
-  error?: string
-}>()
+  modelValue: string | number | null;
+  options: SelectOption[];
+  placeholder?: string;
+  disabled?: boolean;
+  error?: string;
+}>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string | number): void
-}>()
+  (e: 'update:modelValue', value: string | number): void;
+}>();
 
-const isOpen = ref(false)
+const isOpen = ref(false);
 
 function toggleDropdown() {
-  if (props.disabled) return
-  isOpen.value = !isOpen.value
+  if (props.disabled) return;
+  isOpen.value = !isOpen.value;
 }
 
 function selectOption(option: SelectOption) {
-  emit('update:modelValue', option.value)
-  isOpen.value = false
+  emit('update:modelValue', option.value);
+  isOpen.value = false;
 }
 
 const selectedLabel = computed(() => {
-  const found = props.options.find((opt) => opt.value === props.modelValue)
-  return found?.label ?? ''
-})
+  const found = props.options.find((opt) => opt.value === props.modelValue);
+  return found?.label ?? '';
+});
 </script>

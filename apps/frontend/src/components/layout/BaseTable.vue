@@ -42,11 +42,7 @@
                     class="accent-zayit-blue"
                   />
                 </th>
-                <th
-                  v-for="header in headers"
-                  :key="header.key"
-                  class="px-4 py-3"
-                >
+                <th v-for="header in headers" :key="header.key" class="px-4 py-3">
                   <slot :name="'header:' + header.key">
                     {{ header.label }}
                   </slot>
@@ -78,7 +74,7 @@
                   <BaseCheckbox
                     :modelValue="selected.includes(item.id)"
                     :value="item.id"
-                    @update:modelValue="value => toggleItem(value as boolean, item.id)"
+                    @update:modelValue="(value) => toggleItem(value as boolean, item.id)"
                     class="accent-zayit-blue"
                   />
                 </td>
@@ -116,66 +112,67 @@
   </section>
 </template>
 
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import BaseCheckbox from '../ui/forms/BaseCheckbox.vue'
+<script setup lang="ts" generic="T extends Record<string, any>">
+import { ref, computed } from 'vue';
+import BaseCheckbox from '../ui/forms/BaseCheckbox.vue';
 
 const props = defineProps<{
-  items: Record<string, any>[],
-  perPage?: number,
-  loading?: boolean
-}>()
+  items: T[];
+  perPage?: number;
+  loading?: boolean;
+}>();
 
 const emit = defineEmits<{
-  (e: 'bulkDelete', ids: (string | number)[]): void
-}>()
+  (e: 'bulkDelete', ids: (string | number)[]): void;
+}>();
 
 // Busca e seleção
-const search = ref('')
-const selected = ref<(string | number)[]>([])
+const search = ref('');
+const selected = ref<(string | number)[]>([]);
 
 // Gerando os cabeçalhos a partir da primeira linha
 const headers = computed(() => {
-  if (!props.items.length) return []
+  if (!props.items.length) return [];
   return Object.keys(props.items[0])
     .filter((key) => key !== 'id')
     .map((key) => ({
       key,
-      label: key.charAt(0).toUpperCase() + key.slice(1)
-    }))
-})
+      label: key.charAt(0).toUpperCase() + key.slice(1),
+    }));
+});
 
 // Filtrando os itens conforme a busca
 const filteredData = computed(() => {
-  return props.items.filter(item =>
-    JSON.stringify(item).toLowerCase().includes(search.value.toLowerCase())
-  )
-})
+  return props.items.filter((item) =>
+    JSON.stringify(item).toLowerCase().includes(search.value.toLowerCase()),
+  );
+});
 
 // Paginação
-const pagina = ref(1)
-const porPagina = computed(() => props.perPage ?? 10)
-const inicio = computed(() => (pagina.value - 1) * porPagina.value)
-const fim = computed(() => inicio.value + porPagina.value)
-const paginaAtual = computed(() => filteredData.value.slice(inicio.value, fim.value))
-const pages = computed(() => Math.ceil(filteredData.value.length / porPagina.value))
+const pagina = ref(1);
+const porPagina = computed(() => props.perPage ?? 10);
+const inicio = computed(() => (pagina.value - 1) * porPagina.value);
+const fim = computed(() => inicio.value + porPagina.value);
+const paginaAtual = computed(() => filteredData.value.slice(inicio.value, fim.value));
+const pages = computed(() => Math.ceil(filteredData.value.length / porPagina.value));
 
 // Verifica se todos os itens da página estão selecionados
-const isAllSelected = computed(() =>
-  !!(
-    paginaAtual.value.length &&
-    paginaAtual.value.every(item => selected.value.includes(item.id))
-  )
-)
+const isAllSelected = computed(
+  () =>
+    !!(
+      paginaAtual.value.length &&
+      paginaAtual.value.every((item) => selected.value.includes(item.id))
+    ),
+);
 
 // Função para alternar a seleção de todos da página
 function toggleAll(value: boolean | (string | number)[]) {
   // Se for array, converte para booleano (nesse caso deve ser um booleano mesmo, mas segurança)
-  const newVal = typeof value === 'boolean' ? value : Boolean(value)
+  const newVal = typeof value === 'boolean' ? value : Boolean(value);
   if (newVal) {
-    selected.value = paginaAtual.value.map(item => item.id)
+    selected.value = paginaAtual.value.map((item) => item.id);
   } else {
-    selected.value = []
+    selected.value = [];
   }
 }
 
@@ -183,10 +180,10 @@ function toggleAll(value: boolean | (string | number)[]) {
 function toggleItem(newVal: boolean, id: string | number) {
   if (newVal) {
     if (!selected.value.includes(id)) {
-      selected.value.push(id)
+      selected.value.push(id);
     }
   } else {
-    selected.value = selected.value.filter(item => item !== id)
+    selected.value = selected.value.filter((item) => item !== id);
   }
 }
 </script>

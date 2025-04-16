@@ -1,25 +1,17 @@
-import axios from 'axios';
-import { getAuth } from 'firebase/auth';
+import axios from 'axios'
+import { getStoredToken } from '@/utils/authToken'
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000', // ou URL da sua API no ambiente de prod
-});
+  baseURL: 'http://localhost:8000',
+})
 
-api.interceptors.request.use(
-  async (config) => {
-    const auth = getAuth();
-    const user = auth.currentUser;
+api.interceptors.request.use((config) => {
+  const token = getStoredToken()
+  console.log('🚀 Interceptor foi executado', token)
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
 
-    if (user) {
-      const token = await user.getIdToken();
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
-
-export default api;
+export default api

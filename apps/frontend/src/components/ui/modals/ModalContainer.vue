@@ -19,12 +19,12 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
-import { useModalStore } from '@/stores/layout/modal'
+import { storeToRefs } from 'pinia';
+import { useModalStore } from '@/stores/layout/modal';
 
-const store = useModalStore()
-const { modals } = storeToRefs(store)
-const { close, cancel } = store
+const store = useModalStore();
+const { modals } = storeToRefs(store);
+const { close, cancel } = store;
 </script>
 
 <style scoped>

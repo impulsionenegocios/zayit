@@ -1,24 +1,27 @@
-import { useModalStore } from '@/stores/layout/modal'
+import { useModalStore } from '@/stores/layout/modal';
 
 export function useModal() {
-  const store = useModalStore()
+  const store = useModalStore();
 
-  async function open(component: any, options: {
-    title?: string
-    props?: Record<string, any>
-    size?: 'sm' | 'md' | 'lg' | 'xl'
-    persistent?: boolean
-    showFooter?: boolean
-  } = {}) {
+  async function open(
+    component: any,
+    options: {
+      title?: string;
+      props?: Record<string, any>;
+      size?: 'sm' | 'md' | 'lg' | 'xl';
+      persistent?: boolean;
+      showFooter?: boolean;
+    } = {},
+  ) {
     return store.open({
       component,
-      ...options
-    })
+      ...options,
+    });
   }
   return {
     open,
     close: store.close,
     cancel: store.cancel,
     dismissAll: store.dismissAll,
-  }
+  };
 }

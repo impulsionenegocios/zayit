@@ -50,32 +50,26 @@
             </button>
 
             <transition
-  name="dropdown"
-  enter-active-class="transition-all duration-300 ease-out"
-  leave-active-class="transition-all duration-200 ease-in"
-  enter-from-class="opacity-0 max-h-0"
-  enter-to-class="opacity-100 max-h-[300px]"
-  leave-from-class="opacity-100 max-h-[300px]"
-  leave-to-class="opacity-0 max-h-0"
->
-  <ul
-    v-show="item.dropdownOpen"
-    class="overflow-hidden py-2 space-y-2 ml-11"
-  >
-    <li
-      v-for="(subitem, subIndex) in item.subitems"
-      :key="subIndex"
-    >
-      <router-link
-        :to="subitem.to"
-        class="flex items-center p-2 pl-6 w-full text-base font-normal rounded-lg transition duration-300 group h-12 hover:bg-zayit-blue hover:text-white"
-        :class="isActive(subitem.to) ? 'sidebar-active hover:!text-white' : ''"
-      >
-        {{ subitem.label }}
-      </router-link>
-    </li>
-  </ul>
-</transition>
+              name="dropdown"
+              enter-active-class="transition-all duration-300 ease-out"
+              leave-active-class="transition-all duration-200 ease-in"
+              enter-from-class="opacity-0 max-h-0"
+              enter-to-class="opacity-100 max-h-[300px]"
+              leave-from-class="opacity-100 max-h-[300px]"
+              leave-to-class="opacity-0 max-h-0"
+            >
+              <ul v-show="item.dropdownOpen" class="overflow-hidden py-2 space-y-2 ml-11">
+                <li v-for="(subitem, subIndex) in item.subitems" :key="subIndex">
+                  <router-link
+                    :to="subitem.to"
+                    class="flex items-center p-2 pl-6 w-full text-base font-normal rounded-lg transition duration-300 group h-12 hover:bg-zayit-blue hover:text-white"
+                    :class="isActive(subitem.to) ? 'sidebar-active hover:!text-white' : ''"
+                  >
+                    {{ subitem.label }}
+                  </router-link>
+                </li>
+              </ul>
+            </transition>
           </div>
         </li>
       </ul>
@@ -84,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { watch, onMounted,ref } from 'vue'
+import { watch, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
 
@@ -167,13 +161,12 @@ function toggleDropdown(index: number) {
 function activateDropdownsFromRoute() {
   menuItems.value.forEach((item) => {
     if (item.subitems) {
-      const shouldOpen = item.subitems.some((sub: any) => isActive(sub.to))
-      item.dropdownOpen = shouldOpen
+      const shouldOpen = item.subitems.some((sub: any) => isActive(sub.to));
+      item.dropdownOpen = shouldOpen;
     }
-  })
+  });
 }
 
-onMounted(activateDropdownsFromRoute)
-watch(() => route.fullPath, activateDropdownsFromRoute)
-
+onMounted(activateDropdownsFromRoute);
+watch(() => route.fullPath, activateDropdownsFromRoute);
 </script>

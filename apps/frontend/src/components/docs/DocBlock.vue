@@ -35,21 +35,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
 const props = defineProps<{
-  title: string
-  description?: string
-  code?: string
-}>()
+  title: string;
+  description?: string;
+  code?: string;
+}>();
 
-const copied = ref(false)
+const copied = ref(false);
 
 function copyCode() {
-  if (!props.code) return
+  if (!props.code) return;
   navigator.clipboard.writeText(props.code).then(() => {
-    copied.value = true
-    setTimeout(() => (copied.value = false), 2000)
-  })
+    copied.value = true;
+    setTimeout(() => (copied.value = false), 2000);
+  });
 }
 </script>

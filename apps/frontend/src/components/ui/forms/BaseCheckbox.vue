@@ -41,51 +41,56 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps<{
-  modelValue: boolean | (string | number)[]
-  value?: string | number
-  label?: string
-  disabled?: boolean
-  error?: string
-  id?: string
-}>()
+  modelValue: boolean | (string | number)[];
+  value?: string | number;
+  label?: string;
+  disabled?: boolean;
+  error?: string;
+  id?: string;
+}>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean | (string | number)[]): void
-}>()
+  (e: 'update:modelValue', value: boolean | (string | number)[]): void;
+}>();
 
 // Se o modelValue for um array (modo grupo) ou um booleano
-const isArrayMode = computed(() => Array.isArray(props.modelValue))
+const isArrayMode = computed(() => Array.isArray(props.modelValue));
 
 const checked = computed(() => {
   if (isArrayMode.value) {
     // Em modo array, verifica se o valor (passado via prop "value") está incluído no array
-    return props.value !== undefined && (props.modelValue as (string | number)[]).includes(props.value)
+    return (
+      props.value !== undefined && (props.modelValue as (string | number)[]).includes(props.value)
+    );
   }
-  return props.modelValue as boolean
-})
+  return props.modelValue as boolean;
+});
 
 function onChange(event: Event) {
-  const target = event.target as HTMLInputElement
-  const newValue = target.checked
+  const target = event.target as HTMLInputElement;
+  const newValue = target.checked;
 
   if (isArrayMode.value) {
-    const currentArray = props.modelValue as (string | number)[]
+    const currentArray = props.modelValue as (string | number)[];
     if (newValue) {
       // Adiciona o valor se ele não estiver presente
       if (props.value !== undefined && !currentArray.includes(props.value)) {
-        emit('update:modelValue', [...currentArray, props.value])
+        emit('update:modelValue', [...currentArray, props.value]);
       }
     } else {
       // Remove o valor se estiver presente
       if (props.value !== undefined && currentArray.includes(props.value)) {
-        emit('update:modelValue', currentArray.filter((v) => v !== props.value))
+        emit(
+          'update:modelValue',
+          currentArray.filter((v) => v !== props.value),
+        );
       }
     }
   } else {
-    emit('update:modelValue', newValue)
+    emit('update:modelValue', newValue);
   }
 }
 </script>

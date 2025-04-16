@@ -1,5 +1,5 @@
 // src/router/docs.ts
-import SuperAdminLayout from '@/layouts/AdminLayout.vue'
+import SuperAdminLayout from '@/layouts/AdminLayout.vue';
 
 export default [
   {
@@ -46,4 +46,4 @@ export default [
       // Adicione outras páginas aqui
     ],
   },
-]
+];

@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from api.routes import auth  # importando o router
+from api.routes import auth  
+from api.routes import clientes  
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -16,6 +17,7 @@ app.add_middleware(
 )
 # Incluindo as rotas definidas no arquivo auth.py
 app.include_router(auth.router)
+app.include_router(clientes.router)
 
 @app.get("/")
 def root():
