@@ -18,9 +18,9 @@
   >
     <div class="relative h-full overflow-y-auto py-5 px-3 bg-black">
       <!-- Cabeçalho interno para desktop (logo) -->
-      <div class="items-center justify-between mb-4 hidden md:flex">
+      <div class="items-center justify-center mb-4 hidden md:flex">
         <router-link to="/">
-          <img class="h-12 cursor-pointer" src="@/assets/images/logo.png" alt="Voltar ao início" />
+          <img class="h-12 cursor-pointer" src="@/assets/images/logo-dark.png" alt="Voltar ao início" />
         </router-link>
       </div>
       <ul class="space-y-2">
