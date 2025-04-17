@@ -10,6 +10,7 @@ export type UseFileUploadOptions = {
   uploadUrl?: string;
   uploadFieldName?: string;
   accept?: string; // opção para validação de tipos permitidos
+  validateFileType?: (file: File) => string | null; // função personalizada para validação de tipo
 };
 
 export function useFileUpload(options: UseFileUploadOptions = {}) {
@@ -21,6 +22,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     uploadUrl = '',
     uploadFieldName = 'file',
     accept,
+    validateFileType: customValidateFileType,
   } = options;
 
   const files = ref<File[]>([]);
@@ -95,10 +97,18 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     // Valida e filtra arquivos válidos
     const validFiles: File[] = [];
     for (const file of fileList) {
-      if (!validateFileType(file)) {
+      if (customValidateFileType) {
+        const errorMessage = customValidateFileType(file);
+        if (errorMessage) {
+          fileErrors.value.push(errorMessage);
+          continue;
+        }
+      } 
+      else if (!validateFileType(file)) {
         fileErrors.value.push(`"${file.name}" tem tipo inválido.`);
         continue;
       }
+      
       if (!validateFileSize(file)) {
         fileErrors.value.push(`"${file.name}" excede ${MAX_SIZE_MB}MB.`);
         continue;
