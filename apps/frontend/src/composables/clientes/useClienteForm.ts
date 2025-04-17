@@ -8,6 +8,9 @@ export function useClienteForm(idCliente?: string) {
   const toast = useToast()
   const carregando = ref(false)
 
+  // guarda apenas a URL da logo existente (string) ou null
+  const existingLogoUrl = ref<string | null>(null)
+
   const { handleSubmit, setValues, resetForm } = useForm()
 
   const {
@@ -31,8 +34,10 @@ export function useClienteForm(idCliente?: string) {
     meta: passwordMeta,
   } = useField<string>('password', idCliente ? '' : 'required|min:6')
 
+  // este é o File que o usuário selecionar; começa sempre em null
   const { value: logo } = useField<File | null>('logo')
 
+  // Carrega os dados do cliente e preenche os campos (menos o logo, que só define a URL)
   async function carregarClienteParaEdicao() {
     if (!idCliente) return
 
@@ -40,17 +45,27 @@ export function useClienteForm(idCliente?: string) {
     try {
       const res = await getClientePorId(idCliente)
       const cliente = res.data
+
+      // preenche somente name, email e zera password
       setValues({
         name: cliente.name,
         email: cliente.email,
-        password: '', // não retornamos senha
-        logo: null,
+        password: '',
       })
+
+      // guarda a URL da logo para preview
+      existingLogoUrl.value = cliente.logo_url || null
     } catch (error) {
       toast.error('Erro ao carregar cliente.')
+      console.error(error)
     } finally {
       carregando.value = false
     }
+  }
+
+  // Limpa a URL antiga (quando o usuário clica em “remover” no componente)
+  function removeExistingLogo() {
+    existingLogoUrl.value = null
   }
 
   const salvar = handleSubmit(async (values) => {
@@ -59,13 +74,13 @@ export function useClienteForm(idCliente?: string) {
     data.append('email', values.email)
     if (values.password) data.append('password', values.password)
     data.append('role', 'company')
-    if (values.logo) data.append('logo', values.logo)
-      console.log('📦 Dados do FormData:')
-for (const [key, value] of (data as any).entries()) {
-  console.log(`${key}:`, value)
-}
 
+    // se o usuário escolheu um novo File, inclui no FormData
+    if (values.logo) {
+      data.append('logo', values.logo)
+    }
 
+    carregando.value = true
     try {
       if (idCliente) {
         await atualizarCliente(idCliente, data)
@@ -74,17 +89,30 @@ for (const [key, value] of (data as any).entries()) {
         await criarCliente(data)
         toast.success('Cliente criado com sucesso!')
         resetForm()
+        existingLogoUrl.value = null
       }
     } catch (error) {
       toast.error('Erro ao salvar cliente.')
       console.error(error)
+    } finally {
+      carregando.value = false
     }
   })
 
   return {
+    // campos do formulário
     name, nameError, blurName, nameMeta,
     email, emailError, blurEmail, emailMeta,
     password, passwordError, blurPassword, passwordMeta,
-    logo, salvar, carregarClienteParaEdicao, carregando,
+    logo,
+
+    // preview da logo atual
+    existingLogoUrl,
+    removeExistingLogo,
+
+    // ações
+    salvar,
+    carregarClienteParaEdicao,
+    carregando,
   }
 }
