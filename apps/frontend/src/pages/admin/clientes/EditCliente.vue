@@ -60,13 +60,16 @@
       <FormGrid :cols="1">
         <FormControl label="Logo">
           <BaseFileInput
-            v-model="logo"
-            name="logo"
-            :multiple="false"
-            :auto-upload="false"
-            upload-url="/uploads/avatar"
-            upload-field-name="avatar"
-          />
+          v-model="logo"
+          :existing-file-url="'http://localhost:8000'+existingLogoUrl"
+          name="logo"
+          :multiple="false"
+          :auto-upload="false"
+          upload-url="/uploads/avatar"
+          upload-field-name="avatar"
+          @file-removed="removeExistingLogo"
+        />
+
         </FormControl>
       </FormGrid>
 
@@ -74,7 +77,6 @@
         <button 
           type="button" 
           class="btn-error btn" 
-          @click="confirmarExclusao"
           :disabled="carregando"
         >
           Excluir
@@ -127,6 +129,8 @@ const {
   logo,
   salvar,
   carregarClienteParaEdicao,
+  existingLogoUrl,
+  removeExistingLogo,
   carregando
 } = useClienteForm(clienteId)
 
@@ -135,24 +139,5 @@ onMounted(() => {
   carregarClienteParaEdicao()
 })
 
-// Função para confirmar exclusão
-const confirmarExclusao = () => {
-  modalStore.open({
-    type: 'confirm',
-    title: 'Excluir Cliente',
-    message: 'Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita.',
-    confirmText: 'Sim, excluir',
-    cancelText: 'Cancelar',
-    onConfirm: async () => {
-      try {
-        await deletarCliente(clienteId)
-        toast.success('Cliente excluído com sucesso!')
-        router.push({ name: 'VerClientes' })
-      } catch (error) {
-        toast.error('Erro ao excluir cliente.')
-        console.error(error)
-      }
-    }
-  })
-}
+
 </script>
