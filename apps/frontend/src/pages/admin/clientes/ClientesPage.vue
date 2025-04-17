@@ -6,14 +6,13 @@
   </BaseTable>
 </template>
 <script setup lang="ts">
-import { h, watch, ref  } from 'vue'
+import { h, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Cliente } from '@/types'
 import BaseTable from '@/components/layout/BaseTable.vue'
 import { usePageActionButton } from '@/composables/usePageActionButton'
 import { Icon } from '@iconify/vue'
 import { useClienteList } from '@/composables/clientes/useClienteList'
-import { useTokenRef } from '@/utils/authToken'
 const tableLoading = ref<boolean>(true)
 const router = useRouter()
 const { clientes, carregando, fetchClientes } = useClienteList()
@@ -39,23 +38,17 @@ usePageActionButton(
     icon: () => h(Icon, { icon: 'mdi:plus' }),
   },
 )
-const tokenRef = useTokenRef()
-
-watch(
-  tokenRef,
-  async (token) => {
-    if (!token) return
-
-    try {
-      await fetchClientes()
-    } catch (error) {
-      console.error('Erro ao buscar clientes:', error)
-    } finally {
-      tableLoading.value = false
-    }
-  },
-  { immediate: true }
-)
+// Substituir o watch do token por um carregamento direto dos dados
+onMounted(async () => {
+  tableLoading.value = true
+  try {
+    await fetchClientes()
+  } catch (error) {
+    console.error('Erro ao buscar clientes:', error)
+  } finally {
+    tableLoading.value = false
+  }
+})
 
 
 </script>
