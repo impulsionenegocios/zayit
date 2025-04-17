@@ -21,10 +21,6 @@ def salvar_logo_local(file: UploadFile, uid: str) -> str:
     filename = f"{uuid4().hex}{extension}"
     caminho = os.path.join(pasta, filename)
 
-    print("🖼️ Salvando imagem em:", os.path.abspath(caminho))
-    print("📎 Content-Type:", content_type)
-    print("📎 Extensão usada:", extension)
-
     with open(caminho, "wb") as f:
         shutil.copyfileobj(file.file, f)
 
