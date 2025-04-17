@@ -120,6 +120,7 @@ const props = defineProps<{
   items: T[];
   perPage?: number;
   loading?: boolean;
+  columns?: { key: string; label: string }[];
 }>();
 
 const emit = defineEmits<{
@@ -130,8 +131,12 @@ const emit = defineEmits<{
 const search = ref('');
 const selected = ref<(string | number)[]>([]);
 
-// Gerando os cabeçalhos a partir da primeira linha
+// Gerando os cabeçalhos a partir da primeira linha ou usando os fornecidos via prop
 const headers = computed(() => {
+  if (props.columns) {
+    return props.columns;
+  }
+  
   if (!props.items.length) return [];
   return Object.keys(props.items[0])
     .filter((key) => key !== 'id')
