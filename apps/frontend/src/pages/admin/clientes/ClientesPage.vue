@@ -35,7 +35,7 @@ import BaseTable from '@/components/layout/BaseTable.vue'
 import { usePageActionButton } from '@/composables/usePageActionButton'
 import { Icon } from '@iconify/vue'
 import { useClienteList } from '@/composables/clientes/useClienteList'
-import { useModalStore } from '@/stores/modal'
+import { useModalStore } from '@/stores/layout/modal'
 import { deletarCliente } from '@/services/clienteService'
 import { useToast } from '@/composables/useToast'
 

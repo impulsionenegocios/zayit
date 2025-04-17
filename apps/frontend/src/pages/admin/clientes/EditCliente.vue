@@ -92,7 +92,7 @@
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useClienteForm } from '@/composables/clientes/useClienteForm'
-import { useModalStore } from '@/stores/modal'
+import { useModalStore } from '@/stores/layout/modal'
 import { deletarCliente } from '@/services/clienteService'
 import { useToast } from '@/composables/useToast'
 
