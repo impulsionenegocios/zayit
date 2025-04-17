@@ -66,6 +66,9 @@
             :auto-upload="false"
             upload-url="/uploads/avatar"
             upload-field-name="avatar"
+            :existingFileUrl="logoUrl"
+            @file-removed="marcarLogoParaRemocao"
+            accept="image/*"
           />
         </FormControl>
       </FormGrid>
@@ -102,6 +105,7 @@ import FormGrid from '@/components/ui/forms/FormGrid.vue'
 import FormControl from '@/components/ui/forms/FormControl.vue'
 import BaseInput from '@/components/ui/forms/BaseInput.vue'
 import BaseFileInput from '@/components/ui/forms/BaseFileInput.vue'
+import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -125,6 +129,9 @@ const {
   blurPassword,
   passwordMeta,
   logo,
+  logoUrl,
+  logoRemovido,
+  marcarLogoParaRemocao,
   salvar,
   carregarClienteParaEdicao,
   carregando
@@ -138,12 +145,15 @@ onMounted(() => {
 // Função para confirmar exclusão
 const confirmarExclusao = () => {
   modalStore.open({
-    type: 'confirm',
-    title: 'Excluir Cliente',
-    message: 'Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita.',
-    confirmText: 'Sim, excluir',
-    cancelText: 'Cancelar',
-    onConfirm: async () => {
+    component: ConfirmModal,
+    props: {
+      title: 'Excluir Cliente',
+      message: 'Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita.',
+      confirmText: 'Sim, excluir',
+      cancelText: 'Cancelar'
+    }
+  }).then(async (confirmed) => {
+    if (confirmed) {
       try {
         await deletarCliente(clienteId)
         toast.success('Cliente excluído com sucesso!')

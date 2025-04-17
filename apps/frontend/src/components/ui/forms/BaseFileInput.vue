@@ -14,7 +14,7 @@
         class="hidden"
         type="file"
         :id="id"
-        :accept="accept"
+        :accept="accept || 'image/*'"
         :multiple="multiple"
         :disabled="disabled || isLoading || !canUpload"
         @change="handleFileChange"
@@ -46,7 +46,39 @@
         <li v-for="(err, i) in fileErrors" :key="i">{{ err }}</li>
       </ul>
 
-      <!-- Preview estilo FilePond -->
+      <!-- Preview de arquivo existente -->
+      <div
+        v-if="existingFileUrl && !previewUrls.length && !fileRemoved"
+        class="mt-4 grid grid-cols-1 gap-4"
+      >
+        <div
+          class="file-item group relative bg-black/20 rounded-lg overflow-hidden border border-white/10 shadow-lg transition hover:shadow-xl"
+        >
+          <img
+            v-if="isImage(existingFileUrl)"
+            :src="existingFileUrl"
+            class="w-full h-auto aspect-[4/3] object-cover transition group-hover:scale-105"
+            alt="Arquivo atual"
+          />
+          <div
+            v-else
+            class="w-full aspect-[4/3] flex items-center justify-center text-sm text-white/60 bg-black/30"
+          >
+            Arquivo atual
+          </div>
+
+          <button
+            type="button"
+            @click.stop="removeExistingFile"
+            class="absolute top-1 right-1 bg-black/60 hover:bg-red-600 text-white p-1 rounded-full z-10"
+            title="Remover"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview de novos arquivos -->
       <div
         v-if="previewUrls.length"
         class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
@@ -60,6 +92,7 @@
             v-if="isImage(src)"
             :src="src"
             class="w-full h-auto aspect-[4/3] object-cover transition group-hover:scale-105"
+            alt="Nova imagem"
           />
           <div
             v-else
@@ -83,7 +116,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, watch, ref } from 'vue';
 import { useFileUpload } from '@/composables/forms/useFileUpload';
 
 const props = defineProps<{
@@ -96,16 +129,19 @@ const props = defineProps<{
   autoUpload?: boolean;
   uploadUrl?: string;
   uploadFieldName?: string;
+  existingFileUrl?: string | null;
+  onFileRemoved?: () => void;
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: File | File[] | null): void
+  (e: 'update:modelValue', value: File | File[] | null): void;
+  (e: 'file-removed'): void;
 }>()
 
+const fileRemoved = ref(false);
+
 const acceptText = computed(() => {
-  if (props.accept?.includes('image')) return 'PNG, JPG, JPEG, WebP, etc';
-  if (props.accept?.includes('pdf')) return 'PDF até 5MB';
-  return 'Arquivos permitidos';
+  return 'Apenas imagens: PNG, JPG, JPEG, WebP, etc';
 })
 
 const {
@@ -127,10 +163,20 @@ const {
   autoUpload: props.autoUpload,
   uploadUrl: props.uploadUrl,
   uploadFieldName: props.uploadFieldName,
-  accept: props.accept,
+  accept: props.accept || 'image/*',
 })
 
-// ✨ Aqui a mágica acontece
+// Função para remover arquivo existente
+const removeExistingFile = () => {
+  fileRemoved.value = true;
+  emit('file-removed');
+  
+  if (props.onFileRemoved) {
+    props.onFileRemoved();
+  }
+}
+
+// Atualiza o modelo quando os arquivos mudam
 watch(files, () => {
   if (props.multiple) {
     emit('update:modelValue', files.value)

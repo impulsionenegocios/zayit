@@ -98,6 +98,7 @@ async def atualizar_cliente(
     email: str = Form(...),
     password: str = Form(None),
     role: str = Form(...),
+    logo_removido: str = Form("false"),
     logo: UploadFile = None,
     user_data=Depends(verify_token)
 ):
@@ -118,7 +119,11 @@ async def atualizar_cliente(
         if password:
             auth.update_user(cliente_id, password=password)
         
-        if logo:
+        if logo_removido.lower() == "true":
+            from utils.storage import remover_logo_local
+            remover_logo_local(cliente_id)
+            update_data["logo_url"] = None
+        elif logo:
             logo_url = salvar_logo_local(logo, cliente_id)
             update_data["logo_url"] = logo_url
         
