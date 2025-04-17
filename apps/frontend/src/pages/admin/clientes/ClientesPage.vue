@@ -38,6 +38,7 @@ import { useClienteList } from '@/composables/clientes/useClienteList'
 import { useModalStore } from '@/stores/layout/modal'
 import { deletarCliente } from '@/services/clienteService'
 import { useToast } from '@/composables/useToast'
+import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue'
 
 const tableLoading = ref<boolean>(true)
 const router = useRouter()
@@ -57,12 +58,13 @@ const handleBulkDelete = (ids: (string | number)[]) => {
   if (!ids.length) return
 
   modalStore.open({
-    type: 'confirm',
-    title: 'Excluir Clientes',
-    message: `Tem certeza que deseja excluir ${ids.length} cliente(s)? Esta ação não pode ser desfeita.`,
-    confirmText: 'Sim, excluir',
-    cancelText: 'Cancelar',
-    onConfirm: async () => {
+    component: ConfirmModal,
+    props: {
+      title: 'Excluir Clientes',
+      message: `Tem certeza que deseja excluir ${ids.length} cliente(s)? Esta ação não pode ser desfeita.`
+    }
+  }).then(async (confirmed) => {
+    if (confirmed) {
       try {
         // Excluir cada cliente selecionado
         await Promise.all(ids.map(id => deletarCliente(id.toString())))
@@ -85,12 +87,13 @@ const editarCliente = (item: Cliente) => {
 // Função para excluir cliente individual
 const excluirCliente = (item: Cliente) => {
   modalStore.open({
-    type: 'confirm',
-    title: 'Excluir Cliente',
-    message: `Tem certeza que deseja excluir o cliente "${item.name}"? Esta ação não pode ser desfeita.`,
-    confirmText: 'Sim, excluir',
-    cancelText: 'Cancelar',
-    onConfirm: async () => {
+    component: ConfirmModal,
+    props: {
+      title: 'Excluir Cliente',
+      message: `Tem certeza que deseja excluir o cliente "${item.name}"? Esta ação não pode ser desfeita.`
+    }
+  }).then(async (confirmed) => {
+    if (confirmed) {
       try {
         await deletarCliente(item.id)
         toast.success('Cliente excluído com sucesso!')
