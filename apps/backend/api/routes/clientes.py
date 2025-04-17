@@ -90,3 +90,63 @@ async def obter_cliente(cliente_id: str, user_data=Depends(verify_token)):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.put("/{cliente_id}")
+async def atualizar_cliente(
+    cliente_id: str,
+    name: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(None),
+    role: str = Form(...),
+    logo: UploadFile = None,
+    user_data=Depends(verify_token)
+):
+    try:
+        doc_ref = db.collection("users").document(cliente_id)
+        doc = doc_ref.get()
+        
+        if not doc.exists:
+            raise HTTPException(status_code=404, detail="Cliente não encontrado")
+        
+        update_data = {
+            "name": name,
+            "email": email,
+            "role": role,
+            "updated_at": firestore.SERVER_TIMESTAMP,
+        }
+        
+        if password:
+            auth.update_user(cliente_id, password=password)
+        
+        if logo:
+            logo_url = salvar_logo_local(logo, cliente_id)
+            update_data["logo_url"] = logo_url
+        
+        doc_ref.update(update_data)
+        
+        auth.update_user(
+            cliente_id,
+            email=email,
+            display_name=name,
+        )
+        
+        return {"msg": "Cliente atualizado com sucesso"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/{cliente_id}")
+async def deletar_cliente(cliente_id: str, user_data=Depends(verify_token)):
+    try:
+        doc_ref = db.collection("users").document(cliente_id)
+        doc = doc_ref.get()
+        
+        if not doc.exists:
+            raise HTTPException(status_code=404, detail="Cliente não encontrado")
+        
+        auth.delete_user(cliente_id)
+        
+        doc_ref.delete()
+        
+        return {"msg": "Cliente excluído com sucesso"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
