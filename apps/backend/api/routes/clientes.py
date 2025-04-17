@@ -67,3 +67,26 @@ async def listar_clientes(role: str = Query(default="company"), user_data=Depend
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/{cliente_id}")
+async def obter_cliente(cliente_id: str, user_data=Depends(verify_token)):
+    try:
+        doc_ref = db.collection("users").document(cliente_id)
+        doc = doc_ref.get()
+        
+        if not doc.exists:
+            raise HTTPException(status_code=404, detail="Cliente não encontrado")
+            
+        data = doc.to_dict()
+        return {
+            "id": data.get("id"),
+            "name": data.get("name"),
+            "email": data.get("email"),
+            "role": data.get("role"),
+            "logo_url": data.get("logo_url"),
+            "created_at": data.get("created_at"),
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
