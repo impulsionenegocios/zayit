@@ -49,15 +49,15 @@
       <!-- Preview de arquivo existente -->
       <div
         v-if="existingFileUrl && !previewUrls.length && !fileRemoved"
-        class="mt-4 grid grid-cols-1 gap-4"
+        class="mt-4 grid grid-cols-1 gap-4 w-[70%]"
       >
         <div
-          class="file-item group relative bg-black/20 rounded-lg overflow-hidden border border-white/10 shadow-lg transition hover:shadow-xl"
+          class="file-item group relative transition-all duration-500 bg-black/20 rounded-lg overflow-hidden border border-white/10 shadow-lg  hover:shadow-xl"
         >
           <img
             v-if="isImage(existingFileUrl)"
             :src="existingFileUrl"
-            class="w-full h-auto aspect-[4/3] object-cover transition group-hover:scale-105"
+            class="w-full transition-all duration-500 h-auto aspect-[4/3] object-cover group-hover:scale-105 max-h-[300px]"
             alt="Arquivo atual"
           />
           <div
