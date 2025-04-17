@@ -6,7 +6,8 @@ services:
     volumes:
       - ./apps/backend:/apps/backend
       - ./apps/backend/static:/app/apps/backend/static
-
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     networks:
@@ -24,6 +25,8 @@ services:
     # Não precisa de command aqui, pois o CMD do Dockerfile já chama 'pnpm run dev'
     networks:
       - app-network
+    env_file:
+      - .env  
 
 networks:
   app-network:

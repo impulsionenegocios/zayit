@@ -1,0 +1,11 @@
+# apps/backend/ruff.toml
+
+line-length = 88
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "I", "UP", "N", "B"] # (erros, isort, unused, etc)
+ignore = ["E501"] # ignore line length if needed
+
+[format]
+quote-style = "double"

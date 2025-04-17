@@ -1,8 +1,8 @@
 from fastapi import FastAPI
-from api.routes import auth  
-from api.routes import clientes  
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+
+from api.routes import auth, clientes
 
 app = FastAPI()
 origins = [

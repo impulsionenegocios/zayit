@@ -1,8 +1,10 @@
-import os
-from uuid import uuid4
-from fastapi import UploadFile
-import shutil
 import mimetypes
+import os
+import shutil
+from uuid import uuid4
+
+from fastapi import UploadFile
+
 
 def salvar_logo_local(file: UploadFile, uid: str) -> str:
     pasta = f"static/logos/{uid}"

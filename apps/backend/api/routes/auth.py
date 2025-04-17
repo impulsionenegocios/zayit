@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+
 from firebase.auth import verify_token
 from firebase.client import db  # Firestore client
 

@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, Form, UploadFile, HTTPException, Query
+
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, UploadFile
 from firebase_admin import auth, firestore
+
 from firebase.auth import verify_token
 from firebase.client import db
-from utils.storage import salvar_logo_local
 from schemas.cliente import ClienteBase
-from typing import List
-import os
+from utils.storage import salvar_logo_local
+
 router = APIRouter(prefix="/clientes", tags=["clientes"])
 
 def map_form_to_schema(
