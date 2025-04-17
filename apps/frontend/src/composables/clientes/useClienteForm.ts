@@ -7,6 +7,8 @@ import { useToast } from '@/composables/useToast'
 export function useClienteForm(idCliente?: string) {
   const toast = useToast()
   const carregando = ref(false)
+  const logoUrl = ref<string | null>(null)
+  const logoRemovido = ref(false)
 
   const { handleSubmit, setValues, resetForm } = useForm()
 
@@ -46,11 +48,18 @@ export function useClienteForm(idCliente?: string) {
         password: '', // não retornamos senha
         logo: null,
       })
+      logoUrl.value = cliente.logo_url || null
+      logoRemovido.value = false
     } catch (error) {
       toast.error('Erro ao carregar cliente.')
     } finally {
       carregando.value = false
     }
+  }
+
+  const marcarLogoParaRemocao = () => {
+    logoRemovido.value = true
+    logoUrl.value = null
   }
 
   const salvar = handleSubmit(async (values) => {
@@ -59,12 +68,12 @@ export function useClienteForm(idCliente?: string) {
     data.append('email', values.email)
     if (values.password) data.append('password', values.password)
     data.append('role', 'company')
-    if (values.logo) data.append('logo', values.logo)
-      console.log('📦 Dados do FormData:')
-for (const [key, value] of (data as any).entries()) {
-  console.log(`${key}:`, value)
-}
-
+    
+    data.append('logo_removido', logoRemovido.value.toString())
+    
+    if (values.logo) {
+      data.append('logo', values.logo)
+    }
 
     try {
       if (idCliente) {
@@ -85,6 +94,7 @@ for (const [key, value] of (data as any).entries()) {
     name, nameError, blurName, nameMeta,
     email, emailError, blurEmail, emailMeta,
     password, passwordError, blurPassword, passwordMeta,
-    logo, salvar, carregarClienteParaEdicao, carregando,
+    logo, logoUrl, logoRemovido, marcarLogoParaRemocao,
+    salvar, carregarClienteParaEdicao, carregando,
   }
 }
