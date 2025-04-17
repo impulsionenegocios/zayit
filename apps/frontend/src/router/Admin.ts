@@ -13,7 +13,7 @@ export default [
         children: [
           {
             path: '',
-            name: 'Clientes',
+            name: 'VerClientes',
             component: () => import('@/pages/admin/clientes/ClientesPage.vue'),
           },
           {
@@ -21,6 +21,12 @@ export default [
             name: 'AddCliente',
             component: () => import('@/pages/admin/clientes/AddCliente.vue'),
             meta: { breadcrumb: 'Criar Cliente' },
+          },
+          {
+            path: 'editar/:id',
+            name: 'EditarCliente',
+            component: () => import('@/pages/admin/clientes/EditCliente.vue'),
+            meta: { breadcrumb: 'Editar Cliente' },
           },
         ],
       },

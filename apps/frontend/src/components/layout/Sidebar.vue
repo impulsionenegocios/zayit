@@ -101,7 +101,7 @@ const menuItems = ref([
     subitems: [
       {
         label: 'Ver Clientes',
-        to: { name: 'Clientes' },
+        to: { name: 'VerClientes' },
       },
     ],
   },
