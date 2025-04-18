@@ -25,3 +25,13 @@ def salvar_logo_local(file: UploadFile, uid: str) -> str:
         shutil.copyfileobj(file.file, f)
 
     return f"/static/logos/{uid}/{filename}"
+
+def apagar_arquivo_logo(caminho_relativo: str) -> None:
+    # Remove um arquivo de logo do sistema de arquivos.
+
+    # Exemplo de caminho_relativo: "/static/logos/<uid>/nome.png"
+
+    caminho_absoluto = os.path.join("apps/backend", caminho_relativo.lstrip("/"))
+
+    if os.path.exists(caminho_absoluto):
+        os.remove(caminho_absoluto)
