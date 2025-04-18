@@ -17,7 +17,7 @@ def criar_cliente_service(
             display_name=cliente.name
         )
         uid = user.uid
-        
+
         # 2) Salva a logo (se houver) e obtém URL
         logo_url = salvar_logo_local(logo, uid) if logo else None
 
@@ -100,7 +100,7 @@ def atualizar_cliente_service(
     # 2) Atualiza senha no Auth
     if password:
         firebase_auth.update_user(cliente_id, password=password)
-
+    
     # 3) Troca logo (se houver)
     if logo:
         logo_url = salvar_logo_local(logo, cliente_id)
