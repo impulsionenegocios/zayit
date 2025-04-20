@@ -55,6 +55,22 @@
             @blur="blurPassword"
           />
         </FormControl>
+        <FormControl
+            label="Escolha a permissão"
+            forLabel="role"
+            :error="roleError"
+            :touched="roleMeta.touched"
+            :valid="roleMeta.valid"
+            :showSuccess="true"
+          >
+            <BaseSelect
+              v-model="role"
+              name="role"
+              :options="roles"
+              placeholder="selecione uma role"
+              @blur="blurRole"
+            />
+          </FormControl>
       </FormGrid>
 
       <FormGrid :cols="1">
@@ -69,10 +85,9 @@
           upload-field-name="avatar"
           @file-removed="removeExistingLogo"
         />
-
         </FormControl>
       </FormGrid>
-
+      
       <div class="flex justify-end gap-4 mt-6">
         <button 
           type="button" 
@@ -105,7 +120,7 @@ import FormGrid from '@/components/ui/forms/FormGrid.vue'
 import FormControl from '@/components/ui/forms/FormControl.vue'
 import BaseInput from '@/components/ui/forms/BaseInput.vue'
 import BaseFileInput from '@/components/ui/forms/BaseFileInput.vue'
-
+import BaseSelect from '@/components/ui/forms/BaseSelect.vue'
 const route = useRoute()
 const router = useRouter()
 const modalStore = useModalStore()
@@ -132,7 +147,12 @@ const {
   carregarClienteParaEdicao,
   existingLogoUrl,
   removeExistingLogo,
-  carregando
+  carregando,
+  role,
+  roleError,
+  roleMeta,
+  blurRole,
+  roles
 } = useClienteForm(clienteId)
 // Carregar dados do cliente ao montar o componente
 onMounted(() => {

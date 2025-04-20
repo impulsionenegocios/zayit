@@ -71,6 +71,7 @@ export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
         name: cliente.name,
         email: cliente.email,
         password: '',
+        role: cliente.role
       })
 
       // guarda a URL da logo para preview
@@ -90,6 +91,7 @@ export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
   }
 
   const salvar = handleSubmit(async (values) => {
+    console.log('começou a salvar')
     const data = new FormData()
     data.append('name', values.name)
     data.append('email', values.email)

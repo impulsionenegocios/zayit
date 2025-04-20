@@ -2,7 +2,7 @@ from typing import Optional, Dict, Any
 from fastapi import HTTPException, UploadFile
 from firebase_admin import auth as firebase_auth, firestore
 from auth.client import db
-from schemas.cliente import ClienteBase
+from schemas.cliente import ClienteBase, ClienteUpdate
 from utils.storage import salvar_logo_local, apagar_arquivo_logo
 import shutil
 import os
@@ -56,7 +56,7 @@ def listar_clientes_service():
                 "created_at": data.get("created_at"),
             })
 
-        return {"clientes": clientes}
+        return clientes
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao listar clientes: {e}")
@@ -80,58 +80,60 @@ def obter_cliente_service(cliente_id: str) -> Dict[str, Any]:
 
 def atualizar_cliente_service(
     cliente_id: str,
-    name: str,
-    email: str,
-    password: Optional[str],
-    role: str,
+    cliente: ClienteUpdate,
     logo: Optional[UploadFile],
     remover_logo: bool = False
 ) -> Dict[str, Any]:
     # 1) Verifica existência
     doc_ref = db.collection("users").document(cliente_id)
     doc = doc_ref.get()
-    data = doc.to_dict()
-    if not doc_ref.get().exists:
+    if not doc.exists:
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
 
+    data = doc.to_dict()
+
     update_data: Dict[str, Any] = {
-        "name": name,
-        "email": email,
-        "role": role,
         "updated_at": firestore.SERVER_TIMESTAMP,
     }
 
+    if cliente.name:
+        update_data["name"] = cliente.name
+    if cliente.email:
+        update_data["email"] = cliente.email
+    if cliente.role:
+        update_data["role"] = cliente.role
+
     # 2) Atualiza senha no Auth
-    if password:
-        firebase_auth.update_user(cliente_id, password=password)
-    
+    if cliente.password:
+        firebase_auth.update_user(cliente_id, password=cliente.password)
+
     # 3) Troca logo (se houver)
     if logo:
-        #Busca e Apaga a logo antiga
         logo_antiga_url = data.get("logo_url")
         if logo_antiga_url:
             apagar_arquivo_logo(logo_antiga_url, cliente_id)
-        #Salva a nova
+
         logo_url = salvar_logo_local(logo, cliente_id)
         update_data["logo_url"] = logo_url
 
-    #4) Se não houver nova logo e ela tiver sido excluida, persiste:
+    # 4) Remoção explícita da logo
     if remover_logo:
-        data = doc.to_dict()
         logo_antiga_url = data.get("logo_url")
-        if(logo_antiga_url):
+        if logo_antiga_url:
             apagar_arquivo_logo(logo_antiga_url, cliente_id)
             update_data["logo_url"] = None
 
-    # 4) Persiste no Firestore
+    # 5) Persiste no Firestore
     doc_ref.update(update_data)
 
-    # 5) Atualiza email e displayName no Auth
-    firebase_auth.update_user(
-        cliente_id,
-        email=email,
-        display_name=name
-    )
+    # 6) Atualiza dados no Auth
+    auth_update_args = {}
+    if cliente.name:
+        auth_update_args["display_name"] = cliente.name
+    if cliente.email:
+        auth_update_args["email"] = cliente.email
+    if auth_update_args:
+        firebase_auth.update_user(cliente_id, **auth_update_args)
 
     return {"msg": "Cliente atualizado com sucesso"}
 
