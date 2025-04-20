@@ -64,25 +64,25 @@
     }).then(async (confirmed) => {
       if (confirmed) {
         try {
-          // Excluir cada cliente selecionado
+          // Excluir cada role selecionado
           await Promise.all(ids.map(id => deletarRole(id.toString())))
           toast.success(`${ids.length} role(s) excluído(s) com sucesso!`)
           // Recarregar a lista
           fetchRoles()
         } catch (error) {
-          toast.error('Erro ao excluir clientes.')
+          toast.error('Erro ao excluir roles.')
           console.error(error)
         }
       }
     })
   }
   
-  // Função para editar cliente
+  // Função para editar role
   const editarRole = (item: Roles) => {
     router.push({ name: 'EditarRole', params: { id: item.id } })
   }
   
-  // Função para excluir cliente individual
+  // Função para excluir role individual
   const excluirRole = (item: Roles) => {
     modalStore.open({
       component: ConfirmModal,
@@ -98,14 +98,14 @@
           // Recarregar a lista
           fetchRoles()
         } catch (error) {
-          toast.error('Erro ao excluir cliente.')
+          toast.error('Erro ao excluir role.')
           console.error(error)
         }
       }
     })
   }
   
-  // Botão de ação para criar cliente
+  // Botão de ação para criar role
   usePageActionButton(
     {
       title: 'Criar Role',
@@ -126,7 +126,7 @@
     try {
       await fetchRoles()
     } catch (error) {
-      console.error('Erro ao buscar clientes:', error)
+      console.error('Erro ao buscar roles:', error)
     } finally {
       tableLoading.value = false
     }
