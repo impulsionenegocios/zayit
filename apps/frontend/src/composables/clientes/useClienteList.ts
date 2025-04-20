@@ -14,7 +14,7 @@ export function useClienteList() {
     
     try {
       const res = await getClientes();
-      clientes.value = res.data.clientes;
+      clientes.value = res.data;
       return res;
     } catch (err) {
       console.error('Erro ao carregar clientes', err);
