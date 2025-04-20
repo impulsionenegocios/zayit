@@ -54,6 +54,22 @@
             @blur="blurPassword"
           />
         </FormControl>
+          <FormControl
+            label="Escolha a permissão"
+            forLabel="role"
+            :error="roleError"
+            :touched="roleMeta.touched"
+            :valid="roleMeta.valid"
+            :showSuccess="true"
+          >
+            <BaseSelect
+              v-model="role"
+              name="role"
+              :options="roles"
+              placeholder="selecione uma role"
+              @blur="blurRole"
+            />
+          </FormControl>
       </FormGrid>
 
       <FormGrid :cols="1">
@@ -92,7 +108,7 @@ import FormGrid from '@/components/ui/forms/FormGrid.vue'
 import FormControl from '@/components/ui/forms/FormControl.vue'
 import BaseInput from '@/components/ui/forms/BaseInput.vue'
 import BaseFileInput from '@/components/ui/forms/BaseFileInput.vue'
-
+import BaseSelect from '@/components/ui/forms/BaseSelect.vue'
 // Lógica do formulário
 const {
   name,
@@ -107,8 +123,13 @@ const {
   passwordError,
   blurPassword,
   passwordMeta,
+  role,
+  roleError,
+  roleMeta,
+  blurRole,
   logo,
   salvar,
-  carregando
+  carregando,
+  roles
 } = useClienteForm(undefined, fileInputRef)
 </script>

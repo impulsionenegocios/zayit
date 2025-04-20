@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
-from firebase.auth import verify_token
-from firebase.client import db  # Firestore client
+from auth.auth import verify_token
+from auth.client import db  # Firestore client
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

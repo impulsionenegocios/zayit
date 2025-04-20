@@ -103,6 +103,10 @@ const menuItems = ref([
         label: 'Ver Clientes',
         to: { name: 'VerClientes' },
       },
+      {
+        label: 'Ver Roles',
+        to: { name: 'VerRoles' },
+      },
     ],
   },
   {

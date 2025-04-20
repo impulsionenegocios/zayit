@@ -3,10 +3,25 @@ import { useForm, useField } from 'vee-validate'
 import { ref, Ref } from 'vue'
 import { criarCliente, atualizarCliente, getClientePorId } from '@/services/clienteService'
 import { useToast } from '@/composables/useToast'
+import { getRoles } from '@/services/rolesService'
+import { onMounted } from 'vue'
 
 export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
   const toast = useToast()
   const carregando = ref(false)
+  const roles = ref<{ label: string, value: string }[]>([]) 
+  async function carregarRoles() {
+    try {
+      const res = await getRoles()
+      roles.value = res.data.roles.map((role: any) => ({
+        label: role.name,
+        value: role.name,  // ou role.name, se for o que você quer salvar
+      }))
+    } catch (error) {
+      toast.error('Erro ao carregar as roles')
+      console.error(error)
+    }
+  }
   const logoRemovida =  ref(false)
   // guarda apenas a URL da logo existente (string) ou null
   const existingLogoUrl = ref<string | null>(null)
@@ -32,7 +47,12 @@ export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
     handleBlur: blurPassword,
     meta: passwordMeta,
   } = useField<string>('password', idCliente ? '' : 'required|min:6')
-
+  const {
+    value: role,
+    errorMessage: roleError,
+    handleBlur: blurRole,
+    meta: roleMeta,
+  } = useField<string>('role', 'required')
   // este é o File que o usuário selecionar; começa sempre em null
   const { value: logo } = useField<File | null>('logo')
 
@@ -42,6 +62,7 @@ export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
 
     carregando.value = true
     try {
+      carregarRoles()
       const res = await getClientePorId(idCliente)
       const cliente = res.data
 
@@ -73,7 +94,7 @@ export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
     data.append('name', values.name)
     data.append('email', values.email)
     if (values.password) data.append('password', values.password)
-    data.append('role', 'company')
+    data.append('role',values.role)
     // se o usuário escolheu um novo File, inclui no FormData
     if (values.logo) {
       data.append('logo', values.logo)
@@ -85,6 +106,7 @@ export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
 
     carregando.value = true
     try {
+      carregarRoles()  // <-- carrega sempre
       if (idCliente) {
         await atualizarCliente(idCliente, data)
         toast.success('Cliente atualizado com sucesso!')
@@ -105,11 +127,17 @@ export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
       carregando.value = false
     }
   })
-
+  onMounted(() => {
+    carregarRoles() // carrega as roles sempre
+    if (idCliente) {
+      carregarClienteParaEdicao()
+    }
+  })
   return {
     // campos do formulário
     name, nameError, blurName, nameMeta,
     email, emailError, blurEmail, emailMeta,
+    role, roleError, blurRole, roleMeta,
     password, passwordError, blurPassword, passwordMeta,
     logo,
 
@@ -121,5 +149,6 @@ export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
     salvar,
     carregarClienteParaEdicao,
     carregando,
+    roles
   }
 }

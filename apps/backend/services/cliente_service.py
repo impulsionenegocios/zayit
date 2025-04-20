@@ -1,7 +1,7 @@
 from typing import Optional, Dict, Any
 from fastapi import HTTPException, UploadFile
 from firebase_admin import auth as firebase_auth, firestore
-from firebase.client import db
+from auth.client import db
 from schemas.cliente import ClienteBase
 from utils.storage import salvar_logo_local, apagar_arquivo_logo
 import shutil
@@ -39,10 +39,10 @@ def criar_cliente_service(
         # você pode refinar os tipos de exceção e usar HTTPException aqui
         raise HTTPException(status_code=500, detail=f"Erro ao criar cliente: {e}")
 
-def listar_clientes_service(role: str) -> Dict[str, Any]:
+def listar_clientes_service():
     try:
-        ref = db.collection("users").where("role", "==", role)
-        docs = ref.stream()
+        ref = db.collection("users").where("role", "!=", "superadmin")
+        docs = list(ref.stream())
 
         clientes = []
         for doc in docs:
