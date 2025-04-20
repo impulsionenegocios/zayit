@@ -47,17 +47,14 @@
       </ul>
 
       <!-- Preview de arquivo existente -->
-      <div
-        v-if="existingFileUrl && !previewUrls.length && !fileRemoved"
-        class="mt-4 grid grid-cols-1 gap-4 w-[70%]"
-      >
+      <div v-if="existingFileUrl && !previewUrls.length && !fileRemoved" class="max:w-[50%] h-[300px] bg-card mt-4 rounded-3xl">
         <div
           class="file-item group relative transition-all duration-500 bg-black/20 rounded-lg overflow-hidden border border-white/10 shadow-lg  hover:shadow-xl"
         >
           <img
             v-if="isImage(existingFileUrl)"
             :src="existingFileUrl"
-            class="w-full transition-all duration-500 h-auto aspect-[4/3] object-cover group-hover:scale-105 max-h-[300px]"
+            class="w-full transition-all duration-500 h-auto aspect-[4/3] object-contain p-4 group-hover:scale-105 max-h-[300px]"
             alt="Arquivo atual"
           />
           <div
@@ -70,28 +67,27 @@
           <button
             type="button"
             @click.stop="removeExistingFile"
-            class="absolute top-1 right-1 bg-black/60 hover:bg-red-600 text-white p-1 rounded-full z-10"
+            class="absolute top-1 right-1 bg-zayit-danger py-[2px] cursor-pointer hover:bg-red-600 text-white px-2  rounded-full z-10"
             title="Remover"
           >
             ✕
           </button>
         </div>
       </div>
-
       <!-- Preview de novos arquivos -->
       <div
         v-if="previewUrls.length"
-        class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+        class="max:w-[50%] h-[300px] bg-card mt-4 rounded-3xl"
       >
         <div
           v-for="(src, i) in previewUrls"
           :key="i"
-          class="file-item group relative bg-black/20 rounded-lg overflow-hidden border border-white/10 shadow-lg transition hover:shadow-xl"
+          class="file-item group relative transition-all duration-500 bg-black/20 rounded-lg overflow-hidden border border-white/10 shadow-lg  hover:shadow-xl"
         >
           <img
             v-if="isImage(src)"
             :src="src"
-            class="w-full h-auto aspect-[4/3] object-cover transition group-hover:scale-105"
+            class="w-full transition-all duration-500 h-auto aspect-[4/3] object-contain p-4 group-hover:scale-105 max-h-[300px]"
             alt="Nova imagem"
           />
           <div
@@ -104,7 +100,7 @@
           <button
             type="button"
             @click.stop="removeFile(i)"
-            class="absolute top-1 right-1 bg-black/60 hover:bg-red-600 text-white p-1 rounded-full z-10"
+            class="absolute top-1 right-1 bg-zayit-danger py-[2px] cursor-pointer hover:bg-red-600 text-white px-2  rounded-full z-10"
             title="Remover"
           >
             ✕
@@ -118,7 +114,10 @@
 <script setup lang="ts">
 import { computed, watch, ref } from 'vue';
 import { useFileUpload } from '@/composables/forms/useFileUpload';
-
+import BaseModal from '../modals/BaseModal.vue';
+import ConfirmModal from '../modals/ConfirmModal.vue';
+import { useModal } from '@/composables/useModal';
+const modal = useModal()
 const props = defineProps<{
   modelValue: File | File[] | null;
   accept?: string;
@@ -156,6 +155,7 @@ const {
   removeFile,
   isImage,
   getFileName,
+  clear
 } = useFileUpload({
   multiple: props.multiple,
   compress: true,
@@ -173,14 +173,36 @@ const {
 })
 
 // Função para remover arquivo existente
-const removeExistingFile = () => {
-  fileRemoved.value = true;
-  emit('file-removed');
-  
-  if (props.onFileRemoved) {
-    props.onFileRemoved();
+const removeExistingFile = async () => {
+  try {
+    const result = await modal.open(ConfirmModal, {
+      title: 'Tem certeza?',
+      props: { message: 'Você deseja mesmo remover este arquivo?' },
+      size: 'sm',
+      persistent: false,
+    })
+    if (result) {
+      fileRemoved.value = true
+      emit('file-removed')
+      if (props.onFileRemoved) {
+        props.onFileRemoved()
+      }
+    }
+
+  } catch {
   }
 }
+
+const resetarInput = () => {
+  clear() // limpa previews, arquivos e estados
+  emit('update:modelValue', null) // zera o model vinculado externamente
+  fileRemoved.value = false
+}
+
+defineExpose({
+  resetarInput
+})
+
 
 // Atualiza o modelo quando os arquivos mudam
 watch(files, () => {

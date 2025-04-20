@@ -10,14 +10,14 @@
       <div class="flex gap-2">
         <button 
           @click="editarCliente(item as Cliente)" 
-          class="btn btn-sm btn-primary"
+          class="btn-primary px-3 py-3 rounded-full text-white cursor-pointer"
           title="Editar cliente"
         >
           <Icon icon="mdi:pencil" />
         </button>
         <button 
           @click="excluirCliente(item as Cliente)" 
-          class="btn btn-sm btn-error"
+          class="btn-danger px-3 py-3 rounded-full text-white cursor-pointer"
           title="Excluir cliente"
         >
           <Icon icon="mdi:delete" />

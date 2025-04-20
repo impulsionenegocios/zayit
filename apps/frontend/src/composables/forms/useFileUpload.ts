@@ -223,7 +223,23 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
   onBeforeUnmount(() => {
     blobUrls.value.forEach((url) => URL.revokeObjectURL(url));
   });
-
+  function clear() {
+    // Revoga todos os blobs antigos
+    blobUrls.value.forEach((url) => URL.revokeObjectURL(url))
+  
+    // Limpa todos os estados
+    files.value = []
+    blobUrls.value = []
+    uploadedFiles.value = []
+    uploadProgress.value = []
+    fileErrors.value = []
+  
+    // Restaura flags
+    isDragging.value = false
+    isLoading.value = false
+    canUpload.value = true
+  }
+  
   return {
     files,
     previewUrls,
@@ -240,5 +256,6 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     removeFile,
     getFileName,
     resetFiles,
+    clear
   };
 }

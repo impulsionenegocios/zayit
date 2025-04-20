@@ -16,6 +16,6 @@ export async function atualizarCliente(id: string, payload: FormData | object) {
   return api.put(`/clientes/${id}`, payload)
 }
 
-export async function deletarCliente(id: string) {
+export async function deletarCliente(id: string | number) {
   return api.delete(`/clientes/${id}`)
 }

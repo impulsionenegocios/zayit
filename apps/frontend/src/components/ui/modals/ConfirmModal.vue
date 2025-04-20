@@ -25,14 +25,14 @@
         <button
           @click="confirm"
           type="button"
-          class="text-white bg-zayit-danger hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center transition-all duration-300"
+          class="text-white cursor-pointer bg-zayit-danger hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center transition-all duration-300"
         >
           Sim, Tenho Certeza
         </button>
         <button
           @click="cancel"
           type="button"
-          class="py-2.5 px-5 text-sm font-medium text-white bg-gray-700 border border-gray-600 rounded-lg hover:bg-gray-600 hover:text-white focus:outline-none focus:ring-4 focus:ring-gray-700 transition-all duration-300"
+          class="py-2.5 px-5 text-sm font-medium cursor-pointer text-white bg-gray-700 border border-gray-600 rounded-lg hover:bg-gray-600 hover:text-white focus:outline-none focus:ring-4 focus:ring-gray-700 transition-all duration-300"
         >
           Cancelar
         </button>

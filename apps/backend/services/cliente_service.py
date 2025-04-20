@@ -3,8 +3,9 @@ from fastapi import HTTPException, UploadFile
 from firebase_admin import auth as firebase_auth, firestore
 from firebase.client import db
 from schemas.cliente import ClienteBase
-from utils.storage import salvar_logo_local
-
+from utils.storage import salvar_logo_local, apagar_arquivo_logo
+import shutil
+import os
 def criar_cliente_service(
     cliente: ClienteBase,
     logo: Optional[UploadFile]
@@ -83,10 +84,13 @@ def atualizar_cliente_service(
     email: str,
     password: Optional[str],
     role: str,
-    logo: Optional[UploadFile]
+    logo: Optional[UploadFile],
+    remover_logo: bool = False
 ) -> Dict[str, Any]:
     # 1) Verifica existência
     doc_ref = db.collection("users").document(cliente_id)
+    doc = doc_ref.get()
+    data = doc.to_dict()
     if not doc_ref.get().exists:
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
 
@@ -103,8 +107,21 @@ def atualizar_cliente_service(
     
     # 3) Troca logo (se houver)
     if logo:
+        #Busca e Apaga a logo antiga
+        logo_antiga_url = data.get("logo_url")
+        if logo_antiga_url:
+            apagar_arquivo_logo(logo_antiga_url, cliente_id)
+        #Salva a nova
         logo_url = salvar_logo_local(logo, cliente_id)
         update_data["logo_url"] = logo_url
+
+    #4) Se não houver nova logo e ela tiver sido excluida, persiste:
+    if remover_logo:
+        data = doc.to_dict()
+        logo_antiga_url = data.get("logo_url")
+        if(logo_antiga_url):
+            apagar_arquivo_logo(logo_antiga_url, cliente_id)
+            update_data["logo_url"] = None
 
     # 4) Persiste no Firestore
     doc_ref.update(update_data)
@@ -122,7 +139,15 @@ def deletar_cliente_service(cliente_id: str) -> Dict[str, Any]:
     doc_ref = db.collection("users").document(cliente_id)
     if not doc_ref.get().exists:
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
+    doc = doc_ref.get()
+    data = doc.to_dict()
+    logo = data.get("logo_url")
+    if(logo):
+        apagar_arquivo_logo(logo, cliente_id)
 
+    pasta_logo = os.path.join("/app/apps/backend/static/logos", cliente_id)
+    if os.path.exists(pasta_logo):
+        shutil.rmtree(pasta_logo)    
     # 1) Remove do Auth e do Firestore
     firebase_auth.delete_user(cliente_id)
     doc_ref.delete()

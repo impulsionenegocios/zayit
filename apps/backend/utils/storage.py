@@ -2,6 +2,7 @@ import mimetypes
 import os
 import shutil
 from uuid import uuid4
+from os.path import basename
 
 from fastapi import UploadFile
 
@@ -26,12 +27,10 @@ def salvar_logo_local(file: UploadFile, uid: str) -> str:
 
     return f"/static/logos/{uid}/{filename}"
 
-def apagar_arquivo_logo(caminho_relativo: str) -> None:
-    # Remove um arquivo de logo do sistema de arquivos.
+def apagar_arquivo_logo(caminho_relativo: str, cliente_id: str) -> None:
 
-    # Exemplo de caminho_relativo: "/static/logos/<uid>/nome.png"
-
-    caminho_absoluto = os.path.join("apps/backend", caminho_relativo.lstrip("/"))
+    # Corrigir caminho base para o path DENTRO DO CONTAINER
+    caminho_absoluto = os.path.join("/app/apps/backend/static/logos", cliente_id, os.path.basename(caminho_relativo))
 
     if os.path.exists(caminho_absoluto):
         os.remove(caminho_absoluto)
