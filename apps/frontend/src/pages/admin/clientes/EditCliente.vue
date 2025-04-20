@@ -61,7 +61,7 @@
         <FormControl label="Logo">
           <BaseFileInput
           v-model="logo"
-          :existing-file-url="'http://localhost:8000'+existingLogoUrl"
+          :existing-file-url="verifyExistingLogoUrl"
           name="logo"
           :multiple="false"
           :auto-upload="false"
@@ -76,10 +76,11 @@
       <div class="flex justify-end gap-4 mt-6">
         <button 
           type="button" 
-          class="btn-error btn" 
+          class="btn-default btn" 
           :disabled="carregando"
+           @click="voltar"
         >
-          Excluir
+          Cancelar
         </button>
         <button type="submit" class="btn-success btn" :disabled="carregando">
           <span v-if="carregando">Salvando...</span>
@@ -91,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useClienteForm } from '@/composables/clientes/useClienteForm'
 import { useModalStore } from '@/stores/layout/modal'
@@ -133,11 +134,17 @@ const {
   removeExistingLogo,
   carregando
 } = useClienteForm(clienteId)
-
 // Carregar dados do cliente ao montar o componente
 onMounted(() => {
   carregarClienteParaEdicao()
 })
-
-
+const verifyExistingLogoUrl = computed(() => {
+  if (existingLogoUrl.value) {
+    return 'http://localhost:8000' + existingLogoUrl.value
+  }
+  return null
+})
+const voltar = () => {
+  router.back()
+}
 </script>

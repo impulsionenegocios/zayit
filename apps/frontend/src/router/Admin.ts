@@ -8,6 +8,11 @@ export default [
     meta: { requiresAuth: true, role: 'superadmin', breadcrumb: 'Dashboard' },
     children: [
       {
+        path: '',
+        name: 'Dashboard',
+        component: () => import('@/pages/admin/DashboardPage.vue'),
+      },
+      {
         path: 'clientes',
         meta: { breadcrumb: 'Clientes' },
         children: [
@@ -31,9 +36,27 @@ export default [
         ],
       },
       {
-        path: '',
-        name: 'Dashboard',
-        component: () => import('@/pages/admin/DashboardPage.vue'),
+        path: 'roles',
+        meta: { breadcrumb: 'Roles' },
+        children: [
+          {
+            path: '',
+            name: 'VerRoles',
+            component: () => import('@/pages/admin/roles/RolesPage.vue'),
+          },
+          {
+            path: 'novo',
+            name: 'AddRole',
+            component: () => import('@/pages/admin/roles/AddRole.vue'),
+            meta: { breadcrumb: 'Criar Role' },
+          },
+          {
+            path: 'editar/:id',
+            name: 'EditarRole',
+            component: () => import('@/pages/admin/roles/EditRole.vue'),
+            meta: { breadcrumb: 'Editar Role' },
+          },
+        ],
       },
     ],
   },

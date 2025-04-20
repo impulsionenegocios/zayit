@@ -51,16 +51,19 @@ async def atualizar_cliente(
     password: str = Form(None),
     role: str = Form(...),
     logo: UploadFile = None,
+    remover_logo: bool = Form(False),  
     user_data=Depends(verify_token)
 ):
     return atualizar_cliente_service(
-        cliente_id,
+        cliente_id=cliente_id,
         name=name,
         email=email,
         password=password,
         role=role,
-        logo=logo
+        logo=logo,
+        remover_logo=remover_logo 
     )
+
 
 @router.delete("/{cliente_id}")
 async def deletar_cliente(

@@ -89,7 +89,6 @@
                 </td>
                 <td class="px-4 py-3 flex justify-end">
                   <slot name="actions" :item="item">
-                    <button class="text-gray-400 hover:text-white text-sm">...</button>
                   </slot>
                 </td>
               </tr>

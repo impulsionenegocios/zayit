@@ -59,6 +59,7 @@
       <FormGrid :cols="1">
         <FormControl label="Logo">
           <BaseFileInput
+            ref="fileInputRef"
             v-model="logo"
             name="logo"
             :multiple="false"
@@ -82,6 +83,8 @@
 <script setup lang="ts">
 // Composable atualizado com estrutura modular
 import { useClienteForm } from '@/composables/clientes/useClienteForm'
+import { ref } from 'vue'
+const fileInputRef = ref()
 
 // Componentes visuais
 import FormSection from '@/components/ui/forms/FormSection.vue'
@@ -107,5 +110,5 @@ const {
   logo,
   salvar,
   carregando
-} = useClienteForm()
+} = useClienteForm(undefined, fileInputRef)
 </script>
