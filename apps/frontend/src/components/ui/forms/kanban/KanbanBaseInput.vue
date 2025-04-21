@@ -1,7 +1,7 @@
 <template>
   <div class="relative w-full">
     <!-- Ícone à esquerda -->
-    <div v-if="$slots.icon" class="absolute inset-y-0 left-0 flex items-center pointer-events-none">
+    <div v-if="$slots.icon" class=" absolute inset-y-0 left-0 flex items-center pointer-events-none">
       <slot name="icon" />
     </div>
 

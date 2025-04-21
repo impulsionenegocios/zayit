@@ -24,7 +24,7 @@
     <hr class="text-gray-600" />
 
     <!-- Cards + Adicionar -->
-    <div class="bg-black rounded-3xl relative pb-4">
+    <div class="bg-[#20203a] rounded-3xl relative pb-4">
       <p v-if="!localCards.length" class="text-sm text-gray-400 text-center py-2">Sem cards</p>
 
       <draggable
@@ -49,7 +49,7 @@
             <!-- Card com input -->
             <div
               v-else
-              class="transition-all mb-8 py-2 bg-[#20203a] duration-500 rounded-3xl cursor-pointer hover:bg-zayit-blue/80 text-white px-6 shadow group relative"
+              class="transition-all mb-8 py-2 bg-surface duration-500 rounded-3xl cursor-pointer hover:bg-zayit-blue/80 text-white px-6 shadow group relative"
             >
               <input
                 v-model="element.title"
@@ -68,7 +68,7 @@
 
       <!-- Botão de adicionar -->
       <div class="absolute bottom-0 w-full">
-        <div v-if="isAddingCard" class="flex justify-end bg-black rounded-b-3xl">
+        <div v-if="isAddingCard" class="flex justify-end bg-surface rounded-b-3xl">
           <button
             class="w-full bg-zayit-blue py-2 rounded-bl-3xl cursor-pointer hover:bg-zayit-blue/80 transition-all duration-500"
             @click="confirmAddCard"
@@ -84,7 +84,7 @@
         </div>
         <button
           v-else
-          class="h-12 w-full rounded-b-3xl cursor-pointer bg-black hover:bg-card transition"
+          class="h-12 w-full rounded-b-3xl cursor-pointer bg-[#20203a] hover:bg-card transition"
           @click="handleAddCardRequest"
         >
           + Adicionar novo
