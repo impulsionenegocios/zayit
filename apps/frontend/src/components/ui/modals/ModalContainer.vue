@@ -8,11 +8,13 @@
         class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm"
         @click.self="!modal.persistent && cancel(modal.id)"
       >
-        <component
-          :is="modal.component"
-          v-bind="modal.props"
-          @close="(result: any) => close(modal.id, result)"
-        />
+        <ModalInstanceProvider :resolve="modal.resolve" :reject="modal.reject">
+          <component
+            :is="modal.component"
+            v-bind="modal.props"
+            @close="(result: any) => close(modal.id, result)"
+          />
+        </ModalInstanceProvider>
       </div>
     </transition-group>
   </div>
@@ -21,6 +23,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useModalStore } from '@/stores/layout/modal';
+import ModalInstanceProvider from './ModalInstanceProvider.vue';
 
 const store = useModalStore();
 const { modals } = storeToRefs(store);

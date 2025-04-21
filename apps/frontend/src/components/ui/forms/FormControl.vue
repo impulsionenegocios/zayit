@@ -28,14 +28,14 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  label?: string
-  forLabel?: string
-  hint?: string
-  error?: string
-  touched?: boolean
-  valid?: boolean
-  showSuccess?: boolean
-}>()
+  label?: string;
+  forLabel?: string;
+  hint?: string;
+  error?: string;
+  touched?: boolean;
+  valid?: boolean;
+  showSuccess?: boolean;
+}>();
 </script>
 
 <style scoped>

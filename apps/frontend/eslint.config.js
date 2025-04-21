@@ -1,8 +1,8 @@
-import { defineConfig } from 'eslint/config'
-import vue from 'eslint-plugin-vue'
-import tseslint from '@typescript-eslint/eslint-plugin'
-import tsParser from '@typescript-eslint/parser'
-import vueParser from 'vue-eslint-parser'
+import { defineConfig } from 'eslint/config';
+import vue from 'eslint-plugin-vue';
+import tseslint from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import vueParser from 'vue-eslint-parser';
 
 export default defineConfig([
   {
@@ -44,4 +44,4 @@ export default defineConfig([
     // Global ignore (node_modules, dist, etc)
     ignores: ['dist/', 'node_modules/', '**/.eslintrc.*'],
   },
-])
+]);

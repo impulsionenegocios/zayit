@@ -30,25 +30,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps<{
-  modelValue: string
-  name?: string
-  type?: 'text' | 'password' | 'email'
-  placeholder?: string
-  loading?: boolean
-  disabled?: boolean
-  readonly?: boolean
-}>()
+  modelValue: string;
+  name?: string;
+  type?: 'text' | 'password' | 'email';
+  placeholder?: string;
+  loading?: boolean;
+  disabled?: boolean;
+  readonly?: boolean;
+}>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-  (e: 'blur'): void
-}>()
+  (e: 'update:modelValue', value: string): void;
+  (e: 'blur'): void;
+}>();
 
 const inputValue = computed({
   get: () => props.modelValue,
   set: (value: string) => emit('update:modelValue', value),
-})
+});
 </script>

@@ -9,19 +9,14 @@
       :disabled="disabled"
       :maxlength="maxlength"
       :rows="rows"
-      :class="[
-        'w-full rounded-lg px-4 py-2 bg-surface border text-white placeholder-gray-400 overflow-hidden',
-        error ? 'border-red-500 focus:border-red-500' : 'border-gray-600 focus:border-zayit-blue',
-        'focus:outline-none focus:ring-1 focus:zayit-blue',
-        disabled ? 'opacity-50 cursor-not-allowed' : '',
-        resizeClass,
-      ]"
+      class="input-base"
+      style="--tw-ring-color: var(--color-zayit-blue), --tw-ring-shadow: none"
     />
     <div
       v-if="maxlength"
-      class="absolute bottom-1 right-2 text-xs text-white/50 pointer-events-none"
+      class="absolute bottom-1 right-2 text-xs text-white/50 pointer-events-none focus:border-zayit-blue"
     >
-      {{ modelValue.length }} / {{ maxlength }}
+      {{ modelValue?.length }} / {{ maxlength }}
     </div>
   </div>
 </template>
@@ -30,7 +25,7 @@
 import { ref, watch, computed, onMounted, nextTick } from 'vue';
 
 const props = defineProps<{
-  modelValue: string;
+  modelValue?: string;
   placeholder?: string;
   error?: string;
   disabled?: boolean;

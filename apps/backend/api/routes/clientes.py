@@ -64,7 +64,7 @@ async def obter_cliente(
 
 
 # ✅ PUT - Atualizar cliente
-@router.put("/{cliente_id}", response_model=ClienteOut)
+@router.put("/{cliente_id}")
 async def atualizar_cliente(
     cliente_id: str,
     cliente: ClienteUpdate = Depends(map_form_to_update_schema),

@@ -18,9 +18,9 @@ export interface Cliente {
 }
 
 export interface ClienteForm {
-    name: string;
-    email: string;
-    password: string;
-    role: string;
-    logo: File | null; 
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+  logo: File | null;
 }

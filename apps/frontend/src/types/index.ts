@@ -1,2 +1,2 @@
 export * from './cliente';
-export *from './roles'
+export * from './roles';

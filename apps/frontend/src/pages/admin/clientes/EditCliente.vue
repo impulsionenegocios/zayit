@@ -56,45 +56,40 @@
           />
         </FormControl>
         <FormControl
-            label="Escolha a permissão"
-            forLabel="role"
-            :error="roleError"
-            :touched="roleMeta.touched"
-            :valid="roleMeta.valid"
-            :showSuccess="true"
-          >
-            <BaseSelect
-              v-model="role"
-              name="role"
-              :options="roles"
-              placeholder="selecione uma role"
-              @blur="blurRole"
-            />
-          </FormControl>
+          label="Escolha a permissão"
+          forLabel="role"
+          :error="roleError"
+          :touched="roleMeta.touched"
+          :valid="roleMeta.valid"
+          :showSuccess="true"
+        >
+          <BaseSelect
+            v-model="role"
+            name="role"
+            :options="roles"
+            placeholder="selecione uma role"
+            @blur="blurRole"
+          />
+        </FormControl>
       </FormGrid>
 
       <FormGrid :cols="1">
         <FormControl label="Logo">
           <BaseFileInput
-          v-model="logo"
-          :existing-file-url="verifyExistingLogoUrl"
-          name="logo"
-          :multiple="false"
-          :auto-upload="false"
-          upload-url="/uploads/avatar"
-          upload-field-name="avatar"
-          @file-removed="removeExistingLogo"
-        />
+            v-model="logo"
+            :existing-file-url="verifyExistingLogoUrl"
+            name="logo"
+            :multiple="false"
+            :auto-upload="false"
+            upload-url="/uploads/avatar"
+            upload-field-name="avatar"
+            @file-removed="removeExistingLogo"
+          />
         </FormControl>
       </FormGrid>
-      
+
       <div class="flex justify-end gap-4 mt-6">
-        <button 
-          type="button" 
-          class="btn-default btn" 
-          :disabled="carregando"
-           @click="voltar"
-        >
+        <button type="button" class="btn-default btn" :disabled="carregando" @click="voltar">
           Cancelar
         </button>
         <button type="submit" class="btn-success btn" :disabled="carregando">
@@ -107,26 +102,26 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useClienteForm } from '@/composables/clientes/useClienteForm'
-import { useModalStore } from '@/stores/layout/modal'
-import { deletarCliente } from '@/services/clienteService'
-import { useToast } from '@/composables/useToast'
+import { onMounted, computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useClienteForm } from '@/composables/clientes/useClienteForm';
+import { useModalStore } from '@/stores/layout/modal';
+import { deletarCliente } from '@/services/clienteService';
+import { useToast } from '@/composables/useToast';
 
 // Componentes visuais
-import FormSection from '@/components/ui/forms/FormSection.vue'
-import FormGrid from '@/components/ui/forms/FormGrid.vue'
-import FormControl from '@/components/ui/forms/FormControl.vue'
-import BaseInput from '@/components/ui/forms/BaseInput.vue'
-import BaseFileInput from '@/components/ui/forms/BaseFileInput.vue'
-import BaseSelect from '@/components/ui/forms/BaseSelect.vue'
-const route = useRoute()
-const router = useRouter()
-const modalStore = useModalStore()
-const toast = useToast()
+import FormSection from '@/components/ui/forms/FormSection.vue';
+import FormGrid from '@/components/ui/forms/FormGrid.vue';
+import FormControl from '@/components/ui/forms/FormControl.vue';
+import BaseInput from '@/components/ui/forms/BaseInput.vue';
+import BaseFileInput from '@/components/ui/forms/BaseFileInput.vue';
+import BaseSelect from '@/components/ui/forms/BaseSelect.vue';
+const route = useRoute();
+const router = useRouter();
+const modalStore = useModalStore();
+const toast = useToast();
 
-const clienteId = route.params.id as string
+const clienteId = route.params.id as string;
 
 // Lógica do formulário
 const {
@@ -152,19 +147,19 @@ const {
   roleError,
   roleMeta,
   blurRole,
-  roles
-} = useClienteForm(clienteId)
+  roles,
+} = useClienteForm(clienteId);
 // Carregar dados do cliente ao montar o componente
 onMounted(() => {
-  carregarClienteParaEdicao()
-})
+  carregarClienteParaEdicao();
+});
 const verifyExistingLogoUrl = computed(() => {
   if (existingLogoUrl.value) {
-    return 'http://localhost:8000' + existingLogoUrl.value
+    return 'http://localhost:8000' + existingLogoUrl.value;
   }
-  return null
-})
+  return null;
+});
 const voltar = () => {
-  router.back()
-}
+  router.back();
+};
 </script>

@@ -11,7 +11,7 @@ export function useRolesList() {
   const fetchRoles = async () => {
     carregando.value = true;
     error.value = null;
-    
+
     try {
       const res = await getRoles();
       roles.value = res.data.roles;

@@ -1,6 +1,6 @@
 <!-- src/components/ui/modals/BaseModal.vue -->
 <template>
-  <div :class="['rounded-lg shadow-lg bg-card p-6 w-full relative', sizeClass]">
+  <div :class="['rounded-lg shadow-lg bg-card p-6 w-full custom-scroll relative max-h-[80%] overflow-auto', sizeClass]">
     <!-- Header -->
     <div class="flex justify-between items-start mb-4">
       <h2 class="text-lg font-bold">{{ props.title }}</h2>
@@ -42,3 +42,17 @@ const sizeClass = computed(() => {
   return map[props.size || 'md'];
 });
 </script>
+<style scoped>
+:deep(.custom-scroll)::-webkit-scrollbar {
+  width: 8px;
+}
+
+:deep(.custom-scroll)::-webkit-scrollbar-thumb {
+  background-color: var(--color-zayit-blue); /* ou qualquer cor do seu tema */
+  border-radius: 6px;
+}
+
+:deep(.custom-scroll)::-webkit-scrollbar-track {
+  background: transparent;
+}
+</style>
