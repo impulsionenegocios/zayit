@@ -88,8 +88,7 @@
                   </slot>
                 </td>
                 <td class="px-4 py-3 flex justify-end">
-                  <slot name="actions" :item="item">
-                  </slot>
+                  <slot name="actions" :item="item"> </slot>
                 </td>
               </tr>
               <tr v-if="!paginaAtual.length">
@@ -135,7 +134,7 @@ const headers = computed(() => {
   if (props.columns) {
     return props.columns;
   }
-  
+
   if (!props.items.length) return [];
   return Object.keys(props.items[0])
     .filter((key) => key !== 'id')

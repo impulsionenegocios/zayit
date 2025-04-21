@@ -103,12 +103,11 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
           fileErrors.value.push(errorMessage);
           continue;
         }
-      } 
-      else if (!validateFileType(file)) {
+      } else if (!validateFileType(file)) {
         fileErrors.value.push(`"${file.name}" tem tipo inválido.`);
         continue;
       }
-      
+
       if (!validateFileSize(file)) {
         fileErrors.value.push(`"${file.name}" excede ${MAX_SIZE_MB}MB.`);
         continue;
@@ -171,9 +170,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
       try {
         const { data } = await api.post(uploadUrl, form, {
           onUploadProgress: (e) => {
-            uploadProgress.value[index] = Math.round(
-              (e.loaded * 100) / (e.total || 1)
-            );
+            uploadProgress.value[index] = Math.round((e.loaded * 100) / (e.total || 1));
           },
         });
         uploadedFiles.value[index] = data;
@@ -225,21 +222,21 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
   });
   function clear() {
     // Revoga todos os blobs antigos
-    blobUrls.value.forEach((url) => URL.revokeObjectURL(url))
-  
+    blobUrls.value.forEach((url) => URL.revokeObjectURL(url));
+
     // Limpa todos os estados
-    files.value = []
-    blobUrls.value = []
-    uploadedFiles.value = []
-    uploadProgress.value = []
-    fileErrors.value = []
-  
+    files.value = [];
+    blobUrls.value = [];
+    uploadedFiles.value = [];
+    uploadProgress.value = [];
+    fileErrors.value = [];
+
     // Restaura flags
-    isDragging.value = false
-    isLoading.value = false
-    canUpload.value = true
+    isDragging.value = false;
+    isLoading.value = false;
+    canUpload.value = true;
   }
-  
+
   return {
     files,
     previewUrls,
@@ -256,6 +253,6 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     removeFile,
     getFileName,
     resetFiles,
-    clear
+    clear,
   };
 }

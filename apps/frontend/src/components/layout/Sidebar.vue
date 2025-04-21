@@ -20,7 +20,11 @@
       <!-- Cabeçalho interno para desktop (logo) -->
       <div class="items-center justify-center mb-4 hidden md:flex">
         <router-link to="/">
-          <img class="h-12 cursor-pointer" src="@/assets/images/logo-dark.png" alt="Voltar ao início" />
+          <img
+            class="h-12 cursor-pointer"
+            src="@/assets/images/logo-dark.png"
+            alt="Voltar ao início"
+          />
         </router-link>
       </div>
       <ul class="space-y-2">
@@ -106,6 +110,10 @@ const menuItems = ref([
       {
         label: 'Ver Roles',
         to: { name: 'VerRoles' },
+      },
+      {
+        label: 'Ver Kanban',
+        to: { name: 'Ver Kanban' },
       },
     ],
   },

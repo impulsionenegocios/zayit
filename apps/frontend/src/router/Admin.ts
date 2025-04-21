@@ -1,5 +1,4 @@
-import SuperAdminLayout from '@/layouts/AdminLayout.vue'
-
+import SuperAdminLayout from '@/layouts/AdminLayout.vue';
 
 export default [
   {
@@ -58,6 +57,17 @@ export default [
           },
         ],
       },
+      {
+        path: 'kanban',
+        meta: { breadcrumb: 'kanban' },
+        children: [
+          {
+            path: '',
+            name: 'Ver Kanban',
+            component: () => import('@/pages/admin/kanban/KanbanPage.vue'),
+          },
+        ],
+      },
     ],
   },
-]
+];

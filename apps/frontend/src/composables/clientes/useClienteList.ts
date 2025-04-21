@@ -11,14 +11,15 @@ export function useClienteList() {
   const fetchClientes = async () => {
     carregando.value = true;
     error.value = null;
-    
+
     try {
       const res = await getClientes();
       clientes.value = res.data;
       return res;
     } catch (err) {
       console.error('Erro ao carregar clientes', err);
-      error.value = err instanceof Error ? err : new Error('Erro desconhecido ao carregar clientes');
+      error.value =
+        err instanceof Error ? err : new Error('Erro desconhecido ao carregar clientes');
       throw err;
     } finally {
       carregando.value = false;
