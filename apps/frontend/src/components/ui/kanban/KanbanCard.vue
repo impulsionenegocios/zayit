@@ -1,7 +1,8 @@
 <!-- src/components/kanban/KanbanCard.vue -->
 <template>
+  <div class="absolute w-6 h-6 bg-zayit-pink z-[888] rounded-full shadow-3xl shadow-zayit-pink"></div>
   <div
-    class="transition-all py-2 bg-[#20203a] duration-500 rounded-3xl cursor-pointer hover:bg-zayit-blue/80 text-white px-6 shadow group relative"
+    class="transition-all py-2 bg-surface duration-500 rounded-3xl cursor-pointer hover:bg-zayit-blue/80 text-white px-6 shadow group relative"
   >
     <div class="flex gap-1 absolute right-4 transition text-sm">
       <button @click="$emit('delete', card.id)" title="Deletar">🗑️</button>
@@ -18,7 +19,7 @@
     </div>
     <!-- Titulo -->
     <div class="flex justify-between items-center">
-      <div class="font-medium text-md cursor-pointer w-full h-full" @click="openEditModal">
+      <div class="font-medium text-sm cursor-pointer w-full h-full" @click="openEditModal">
         {{ card.title }}
       </div>
     </div>
@@ -26,7 +27,7 @@
     <div v-if="card.checklist?.length" class="text-xs text-gray-500 mt-2">
       ✅ {{ card.checklist.filter((c) => c.done).length }} / {{ card.checklist.length }} tarefas
     </div>
-    <div>comentarios</div>
+    <div></div>
   </div>
 </template>
 
