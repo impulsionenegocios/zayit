@@ -15,13 +15,13 @@ const closeSidebar = () => (sidebarOpen.value = false);
 </script>
 
 <template>
-  <div class="h-16 md:hidden fixed bg-black w-full flex items-center justify-between z-50 md:px-8">
+  <div class="h-16 lg:hidden fixed bg-black w-full flex items-center justify-between z-50 lg:px-8">
     <div class="flex items-center gap-4">
       <button
         @click="toggleSidebar"
         aria-controls="default-sidebar"
         :aria-expanded="sidebarOpen"
-        class="md:hidden inline-flex items-center p-2 ml-3 text-sm rounded-lg focus:outline-none focus:ring-2 text-gray-400 hover:bg-gray-700 focus:ring-gray-600"
+        class="lg:hidden inline-flex items-center p-2 ml-3 text-sm rounded-lg focus:outline-none focus:ring-2 text-gray-400 hover:bg-gray-700 focus:ring-gray-600"
       >
         <span class="sr-only">Abrir sidebar</span>
         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -41,16 +41,16 @@ const closeSidebar = () => (sidebarOpen.value = false);
     <Sidebar :open="sidebarOpen" @close="closeSidebar" />
     <div class="flex h-screen">
       <div
-        class="flex-1 mt-16 overflow-y-auto md:ml-80 bg-surface rounded-2xl md:mr-4 md:mb-4 lg:mr-8 lg:mb-8"
+        class="flex-1 custom-scroll mt-8 overflow-y-auto lg:ml-64 2xl:ml-76 bg-surface rounded-2xl lg:mr-4 lg:mb-4 lg:mr-8 lg:mb-8"
       >
-        <nav class="flex items-center justify-between p-4">
+        <nav class="flex items-center justify-between p-4 fixed h-16 mt-12 w-full">
           <div class="flex items-center space-x-4">
             <span class="text-2xl text-gray-100">{{ route.name || 'Página' }}</span>
             <Breadcrumb />
           </div>
           <component :is="actionButton.component" v-if="actionButton.component" />
         </nav>
-        <router-view />
+        <router-view class="mt-28 lg:mt-16" />
       </div>
     </div>
   </div>

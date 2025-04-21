@@ -1,0 +1,51 @@
+<template>
+  <div class="relative w-full">
+    <!-- Ícone à esquerda -->
+    <div v-if="$slots.icon" class="absolute inset-y-0 left-0 flex items-center pointer-events-none">
+      <slot name="icon" />
+    </div>
+
+    <!-- Input principal -->
+    <input
+      :name="name"
+      :type="type"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :readonly="readonly"
+      :class="['input-kanban', $slots.icon ? 'pl-10' : '', loading ? 'pr-10' : '']"
+      v-model="inputValue"
+      @blur="$emit('blur')"
+    />
+
+    <!-- Spinner de loading -->
+    <div v-if="loading" class="absolute inset-y-0 right-0 flex items-center pr-3">
+      <div
+        class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"
+      ></div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue';
+
+const props = defineProps<{
+  modelValue: string;
+  name?: string;
+  type?: 'text' | 'password' | 'email';
+  placeholder?: string;
+  loading?: boolean;
+  disabled?: boolean;
+  readonly?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string): void;
+  (e: 'blur'): void;
+}>();
+
+const inputValue = computed({
+  get: () => props.modelValue,
+  set: (value: string) => emit('update:modelValue', value),
+});
+</script>

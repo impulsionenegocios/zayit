@@ -1,6 +1,8 @@
 <template>
-  <main class="min-h-screen bg-gray-100 dark:bg-gray-800">
-    <KanbanBoard />
+  <main class="flex-1 flex flex-col">
+    <div class="relative">
+      <KanbanBoard class="absolute" />
+    </div>
   </main>
 </template>
 

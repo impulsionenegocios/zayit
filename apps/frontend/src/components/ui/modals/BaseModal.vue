@@ -1,13 +1,18 @@
 <!-- src/components/ui/modals/BaseModal.vue -->
 <template>
-  <div :class="['rounded-lg shadow-lg bg-card p-6 w-full custom-scroll relative max-h-[80%] overflow-auto', sizeClass]">
+  <div
+    :class="[
+      'rounded-lg shadow-lg bg-card p-6 w-full custom-scroll relative max-h-[80%] overflow-auto',
+      sizeClass,
+    ]"
+  >
     <!-- Header -->
     <div class="flex justify-between items-start mb-4">
-      <h2 class="text-lg font-bold">{{ props.title }}</h2>
+      <h2 v-if="props?.title" class="text-lg font-bold">{{ props?.title }}</h2>
       <button
         v-if="!persistent"
         @click="$emit('close')"
-        class="text-gray-500 hover:text-black text-xl absolute z-[90] right-8"
+        class="text-gray-500 hover:text-black text-xl absolute z-[90] right-8 top-4"
       >
         ✕
       </button>
@@ -26,7 +31,7 @@
 import { computed } from 'vue';
 
 const props = defineProps<{
-  title: string;
+  title: string | null;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   persistent?: boolean;
 }>();
@@ -42,17 +47,3 @@ const sizeClass = computed(() => {
   return map[props.size || 'md'];
 });
 </script>
-<style scoped>
-:deep(.custom-scroll)::-webkit-scrollbar {
-  width: 8px;
-}
-
-:deep(.custom-scroll)::-webkit-scrollbar-thumb {
-  background-color: var(--color-zayit-blue); /* ou qualquer cor do seu tema */
-  border-radius: 6px;
-}
-
-:deep(.custom-scroll)::-webkit-scrollbar-track {
-  background: transparent;
-}
-</style>

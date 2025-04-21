@@ -1,62 +1,32 @@
 <!-- src/components/kanban/KanbanCard.vue -->
 <template>
   <div
-    class="transition-all duration-500 cursor-pointer bg-zayit-blue hover:bg-zayit-blue/80 border hover:border-gray-900 border-gray-400 text-white p-3 rounded shadow group relative"
+    class="transition-all py-2 bg-[#20203a] duration-500 rounded-3xl cursor-pointer hover:bg-zayit-blue/80 text-white px-6 shadow group relative"
   >
-    <!-- Cabeçalho -->
-    <div class="flex justify-between items-center" >
-      <div class="font-medium text-sm cursor-pointer w-full h-full" @click="openEditModal">
-        {{ card.title }}
-      </div>
-      <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition text-sm">
-        <button @click="toggleExpand" title="Detalhes">🔽</button>
-        <button @click="$emit('delete', card.id)" title="Deletar">🗑️</button>
-      </div>
+    <div class="flex gap-1 absolute right-4 transition text-sm">
+      <button @click="$emit('delete', card.id)" title="Deletar">🗑️</button>
     </div>
     <!-- Tags -->
-    <div v-if="card.tags?.length" class="flex flex-wrap gap-1 mt-2">
+    <div v-if="card.tags?.length" class="flex flex-wrap gap-1">
       <span
         v-for="tag in card.tags"
         :key="tag"
-        class="text-xs bg-zinc-600 text-white px-2 py-0.5 rounded"
+        class="text-xs bg-zinc-600 text-white px-6 py-0.5 rounded"
       >
         {{ tag }}
       </span>
     </div>
-
+    <!-- Titulo -->
+    <div class="flex justify-between items-center">
+      <div class="font-medium text-md cursor-pointer w-full h-full" @click="openEditModal">
+        {{ card.title }}
+      </div>
+    </div>
     <!-- Checklist preview -->
     <div v-if="card.checklist?.length" class="text-xs text-gray-500 mt-2">
       ✅ {{ card.checklist.filter((c) => c.done).length }} / {{ card.checklist.length }} tarefas
     </div>
-
-    <!-- Expansão -->
-    <div v-if="isExpanded" class="mt-2 text-sm flex flex-col gap-2">
-      <div>
-        <label class="block font-semibold mb-1">Descrição:</label>
-        <textarea
-          v-model="localCard.description"
-          class="w-full p-2 border rounded bg-gray-900 text-white text-sm"
-        />
-      </div>
-
-      <div>
-        <label class="block font-semibold mb-1">Checklist:</label>
-        <ul class="flex flex-col gap-1">
-          <li v-for="item in localCard.checklist" :key="item.id" class="flex items-center gap-2">
-            <input type="checkbox" v-model="item.done" />
-            <input
-              v-model="item.text"
-              class="w-full bg-transparent border-b border-gray-600 text-sm"
-            />
-          </li>
-        </ul>
-        <button class="text-xs text-zayit-blue hover:underline mt-2" @click="addChecklistItem">
-          + Adicionar item
-        </button>
-      </div>
-
-      <button class="btn btn-sm mt-2 self-end" @click="saveExpandedCard">Salvar alterações</button>
-    </div>
+    <div>comentarios</div>
   </div>
 </template>
 
