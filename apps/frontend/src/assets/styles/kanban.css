@@ -1,4 +1,22 @@
 .ghost {
-    background-color: var(--color-zayit-blue);
-    opacity: 1,
+  background-color: var(--color-zayit-blue);
+  opacity: 1;
+}
+@layer components {
+  .input-kanban {
+    @apply w-full focus:border  text-white rounded-lg bg-transparent placeholder-white/40 outline-none transition duration-300;
+  }
+  .input-kanban:focus {
+    border-color: var(--color-zayit-blue);
+  }
+
+  .input-kanban:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .input-kanban:read-only {
+    border-style: dashed;
+    opacity: 0.8;
+  }
 }

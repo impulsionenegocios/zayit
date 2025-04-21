@@ -1,12 +1,12 @@
 /* scroll.css */
 .custom-scroll::-webkit-scrollbar {
-    width: 6px;
-  }
-  .custom-scroll::-webkit-scrollbar-thumb {
-    background-color: var(--color-zayit-blue);
-    border-radius: 6px;
-  }
-  .custom-scroll::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
+  width: 6px;
+  height: 6px;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--color-zayit-blue);
+  border-radius: 6px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}

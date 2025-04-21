@@ -9,7 +9,6 @@
 @import '@/assets/styles/toasts.css';
 @import '@/assets/styles/kanban.css';
 @import '@/assets/styles/scroll.css';
-
 @theme {
   --color-black: #080708;
   --color-surface: #0f0f1d;

@@ -3,22 +3,22 @@
   <transition name="fade">
     <div
       v-if="open"
-      class="fixed inset-0 bg-black opacity-50 md:hidden z-40"
+      class="fixed inset-0 bg-black opacity-50 lg:hidden z-40"
       @click="$emit('close')"
     ></div>
   </transition>
   <aside
     id="default-sidebar"
     :class="[
-      'fixed top-0 left-0 z-40 w-72 2xl:w-80 h-screen transition-transform mt-16 md:mt-0',
+      'fixed top-0 left-0 z-40 w-64 2xl:w-76 h-screen transition-transform mt-16 lg:mt-0',
       open ? 'translate-x-0' : '-translate-x-full',
-      'md:translate-x-0',
+      'lg:translate-x-0',
     ]"
     aria-label="Sidenav"
   >
     <div class="relative h-full overflow-y-auto py-5 px-3 bg-black">
       <!-- Cabeçalho interno para desktop (logo) -->
-      <div class="items-center justify-center mb-4 hidden md:flex">
+      <div class="items-center justify-center mb-4 hidden lg:flex">
         <router-link to="/">
           <img
             class="h-12 cursor-pointer"
