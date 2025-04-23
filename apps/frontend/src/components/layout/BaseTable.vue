@@ -146,10 +146,12 @@ const headers = computed(() => {
 
 // Filtrando os itens conforme a busca
 const filteredData = computed(() => {
+  if (!props.items) return [];
   return props.items.filter((item) =>
-    JSON.stringify(item).toLowerCase().includes(search.value.toLowerCase()),
+    JSON.stringify(item).toLowerCase().includes(search.value.toLowerCase())
   );
 });
+
 
 // Paginação
 const pagina = ref(1);

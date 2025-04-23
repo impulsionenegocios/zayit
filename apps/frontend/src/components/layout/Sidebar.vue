@@ -118,6 +118,26 @@ const menuItems = ref([
     ],
   },
   {
+    label: 'Crm',
+    icon: 'mdi:leads',
+    dropdownOpen: false,
+    dropdownIcon:'lsicon:down-outline',
+    subitems: [
+      {
+        label: 'Ver Leads',
+        to: { name: 'Ver Kanban' }
+      },
+      {
+        label: 'Origens',
+        to: { name: 'Ver Kanban' }
+      },
+      {
+        label: 'Etiquetas',
+        to: { name: 'Ver Tags' }
+      },
+    ]
+  },
+  {
     label: 'Docs',
     icon: 'material-symbols:docs',
     dropdownOpen: false,

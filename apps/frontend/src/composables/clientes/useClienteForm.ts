@@ -1,31 +1,22 @@
 // src/composables/clientes/useClienteForm.ts
 import { useForm, useField } from 'vee-validate';
-import { ref, Ref } from 'vue';
+import { ref, Ref, onMounted } from 'vue';
 import { criarCliente, atualizarCliente, getClientePorId } from '@/services/clienteService';
 import { useToast } from '@/composables/useToast';
 import { getRoles } from '@/services/rolesService';
-import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import type { Cliente } from '@/types';
 
 export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
   const toast = useToast();
+  const router = useRouter();
+
   const carregando = ref(false);
   const roles = ref<{ label: string; value: string }[]>([]);
-  async function carregarRoles() {
-    try {
-      const res = await getRoles();
-      roles.value = res.data.roles.map((role: any) => ({
-        label: role.name,
-        value: role.name, // ou role.name, se for o que você quer salvar
-      }));
-    } catch (error) {
-      toast.error('Erro ao carregar as roles');
-      console.error(error);
-    }
-  }
-  const logoRemovida = ref(false);
-  // guarda apenas a URL da logo existente (string) ou null
+
   const existingLogoUrl = ref<string | null>(null);
+  const logoRemovida = ref(false);
+
   const { handleSubmit, setValues, resetForm } = useForm();
 
   const {
@@ -48,26 +39,36 @@ export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
     handleBlur: blurPassword,
     meta: passwordMeta,
   } = useField<string>('password', idCliente ? '' : 'required|min:6');
+
   const {
     value: role,
     errorMessage: roleError,
     handleBlur: blurRole,
     meta: roleMeta,
   } = useField<string>('role', 'required');
-  // este é o File que o usuário selecionar; começa sempre em null
+
   const { value: logo } = useField<File | null>('logo');
 
-  // Carrega os dados do cliente e preenche os campos (menos o logo, que só define a URL)
+  async function carregarRoles() {
+    try {
+      const res = await getRoles();
+      roles.value = res.data.roles.map((role: any) => ({
+        label: role.name,
+        value: role.name,
+      }));
+    } catch (error) {
+      toast.error('Erro ao carregar as roles');
+      console.error(error);
+    }
+  }
+
   async function carregarClienteParaEdicao() {
     if (!idCliente) return;
 
     carregando.value = true;
     try {
-      carregarRoles();
-      const res = await getClientePorId(idCliente);
-      const cliente = res.data;
+      const cliente = await getClientePorId(idCliente);
 
-      // preenche somente name, email e zera password
       setValues({
         name: cliente.name,
         email: cliente.email,
@@ -75,7 +76,6 @@ export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
         role: cliente.role,
       });
 
-      // guarda a URL da logo para preview
       existingLogoUrl.value = cliente.logo_url || null;
     } catch (error) {
       toast.error('Erro ao carregar cliente.');
@@ -85,36 +85,38 @@ export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
     }
   }
 
-  // Limpa a URL antiga (quando o usuário clica em “remover” no componente)
   function removeExistingLogo() {
     existingLogoUrl.value = null;
     logoRemovida.value = true;
   }
 
-  const salvar = handleSubmit(async (values) => {
-    console.log('começou a salvar');
+  function gerarFormData(values: any): FormData {
     const data = new FormData();
     data.append('name', values.name);
     data.append('email', values.email);
     if (values.password) data.append('password', values.password);
     data.append('role', values.role);
-    // se o usuário escolheu um novo File, inclui no FormData
+
     if (values.logo) {
       data.append('logo', values.logo);
       logoRemovida.value = false;
     } else if (logoRemovida.value) {
-      // Usuário removeu a logo e não enviou outra
       data.append('remover_logo', 'true');
     }
 
+    return data;
+  }
+
+  const salvar = handleSubmit(async (values) => {
+    const formData = gerarFormData(values);
+
     carregando.value = true;
     try {
-      carregarRoles(); // <-- carrega sempre
       if (idCliente) {
-        await atualizarCliente(idCliente, data);
+        await atualizarCliente(idCliente, formData);
         toast.success('Cliente atualizado com sucesso!');
       } else {
-        await criarCliente(data);
+        await criarCliente(formData);
         toast.success('Cliente criado com sucesso!');
 
         resetForm();
@@ -130,42 +132,45 @@ export function useClienteForm(idCliente?: string, fileInputRef?: Ref<any>) {
       carregando.value = false;
     }
   });
-  onMounted(() => {
-    carregarRoles(); // carrega as roles sempre
-    if (idCliente) {
-      carregarClienteParaEdicao();
-    }
-  });
-  const router = useRouter();
 
   const voltar = () => {
     router.back();
   };
+
+  onMounted(() => {
+    carregarRoles();
+    if (idCliente) carregarClienteParaEdicao();
+  });
+
   return {
-    // campos do formulário
+    // Campos
     name,
     nameError,
     blurName,
     nameMeta,
+
     email,
     emailError,
     blurEmail,
     emailMeta,
-    role,
-    roleError,
-    blurRole,
-    roleMeta,
+
     password,
     passwordError,
     blurPassword,
     passwordMeta,
+
+    role,
+    roleError,
+    blurRole,
+    roleMeta,
+
     logo,
 
-    // preview da logo atual
+    // Logo existente
     existingLogoUrl,
     removeExistingLogo,
 
-    // ações
+    // Ações
     salvar,
     carregarClienteParaEdicao,
     carregando,

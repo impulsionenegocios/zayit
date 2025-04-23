@@ -58,13 +58,20 @@ export default [
         ],
       },
       {
-        path: 'kanban',
-        meta: { breadcrumb: 'kanban' },
+        path: 'Crm',
+        meta: { breadcrumb: 'Crm' },
         children: [
           {
             path: '',
             name: 'Ver Kanban',
-            component: () => import('@/pages/admin/kanban/KanbanPage.vue'),
+            component: () => import('@/pages/admin/crm/KanbanPage.vue'),
+            meta: { breadcrumb: 'Ver Leads' },
+          },
+          {
+            path: '',
+            name: 'Ver Tags',
+            component: () => import('@/pages/admin/crm/TagsPage.vue'),
+            meta: { breadcrumb: 'Ver Tags' },
           },
         ],
       },
