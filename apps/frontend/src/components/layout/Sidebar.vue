@@ -111,32 +111,52 @@ const menuItems = ref([
         label: 'Ver Roles',
         to: { name: 'VerRoles' },
       },
-      {
-        label: 'Ver Kanban',
-        to: { name: 'Ver Kanban' },
-      },
+      // {
+      //   label: 'Ver Kanban',
+      //   to: { name: 'Ver Kanban' },
+      // },
     ],
   },
+  // {
+  //   label: 'Crm',
+  //   icon: 'mdi:leads',
+  //   dropdownOpen: false,
+  //   dropdownIcon:'lsicon:down-outline',
+  //   subitems: [
+  //     {
+  //       label: 'Ver Leads',
+  //       to: { name: 'Ver Kanban' }
+  //     },
+  //     {
+  //       label: 'Origens',
+  //       to: { name: 'Ver Kanban' }
+  //     },
+  //     {
+  //       label: 'Etiquetas',
+  //       to: { name: 'Ver Tags' }
+  //     },
+  //   ]
+  // },
   {
-    label: 'Crm',
-    icon: 'mdi:leads',
-    dropdownOpen: false,
-    dropdownIcon:'lsicon:down-outline',
-    subitems: [
-      {
-        label: 'Ver Leads',
-        to: { name: 'Ver Kanban' }
-      },
-      {
-        label: 'Origens',
-        to: { name: 'Ver Kanban' }
-      },
-      {
-        label: 'Etiquetas',
-        to: { name: 'Ver Tags' }
-      },
-    ]
-  },
+  label: 'CRM',
+  icon: 'mdi:account-group',
+  dropdownOpen: false,
+  dropdownIcon: 'lsicon:down-outline',
+  subitems: [
+    {
+      label: 'Leads & Clients',
+      to: { name: 'LeadList' },
+    },
+    // {
+    //   label: 'Tasks',
+    //   to: { name: 'VerKanban' },
+    // },
+    // {
+    //   label: 'Dashboard',
+    //   to: { name: 'Dashboard' },
+    // },
+  ],
+},
   {
     label: 'Docs',
     icon: 'material-symbols:docs',
