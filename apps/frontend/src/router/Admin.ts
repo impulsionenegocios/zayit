@@ -58,23 +58,53 @@ export default [
         ],
       },
       {
-        path: 'Crm',
-        meta: { breadcrumb: 'Crm' },
+        path: 'leads',
+        meta: { breadcrumb: 'CRM' },
         children: [
           {
             path: '',
-            name: 'Ver Kanban',
-            component: () => import('@/pages/admin/crm/KanbanPage.vue'),
-            meta: { breadcrumb: 'Ver Leads' },
+            name: 'LeadList',
+            component: () => import('@/pages/crm/leads/LeadListView.vue'),
+            meta: { breadcrumb: 'Leads & Clients' }
           },
           {
-            path: '',
-            name: 'Ver Tags',
-            component: () => import('@/pages/admin/crm/TagsPage.vue'),
-            meta: { breadcrumb: 'Ver Tags' },
+            path: 'new',
+            name: 'CreateLead',
+            component: () => import('@/pages/crm/leads/LeadFormView.vue'),
+            meta: { breadcrumb: 'Create Lead' }
           },
-        ],
+          {
+            path: ':id',
+            name: 'LeadDetail',
+            component: () => import('@/pages/crm/leads/LeadDetailView.vue'),
+            meta: { breadcrumb: 'Lead Details' }
+          },
+          {
+            path: ':id/edit',
+            name: 'EditLead',
+            component: () => import('@/pages/crm/leads/LeadFormView.vue'),
+            meta: { breadcrumb: 'Edit Lead' }
+          }
+        ]
       },
+      // {
+      //   path: 'Crm',
+      //   meta: { breadcrumb: 'Crm' },
+      //   children: [
+      //     {
+      //       path: '',
+      //       name: 'Ver Kanban',
+      //       component: () => import('@/pages/admin/crm/KanbanPage.vue'),
+      //       meta: { breadcrumb: 'Ver Leads' },
+      //     },
+      //     {
+      //       path: '',
+      //       name: 'Ver Tags',
+      //       component: () => import('@/pages/admin/crm/TagsPage.vue'),
+      //       meta: { breadcrumb: 'Ver Tags' },
+      //     },
+      //   ],
+      // },
     ],
   },
 ];
