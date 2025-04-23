@@ -5,85 +5,102 @@
       v-for="col in columns"
       :key="col.id"
       :column="col"
-      @update:cards="(cards) => updateCards(col.id, cards)"
-      @update:name="(name) => updateColumnName(col.id, name)"
-      @delete="deleteColumn(col.id)"
+      @update:cards="cards => onUpdateCards(col.id, cards)"
+      @update:name="name  => onUpdateColumnName(col.id, name)"
+      @delete="()    => onDeleteColumn(col.id)"
       class="min-w-[200px]"
     />
-
-    <AddColumn @add="addColumn" />
+    <AddColumn @add="onAddColumn" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import KanbanColumn from './KanbanColumn.vue';
-import AddColumn from './AddColumn.vue';
+import { ref, onMounted } from 'vue'
+import KanbanColumn from './KanbanColumn.vue'
+import AddColumn from './AddColumn.vue'
 
-// Tipos
+// use o serviço correto
+import {
+  fetchColumns,
+  createColumn,
+  updateColumn,
+  deleteColumn as apiDeleteColumn,
+} from '@/services/crm'  // antes era crm, mude para kanban
+
+// tipagem de checklist
 interface ChecklistItem {
-  id: string;
-  text: string;
-  done: boolean;
+  id: string
+  text: string
+  done: boolean
 }
 
-interface KanbanCard {
-  id: string;
-  title: string;
-  description?: string;
-  tags?: string[];
-  checklist?: ChecklistItem[];
-  created_at: string;
+// cada card
+export interface KanbanCard {
+  id: string
+  title: string
+  description?: string
+  tags?: string[]
+  checklist?: ChecklistItem[]
+  created_at?: string
 }
 
-interface KanbanColumnData {
-  id: string;
-  name: string;
-  color: string;
-  cards: KanbanCard[];
+// cada coluna contém um array de cards
+export interface KanbanColumnData {
+  id: string
+  name: string
+  color: string
+  cards: KanbanCard[]    // <<< aqui é array, não string
 }
 
-// Estado
-const columns = ref<KanbanColumnData[]>([
-  {
-    id: 'todo',
-    name: 'A Fazer',
-    color: 'zayit-warning',
-    cards: [
-      { id: '1', title: 'Criar estrutura base', created_at: '21/04/2025' },
-      { id: '2', title: 'Estilizar colunas e cards', created_at: '21/04/2025' },
-    ],
-  },
-  {
-    id: 'doing',
-    name: 'Em Progresso',
-    color: 'zayit-info',
-    cards: [{ id: '3', title: 'Implementar', created_at: '21/04/2025' }],
-  },
-  {
-    id: 'done',
-    name: 'Concluído',
-    color: 'zayit-success',
-    cards: [{ id: '4', title: 'Setup inicial', created_at: '21/04/2025' }],
-  },
-]);
+const columns = ref<KanbanColumnData[]>([])
 
-// Manipuladores
-function addColumn(col: KanbanColumnData) {
-  columns.value.push(col);
+onMounted(async () => {
+  try {
+    columns.value = await fetchColumns()
+  } catch (err) {
+    console.error('Erro ao carregar colunas:', err)
+  }
+})
+
+async function onAddColumn(payload: { name: string; color: string }) {
+  try {
+    const nova = await createColumn({ name: payload.name, color: payload.color })
+    columns.value.push(nova)
+  } catch (err) {
+    console.error('Erro ao criar coluna:', err)
+  }
 }
 
-function deleteColumn(colId: string) {
-  columns.value = columns.value.filter((c) => c.id !== colId);
+async function onDeleteColumn(id: string) {
+  try {
+    await apiDeleteColumn(id)
+    columns.value = columns.value.filter(c => c.id !== id)
+  } catch (err) {
+    console.error(`Erro ao deletar coluna ${id}:`, err)
+  }
 }
 
-function updateColumnName(colId: string, newName: string) {
-  const col = columns.value.find((c) => c.id === colId);
-  if (col) col.name = newName;
+async function onUpdateColumnName(id: string, name: string) {
+  try {
+    await updateColumn(id, { name })
+    const col = columns.value.find(c => c.id === id)
+    if (col) col.name = name
+  } catch (err) {
+    console.error(`Erro ao renomear coluna ${id}:`, err)
+  }
 }
 
-function updateCards(columnId: string, newCards: KanbanCard[]) {
-  const col = columns.value.find((c) => c.id === columnId);
-  if (col) col.cards = newCards;
+async function onUpdateCards(id: string, cards: KanbanCard[]) {
+  try {
+    await updateColumn(id, { cards })
+    const col = columns.value.find(c => c.id === id)
+    if (col) col.cards = cards
+  } catch (err) {
+    console.error(`Erro ao atualizar cards da coluna ${id}:`, err)
+  }
 }
 </script>
+
+<style scoped>
+/* overflow-x-auto no container já trata o scroll */
+</style>

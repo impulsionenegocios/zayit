@@ -9,6 +9,7 @@ export interface Cliente {
   audit_id: number | null;
   action_plan_id: number | null;
   meta_report_id: number | null;
+  logo_url: string | null;
   instagram_report_id: number | null;
   gmb_report_id: number | null;
   zcard_report_id: number | null;
