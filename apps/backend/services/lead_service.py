@@ -20,64 +20,57 @@ from schemas.lead import (
 from utils.storage import save_file_to_storage, delete_file_from_storage
 
 # Leads
-def create_lead_service(lead: LeadCreate, user_data):
-    try:
-        lead_id = str(uuid.uuid4())
-        now = datetime.now()
-        
-        # Get tags if they exist
-        tags = []
-        if lead.tags:
-            tags_ref = db.collection("tags").where(firestore.field_path.FieldPath.document_id(), "in", lead.tags)
-            tags_docs = tags_ref.stream()
-            tags = [{"id": doc.id, "name": doc.get("name"), "color": doc.get("color")} for doc in tags_docs]
-        
-        lead_data = {
-            "id": lead_id,
-            "name": lead.name,
-            "email": lead.email,
-            "phone": lead.phone,
-            "address": lead.address,
-            "birth_date": lead.birth_date,
-            "source": lead.source,
-            "status": lead.status,
-            "tags": tags,
-            "created_at": now,
-            "updated_at": now,
-        }
-        
-        # Save to Firestore
-        db.collection("leads").document(lead_id).set(lead_data)
-        
-        # Return with proper schema format
-        return Lead(
-            id=lead_id,
-            name=lead.name,
-            email=lead.email,
-            phone=lead.phone,
-            address=lead.address,
-            birth_date=lead.birth_date,
-            source=lead.source,
-            status=lead.status,
-            tags=tags,
-            created_at=now,
-            updated_at=now
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error creating lead: {str(e)}")
 
-def get_leads_service(user_data):
+def create_lead_service(lead: LeadCreate, user_data):
+    lead_id = str(uuid.uuid4())
+    now = datetime.utcnow()
+
+    # 🚀 Validação de tags (até 10 IDs no Firestore "in" query)
+    tags = []
+    if lead.tags:
+        if len(lead.tags) > 10:
+            raise HTTPException(
+                status_code=400,
+                detail="Limite de 10 tags por lead excedido."
+            )
+        try:
+            tags_ref = db.collection("tags").where(
+                firestore.field_path.FieldPath.document_id(), "in", lead.tags
+            )
+            tags_docs = tags_ref.stream()
+            tags = [
+                {
+                    "id": doc.id,
+                    "name": doc.get("name"),
+                    "color": doc.get("color")
+                }
+                for doc in tags_docs
+            ]
+        except Exception as e:
+            raise HTTPException(status_code=500, detail="Erro ao buscar tags: " + str(e))
+
+    lead_data = {
+        "id": lead_id,
+        "name": lead.name,
+        "email": lead.email,
+        "phone": lead.phone,
+        "address": lead.address,
+        "birth_date": lead.birth_date,
+        "source": lead.source,
+        "status": lead.status,
+        "tags": tags,
+        "created_at": now,
+        "updated_at": now,
+    }
+
     try:
-        leads_ref = db.collection("leads").stream()
-        leads = []
-        
-        for doc in leads_ref:
-            lead_data = doc.to_dict()
-            leads.append(Lead(**lead_data))
-        
-        return leads
+        db.collection("leads").document(lead_id).set(lead_data)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error getting leads: {str(e)}")
+        raise HTTPException(status_code=500, detail="Erro ao salvar lead: " + str(e))
+
+    # ✅ Aqui está o correto para Pydantic v2
+    return Lead.model_validate(lead_data)
+
 
 def get_lead_by_id_service(lead_id: str, user_data):
     try:

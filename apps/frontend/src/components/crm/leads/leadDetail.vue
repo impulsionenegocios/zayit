@@ -500,7 +500,7 @@
   <script setup lang="ts">
   import { ref, reactive, computed, onMounted } from 'vue';
   import { useRouter } from 'vue-router';
-  import { useClientStore } from '@/stores/crm/client';
+  import { useLeadStore } from '@/stores/crm/client';
   import { useToast } from '@/composables/useToast';
   import { useModal } from '@/composables/useModal';
   import { Icon } from '@iconify/vue';
@@ -517,7 +517,7 @@
     leadId: string;
   }>();
   
-  const clientStore = useClientStore();
+  const clientStore = useLeadStore();
   const toast = useToast();
   const modal = useModal();
   const router = useRouter();

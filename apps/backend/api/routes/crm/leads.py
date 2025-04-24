@@ -44,7 +44,7 @@ from services.lead_service import (
 router = APIRouter(prefix="/crm/leads", tags=["crm"])
 
 # Leads endpoints
-@router.post("/", response_model=Lead)
+@router.post("/", response_model=LeadCreate)
 async def create_lead(
     lead: LeadCreate,
     user_data=Depends(verify_role(["superadmin"]))
