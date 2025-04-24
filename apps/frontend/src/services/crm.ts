@@ -1,87 +1,95 @@
-// src/services/kanban.ts
+import api from '@/lib/axios';
+import type { Lead, Comment, Contact, Tag, Task, LeadFile } from '@/types/lead.types';
 
-import api from '@/lib/axios';  // ajusta o path se necessário
-
-// ---- Tipagens ----
-export interface ChecklistItem {
-  id: string;
-  text: string;
-  done: boolean;
+// Leads API
+export async function getLeads() {
+  return api.get('/crm/leads/');
 }
 
-export interface Card {
-  id: string;
-  title: string;
-  description?: string;
-  tags?: string[];
-  checklist?: ChecklistItem[];
+export async function getLeadById(id: string) {
+  return api.get(`/crm/leads/${id}`);
 }
 
-export interface Column {
-  id: string;
-  name: string;
-  color: string;
-  cards: Card[];
+export async function createLead(payload: Partial<Lead>) {
+  return api.post('/crm/leads/', payload);
 }
 
-// ---- Funções ----
-/**
- * Cria uma nova coluna
- */
-export async function createColumn(
-    payload: Pick<Column, 'name' | 'color'>
-  ): Promise<Column> {
-    const { data } = await api.post<Column>('/columns', payload);
-    return data;
-  }
-/**
- * Busca todas as colunas com seus cards
- */
-export async function fetchColumns(): Promise<Column[]> {
-  const { data } = await api.get<Column[]>('/columns/');
-  return data;
+export async function updateLead(id: string, payload: Partial<Lead>) {
+  return api.put(`/crm/leads/${id}`, payload);
 }
 
-/**
- * Atualiza nome ou ordem de cards de uma coluna
- */
-export async function updateColumn(
-  columnId: string,
-  payload: Partial<Pick<Column, 'name' | 'cards'>>
-): Promise<Column> {
-  const { data } = await api.patch<Column>(`/columns/${columnId}`, payload);
-  return data;
+export async function deleteLead(id: string) {
+  return api.delete(`/crm/leads/${id}`);
 }
 
-/**
- * Remove uma coluna inteira
- */
-export async function deleteColumn(columnId: string): Promise<void> {
-  await api.delete(`/columns/${columnId}`);
+// Comments API
+export async function getLeadComments(leadId: string) {
+  return api.get(`/crm/leads/${leadId}/comments`);
 }
 
-/**
- * Cria um card novo na coluna
- */
-export async function createCard(
-  columnId: string,
-  title: string
-): Promise<Card> {
-  const { data } = await api.post<Card>(`/columns/${columnId}/cards`, { title });
-  return data;
+export async function addLeadComment(leadId: string, text: string) {
+  return api.post(`/crm/leads/${leadId}/comments`, { text });
 }
 
-/**
- * Atualiza um card específico (título, checklist, tags…)
- */
-export async function updateCard(card: Card): Promise<Card> {
-  const { data } = await api.patch<Card>(`/cards/${card.id}`, card);
-  return data;
+export async function deleteLeadComment(leadId: string, commentId: string) {
+  return api.delete(`/crm/leads/${leadId}/comments/${commentId}`);
 }
 
-/**
- * Remove um card pelo ID
- */
-export async function deleteCard(cardId: string): Promise<void> {
-  await api.delete(`/cards/${cardId}`);
+// Contacts API
+export async function getLeadContacts(leadId: string) {
+  return api.get(`/crm/leads/${leadId}/contacts`);
+}
+
+export async function addLeadContact(leadId: string, contact: Partial<Contact>) {
+  return api.post(`/crm/leads/${leadId}/contacts`, contact);
+}
+
+export async function deleteLeadContact(leadId: string, contactId: string) {
+  return api.delete(`/crm/leads/${leadId}/contacts/${contactId}`);
+}
+
+// Tags API
+export async function getTags() {
+  return api.get('/crm/tags');
+}
+
+export async function createTag(tag: Omit<Tag, 'id'>) {
+  return api.post('/crm/tags', tag);
+}
+
+// Tasks API
+export async function getLeadTasks(leadId: string) {
+  return api.get(`/crm/leads/${leadId}/tasks`);
+}
+
+export async function createLeadTask(leadId: string, task: Partial<Task>) {
+  return api.post(`/crm/leads/${leadId}/tasks`, task);
+}
+
+export async function updateLeadTask(leadId: string, taskId: string, update: Partial<Task>) {
+  return api.put(`/crm/leads/${leadId}/tasks/${taskId}`, update);
+}
+
+export async function deleteLeadTask(leadId: string, taskId: string) {
+  return api.delete(`/crm/leads/${leadId}/tasks/${taskId}`);
+}
+
+// Files API
+export async function getLeadFiles(leadId: string) {
+  return api.get(`/crm/leads/${leadId}/files`);
+}
+
+export async function uploadLeadFile(leadId: string, file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  return api.post(`/crm/leads/${leadId}/files`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+}
+
+export async function deleteLeadFile(leadId: string, fileId: string) {
+  return api.delete(`/crm/leads/${leadId}/files/${fileId}`);
 }
