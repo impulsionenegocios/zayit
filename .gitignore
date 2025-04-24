@@ -6,7 +6,7 @@ __pycache__/
 env/
 venv/
 
-
+apps/backend/auth/*/**
 
 # Node
 node_modules/
