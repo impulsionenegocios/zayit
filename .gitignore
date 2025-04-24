@@ -26,3 +26,4 @@ apps/frontend/dist/
 # IDEs
 .vscode/
 .idea/
+apps/backend/auth/*.json
