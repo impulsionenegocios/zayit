@@ -3,12 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from api.routes import auth, clientes, roles
-# from api.routes.crm import tags, leads
+from api.routes.crm import tags, leads
 
 app = FastAPI()
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "*" #apenas para desenvolvimento
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -21,8 +22,8 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(clientes.router)
 app.include_router(roles.router)
-# app.include_router(leads.router)
-# app.include_router(tags.router)
+app.include_router(leads.router)
+app.include_router(tags.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

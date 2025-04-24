@@ -16,42 +16,36 @@ class TagBase(BaseSchema):
 class TagCreate(TagBase):
     pass
 
-
 class Tag(TagBase):
     id: str
     
-
 class LeadBase(BaseSchema):
     name: str = Field(..., min_length=2)
     email: EmailStr
     phone: str
     address: Optional[str] = None
-    birth_date: Optional[str] = None
+    birth_date: Optional[str] = Field(None, alias="birthDate")
     source: Optional[str] = None
     status: str = Field(..., pattern="^(lead|opportunity|client|lost)$")
 
-
 class LeadCreate(LeadBase):
-    tags: Optional[List[str]] = []
-
+    tags: Optional[List[str]] = Field(default_factory=list)
 
 class LeadUpdate(BaseSchema):
     name: Optional[str] = Field(None, min_length=2)
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
     address: Optional[str] = None
-    birth_date: Optional[str] = None
+    birth_date: Optional[str] = Field(None, alias="birthDate")
     source: Optional[str] = None
     status: Optional[str] = Field(None, pattern="^(lead|opportunity|client|lost)$")
     tags: Optional[List[str]] = None
-
 
 class Lead(LeadBase):
     id: str
     tags: List[Tag] = []
     created_at: datetime
     updated_at: datetime
-
 
 class ContactBase(BaseSchema):
     type: str = Field(..., pattern="^(call|whatsapp|email|meeting)$")

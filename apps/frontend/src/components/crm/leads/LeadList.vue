@@ -135,13 +135,13 @@
   import { ref, computed, onMounted } from 'vue';
   import { useRouter } from 'vue-router';
   import { Icon } from '@iconify/vue';
-  import { useClientStore } from '@/stores/crm/client';
+  import { useLeadStore } from '@/stores/crm/client';
   import { useToast } from '@/composables/useToast';
   import type { Lead, LeadStatus } from '@/types/client.types';
   import { useModal } from '@/composables/useModal';
   import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
   
-  const clientStore = useClientStore();
+  const clientStore = useLeadStore();
   const toast = useToast();
   const modal = useModal();
   const router = useRouter();
