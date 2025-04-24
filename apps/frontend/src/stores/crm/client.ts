@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { Lead, Tag, LeadStatus } from '@/types/client.types';
-import * as clientService from '@/services/clientService';
+import type { Lead, Tag, LeadStatus } from '@/types/lead.types';
+import * as crmService from '@/services/crm';
 
-export const useClientStore = defineStore('client', () => {
+export const useLeadStore = defineStore('lead', () => {
   // State
   const leads = ref<Lead[]>([]);
   const selectedLead = ref<Lead | null>(null);
@@ -30,7 +30,7 @@ export const useClientStore = defineStore('client', () => {
   async function fetchLeads() {
     isLoading.value = true;
     try {
-      const response = await clientService.getLeads();
+      const response = await crmService.getLeads();
       leads.value = response.data;
     } catch (error) {
       console.error('Error fetching leads:', error);
@@ -42,7 +42,7 @@ export const useClientStore = defineStore('client', () => {
   async function fetchLeadById(id: string) {
     isLoading.value = true;
     try {
-      const response = await clientService.getLeadById(id);
+      const response = await crmService.getLeadById(id);
       selectedLead.value = response.data;
       return response.data;
     } catch (error) {
@@ -56,7 +56,7 @@ export const useClientStore = defineStore('client', () => {
   async function createLead(lead: Partial<Lead>) {
     isLoading.value = true;
     try {
-      const response = await clientService.createLead(lead);
+      const response = await crmService.createLead(lead);
       await fetchLeads(); // Refresh the list
       return response.data;
     } catch (error) {
@@ -70,7 +70,7 @@ export const useClientStore = defineStore('client', () => {
   async function updateLead(id: string, lead: Partial<Lead>) {
     isLoading.value = true;
     try {
-      const response = await clientService.updateLead(id, lead);
+      const response = await crmService.updateLead(id, lead);
       
       // Update in the local array too
       const index = leads.value.findIndex(l => l.id === id);
@@ -95,7 +95,7 @@ export const useClientStore = defineStore('client', () => {
   async function deleteLead(id: string) {
     isLoading.value = true;
     try {
-      await clientService.deleteLead(id);
+      await crmService.deleteLead(id);
       leads.value = leads.value.filter(lead => lead.id !== id);
       if (selectedLead.value?.id === id) {
         selectedLead.value = null;
@@ -111,7 +111,7 @@ export const useClientStore = defineStore('client', () => {
   
   async function fetchTags() {
     try {
-      const response = await clientService.getTags();
+      const response = await crmService.getTags();
       tags.value = response.data;
     } catch (error) {
       console.error('Error fetching tags:', error);
