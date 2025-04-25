@@ -9,23 +9,23 @@ export const useLeadStore = defineStore('lead', () => {
   const selectedLead = ref<Lead | null>(null);
   const isLoading = ref(false);
   const tags = ref<Tag[]>([]);
-  
+
   // Getters
   const leadsByStatus = computed(() => {
     const result: Record<LeadStatus, Lead[]> = {
       lead: [],
       opportunity: [],
       client: [],
-      lost: []
+      lost: [],
     };
-    
-    leads.value.forEach(lead => {
+
+    leads.value.forEach((lead) => {
       result[lead.status].push(lead);
     });
-    
+
     return result;
   });
-  
+
   // Actions
   async function fetchLeads() {
     isLoading.value = true;
@@ -38,7 +38,7 @@ export const useLeadStore = defineStore('lead', () => {
       isLoading.value = false;
     }
   }
-  
+
   async function fetchLeadById(id: string) {
     isLoading.value = true;
     try {
@@ -52,7 +52,7 @@ export const useLeadStore = defineStore('lead', () => {
       isLoading.value = false;
     }
   }
-  
+
   async function createLead(lead: Partial<Lead>) {
     isLoading.value = true;
     try {
@@ -66,23 +66,23 @@ export const useLeadStore = defineStore('lead', () => {
       isLoading.value = false;
     }
   }
-  
+
   async function updateLead(id: string, lead: Partial<Lead>) {
     isLoading.value = true;
     try {
       const response = await crmService.updateLead(id, lead);
-      
+
       // Update in the local array too
-      const index = leads.value.findIndex(l => l.id === id);
+      const index = leads.value.findIndex((l) => l.id === id);
       if (index !== -1) {
         leads.value[index] = { ...leads.value[index], ...lead };
       }
-      
+
       // Update selected lead if it's the current one
       if (selectedLead.value?.id === id) {
         selectedLead.value = { ...selectedLead.value, ...lead };
       }
-      
+
       return response.data;
     } catch (error) {
       console.error(`Error updating lead ${id}:`, error);
@@ -91,12 +91,12 @@ export const useLeadStore = defineStore('lead', () => {
       isLoading.value = false;
     }
   }
-  
+
   async function deleteLead(id: string) {
     isLoading.value = true;
     try {
       await crmService.deleteLead(id);
-      leads.value = leads.value.filter(lead => lead.id !== id);
+      leads.value = leads.value.filter((lead) => lead.id !== id);
       if (selectedLead.value?.id === id) {
         selectedLead.value = null;
       }
@@ -108,7 +108,7 @@ export const useLeadStore = defineStore('lead', () => {
       isLoading.value = false;
     }
   }
-  
+
   async function fetchTags() {
     try {
       const response = await crmService.getTags();
@@ -117,23 +117,23 @@ export const useLeadStore = defineStore('lead', () => {
       console.error('Error fetching tags:', error);
     }
   }
-  
+
   return {
     // State
     leads,
     selectedLead,
     isLoading,
     tags,
-    
+
     // Getters
     leadsByStatus,
-    
+
     // Actions
     fetchLeads,
     fetchLeadById,
     createLead,
     updateLead,
     deleteLead,
-    fetchTags
+    fetchTags,
   };
 });

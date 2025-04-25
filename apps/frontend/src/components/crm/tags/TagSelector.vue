@@ -2,10 +2,10 @@
   <div class="space-y-2">
     <!-- Selected Tags -->
     <div v-if="selectedTags.length > 0" class="flex flex-wrap gap-2 mb-2">
-      <Tag 
-        v-for="tag in selectedTags" 
-        :key="tag.id" 
-        :tag="tag" 
+      <Tag
+        v-for="tag in selectedTags"
+        :key="tag.id"
+        :tag="tag"
         deletable
         @delete="removeTag(tag)"
       />
@@ -15,7 +15,7 @@
       <!-- Search Input -->
       <BaseInput
         v-model="searchQuery"
-        placeholder="Search tags..."
+        placeholder="Procurar tags..."
         @focus.native="showDropdown = true"
         @blur.native="handleBlur"
       >
@@ -25,21 +25,21 @@
       </BaseInput>
 
       <!-- Dropdown Menu -->
-      <div 
-        v-if="showDropdown && filteredTags.length > 0" 
+      <div
+        v-if="showDropdown && filteredTags.length > 0"
         class="absolute z-50 mt-1 w-full bg-surface border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-auto"
       >
-        <div 
-          v-for="tag in filteredTags" 
+        <div
+          v-for="tag in filteredTags"
           :key="tag.id"
           class="p-2 hover:bg-zayit-blue/30 cursor-pointer"
           @mousedown.prevent="addTag(tag)"
         >
           <Tag :tag="tag" />
         </div>
-        
+
         <!-- Create New Tag Option -->
-        <div 
+        <div
           v-if="canCreateTags && searchQuery && !tagExists"
           class="p-2 hover:bg-zayit-blue/30 cursor-pointer border-t border-gray-700"
           @mousedown.prevent="createNewTag"
@@ -52,12 +52,12 @@
       </div>
 
       <!-- No Results Message -->
-      <div 
-        v-else-if="showDropdown && searchQuery && filteredTags.length === 0" 
+      <div
+        v-else-if="showDropdown && searchQuery && filteredTags.length === 0"
         class="absolute z-50 mt-1 w-full bg-surface border border-gray-700 rounded-lg shadow-lg p-4 text-center text-gray-400"
       >
         No tags found
-        <div 
+        <div
           v-if="canCreateTags"
           class="mt-2 text-zayit-blue cursor-pointer"
           @mousedown.prevent="createNewTag"
@@ -70,54 +70,42 @@
   </div>
 
   <!-- New Tag Modal -->
-  <BaseModal 
+  <BaseModal
     v-if="showCreateModal"
-    title="Create New Tag"
+    title="Criar nova tag"
     size="sm"
     @close="showCreateModal = false"
   >
     <div class="space-y-4">
-      <FormControl label="Tag Name" forLabel="newTagName">
-        <BaseInput v-model="newTagName" id="newTagName" placeholder="Enter tag name" />
+      <FormControl label="Nome da Tag" forLabel="newTagName">
+        <BaseInput v-model="newTagName" id="newTagName" placeholder="Digite o nome da tag" />
       </FormControl>
 
-      <FormControl label="Tag Color" forLabel="newTagColor">
+      <FormControl label="Cor da Tag" forLabel="newTagColor">
         <div class="flex items-center space-x-3">
-          <input
-            type="color"
-            v-model="newTagColor"
-            class="h-10 w-10 rounded cursor-pointer"
-          />
+          <input type="color" v-model="newTagColor" class="h-10 w-10 rounded cursor-pointer" />
           <BaseInput v-model="newTagColor" id="newTagColor" placeholder="#000000" />
         </div>
 
         <!-- Color Preview -->
         <div class="mt-2 flex space-x-2 items-center">
-          <span class="text-sm text-white/70">Preview:</span>
+          <span class="text-sm text-white/70">Visualização:</span>
           <div
             class="px-2 py-1 text-xs font-medium rounded"
             :style="{ backgroundColor: newTagColor, color: getContrastColor(newTagColor) }"
           >
-            {{ newTagName || 'Tag Preview' }}
+            {{ newTagName || 'Visualização da Tag' }}
           </div>
         </div>
       </FormControl>
 
       <div class="flex justify-end space-x-3 pt-4">
-        <button 
-          class="btn btn-secondary" 
-          @click="showCreateModal = false"
-          :disabled="isCreating"
-        >
-          Cancel
-        </button>
-        <button 
-          class="btn btn-primary" 
-          @click="saveNewTag"
-          :disabled="isCreating"
-        >
-          {{ isCreating ? 'Creating...' : 'Create Tag' }}
-        </button>
+        <DefaultButton variant="default" size="sm" @click="showCreateModal = false" :disabled="isCreating">
+          Cancelar
+        </DefaultButton>
+        <DefaultButton variant="primary" size="sm"  @click="saveNewTag" :disabled="isCreating">
+          {{ isCreating ? 'Criando...' : 'Criar Tag' }}
+        </DefaultButton>
       </div>
     </div>
   </BaseModal>
@@ -133,6 +121,7 @@ import BaseModal from '@/components/ui/modals/BaseModal.vue';
 import FormControl from '@/components/ui/forms/FormControl.vue';
 import Tag from './Tag.vue';
 import type { Tag as TagType } from '@/types';
+import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
 
 const props = defineProps<{
   modelValue: string[];
@@ -155,19 +144,19 @@ const toast = useToast();
 
 // Compute selected and filtered
 const selectedTags = computed(() =>
-  allTags.value.filter(tag => props.modelValue.includes(tag.id))
+  allTags.value.filter((tag) => props.modelValue.includes(tag.id)),
 );
 
 const filteredTags = computed(() => {
   const q = searchQuery.value.toLowerCase();
   return allTags.value.filter(
-    tag => tag.name.toLowerCase().includes(q) && !props.modelValue.includes(tag.id)
+    (tag) => tag.name.toLowerCase().includes(q) && !props.modelValue.includes(tag.id),
   );
 });
 
 const tagExists = computed(() => {
   if (!searchQuery.value) return true;
-  return allTags.value.some(tag => tag.name.toLowerCase() === searchQuery.value.toLowerCase());
+  return allTags.value.some((tag) => tag.name.toLowerCase() === searchQuery.value.toLowerCase());
 });
 
 // Handlers
@@ -183,7 +172,10 @@ function addTag(tag: TagType) {
 }
 
 function removeTag(tag: TagType) {
-  emit('update:modelValue', props.modelValue.filter(id => id !== tag.id));
+  emit(
+    'update:modelValue',
+    props.modelValue.filter((id) => id !== tag.id),
+  );
 }
 
 function createNewTag() {
@@ -203,7 +195,7 @@ async function saveNewTag() {
       id: data.id,
       name: newTagName.value,
       color: newTagColor.value,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
     allTags.value.push(tag);
     addTag(tag);
@@ -219,8 +211,11 @@ async function saveNewTag() {
 }
 
 function getContrastColor(hex: string) {
-  const [r,g,b] = hex.replace('#','').match(/.{2}/g)!.map(c => parseInt(c,16));
-  return (0.299*r+0.587*g+0.114*b)/255 > 0.5 ? '#000' : '#fff';
+  const [r, g, b] = hex
+    .replace('#', '')
+    .match(/.{2}/g)!
+    .map((c) => parseInt(c, 16));
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.5 ? '#000' : '#fff';
 }
 
 // Load tags

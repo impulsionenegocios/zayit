@@ -19,6 +19,6 @@ auth.initAuth();
 app.use(router);
 watchAuthToken();
 configure({
-    generateMessage: generateValidationMessage,
+  generateMessage: generateValidationMessage,
 });
 app.mount('#app');

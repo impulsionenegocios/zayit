@@ -9,35 +9,35 @@ export function useTagForm(tagId?: string) {
   const toast = useToast();
   const router = useRouter();
   const isLoading = ref(false);
-  
+
   // Initialize form with vee-validate
   const { handleSubmit, setValues, resetForm } = useForm<TagCreate>();
 
   // Form fields
-  const { 
-    value: name, 
-    errorMessage: nameError, 
+  const {
+    value: name,
+    errorMessage: nameError,
     handleBlur: blurName,
-    meta: nameMeta
+    meta: nameMeta,
   } = useField<string>('name', 'required');
 
-  const { 
-    value: color, 
-    errorMessage: colorError, 
+  const {
+    value: color,
+    errorMessage: colorError,
     handleBlur: blurColor,
-    meta: colorMeta
+    meta: colorMeta,
   } = useField<string>('color', 'required');
 
   // Load tag data if editing an existing tag
   async function loadTagData() {
     if (!tagId) return;
-    
+
     isLoading.value = true;
     try {
       const { data } = await getTagById(tagId);
       setValues({
         name: data.name,
-        color: data.color
+        color: data.color,
       });
     } catch (error) {
       toast.error('Error loading tag data');
@@ -84,11 +84,11 @@ export function useTagForm(tagId?: string) {
     colorError,
     blurColor,
     colorMeta,
-    
+
     // Actions
     submitForm,
     loadTagData,
     isLoading,
-    goBack
+    goBack,
   };
 }

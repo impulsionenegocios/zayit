@@ -4,13 +4,12 @@ const __VLS_ctx = {};
 let __VLS_components;
 let __VLS_directives;
 const __VLS_self = (await import('vue')).defineComponent({
-    setup() {
-        return {};
-    },
+  setup() {
+    return {};
+  },
 });
 export default (await import('vue')).defineComponent({
-    setup() {
-        return {};
-    },
-});
-; /* PartiallyEnd: #4569/main.vue */
+  setup() {
+    return {};
+  },
+}); /* PartiallyEnd: #4569/main.vue */

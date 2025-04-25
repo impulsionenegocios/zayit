@@ -20,6 +20,7 @@
   --color-zayit-info: #2e5df0;
   --color-zayit-danger: #f94d4d;
   --color-zayit-warning: #ff934f;
+  --color-zayit-default: #646464;
   --color-card: #121223;
 
   --gradient-primary: linear-gradient(180deg, #6f4bdb 30%, rgba(216, 121, 242, 1) 100%);

@@ -4,13 +4,12 @@ let __VLS_components;
 let __VLS_directives;
 var __VLS_dollars;
 const __VLS_self = (await import('vue')).defineComponent({
-    setup() {
-        return {};
-    },
+  setup() {
+    return {};
+  },
 });
 export default (await import('vue')).defineComponent({
-    setup() {
-        return {};
-    },
-});
-; /* PartiallyEnd: #4569/main.vue */
+  setup() {
+    return {};
+  },
+}); /* PartiallyEnd: #4569/main.vue */

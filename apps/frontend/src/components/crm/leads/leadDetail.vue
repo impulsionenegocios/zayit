@@ -24,27 +24,29 @@
             </div>
             
             <div class="flex gap-2">
-              <button 
+              <DefaultButton
+                variant="info"
+                size="md" 
                 @click="editLead"
-                class="btn-outline btn-sm"
               >
                 <Icon icon="mdi:pencil" class="mr-1" />
-                Edit
-              </button>
-              <button 
+                Editar
+              </DefaultButton>
+              <DefaultButton
+                variant="danger"
+                size="md" 
                 @click="confirmDelete"
-                class="btn-danger btn-sm"
               >
                 <Icon icon="mdi:delete" class="mr-1" />
-                Delete
-              </button>
+                Apagar
+              </DefaultButton>
             </div>
           </div>
         </div>
         
         <!-- Contact Information -->
         <div class="bg-surface rounded-lg p-6">
-          <h2 class="text-lg font-semibold text-white mb-4">Contact Information</h2>
+          <h2 class="text-lg font-semibold text-white mb-4">Informações de Contato</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
             <div>
               <h3 class="text-sm text-gray-400">Email</h3>
@@ -60,7 +62,7 @@
             </div>
             
             <div>
-              <h3 class="text-sm text-gray-400">Phone</h3>
+              <h3 class="text-sm text-gray-400">Número</h3>
               <div class="flex items-center mt-1">
                 <Icon icon="mdi:phone-outline" class="text-zayit-blue mr-2" />
                 <a 
@@ -70,7 +72,7 @@
                   {{ lead.phone }}
                 </a>
                 <button 
-                  class="ml-2 text-zayit-blue bg-white/5 hover:bg-white/10 transition-colors p-1.5 rounded-full"
+                  class="ml-2 text-green-700 cursor-pointer  bg-green-400 hover:bg-white/10 transition-colors p-1.5 rounded-full"
                   title="Send WhatsApp message"
                   @click="openWhatsApp(lead.phone)"
                 >
@@ -80,7 +82,7 @@
             </div>
             
             <div>
-              <h3 class="text-sm text-gray-400">Birth Date</h3>
+              <h3 class="text-sm text-gray-400">Data de Nascimento</h3>
               <div class="flex items-center mt-1">
                 <Icon icon="mdi:calendar-outline" class="text-zayit-blue mr-2" />
                 <span class="text-white">
@@ -90,7 +92,7 @@
             </div>
             
             <div>
-              <h3 class="text-sm text-gray-400">Source</h3>
+              <h3 class="text-sm text-gray-400">Fonte</h3>
               <div class="flex items-center mt-1">
                 <Icon icon="mdi:source-branch" class="text-zayit-blue mr-2" />
                 <span class="text-white">{{ formatSource(lead.source) }}</span>
@@ -99,7 +101,7 @@
           </div>
           
           <div class="mt-4">
-            <h3 class="text-sm text-gray-400">Address</h3>
+            <h3 class="text-sm text-gray-400">Endereço</h3>
             <div class="flex items-start mt-1">
               <Icon icon="mdi:map-marker-outline" class="text-zayit-blue mr-2 mt-0.5" />
               <span class="text-white">{{ lead.address || 'No address specified' }}</span>
@@ -108,37 +110,28 @@
           
           <div class="mt-4">
             <h3 class="text-sm text-gray-400">Tags</h3>
-            <div class="flex flex-wrap gap-2 mt-2">
-              <span 
-                v-for="tag in lead.tags" 
-                :key="tag.id" 
-                class="px-2 py-0.5 text-sm rounded-full text-white"
-                :style="{ backgroundColor: tag.color }"
-              >
-                {{ tag.name }}
-              </span>
-              <span v-if="!lead.tags.length" class="text-white/60">No tags</span>
-            </div>
+            <LeadTags :tags="lead.tags" />
           </div>
         </div>
         
         <!-- Contact History -->
         <div class="bg-surface rounded-lg p-6">
           <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-semibold text-white">Contact History</h2>
-            <button 
+            <h2 class="text-lg font-semibold text-white">Histórico de Contatos</h2>
+            <DefaultButton 
+              variant="primary"
+              size="md"
               @click="openNewContactModal"
-              class="btn-primary btn-sm"
             >
               <Icon icon="mdi:plus" class="mr-1" />
-              Add Contact
-            </button>
+              Add Contato
+            </DefaultButton>
           </div>
           
           <div v-if="!contactHistory.length" class="text-center py-8 text-white/60">
             <Icon icon="mdi:history" class="text-4xl mx-auto mb-2" />
-            <p>No contact history yet</p>
-            <p class="text-sm">Record your first interaction with this lead</p>
+            <p>Sem Histórico de Contatos Ainda</p>
+            <p class="text-sm">Grave sua primeira interação com esse lead</p>
           </div>
           
           <div v-else class="space-y-4">
@@ -169,11 +162,11 @@
         
         <!-- Comments -->
         <div class="bg-surface rounded-lg p-6">
-          <h2 class="text-lg font-semibold text-white mb-4">Comments</h2>
+          <h2 class="text-lg font-semibold text-white mb-4">Comentários</h2>
           
           <div class="space-y-4">
             <div v-if="!comments.length" class="text-center py-4 text-white/60">
-              No comments yet
+              Sem comentários Ainda
             </div>
             
             <div 
@@ -192,19 +185,20 @@
               <FormControl label="Add Comment">
                 <BaseTextarea 
                   v-model="newComment" 
-                  placeholder="Write a comment..." 
+                  placeholder="Escreva um comentário..." 
                   :rows="3"
                 />
               </FormControl>
               
               <div class="flex justify-end mt-2">
-                <button 
+                <DefaultButton 
+                  variant="primary"
+                  size="sm"
                   @click="addComment"
-                  class="btn-primary btn-sm"
                   :disabled="!newComment.trim()"
                 >
                   Post Comment
-                </button>
+                </DefaultButton>
               </div>
             </div>
           </div>
@@ -215,27 +209,27 @@
       <div class="space-y-6">
         <!-- Quick Actions -->
         <div class="bg-surface rounded-lg p-6">
-          <h2 class="text-lg font-semibold text-white mb-4">Quick Actions</h2>
+          <h2 class="text-lg font-semibold text-white mb-4">Ações Rápidas</h2>
           
           <div class="grid grid-cols-2 gap-3">
-            <button class="btn-outline p-3 h-auto text-left flex items-center">
+            <button class="btn-outline hover:bg-black/60 transition-all duration-500 cursor-pointer rounded-lg p-3 h-auto text-left flex items-center">
               <Icon icon="mdi:phone" class="mr-2 text-zayit-blue" />
-              <span>Call</span>
+              <span>Ligar</span>
             </button>
             
-            <button class="btn-outline p-3 h-auto text-left flex items-center" @click="openWhatsApp(lead.phone)">
+            <button class="btn-outline hover:bg-black/60 transition-all duration-500 cursor-pointer rounded-lg p-3 h-auto text-left flex items-center" @click="openWhatsApp(lead.phone)">
               <Icon icon="mdi:whatsapp" class="mr-2 text-zayit-blue" />
               <span>WhatsApp</span>
             </button>
             
-            <button class="btn-outline p-3 h-auto text-left flex items-center" @click="sendEmail">
+            <button class="btn-outline hover:bg-black/60 transition-all duration-500 cursor-pointer rounded-lg p-3 h-auto text-left flex items-center" @click="sendEmail">
               <Icon icon="mdi:email" class="mr-2 text-zayit-blue" />
               <span>Email</span>
             </button>
             
-            <button class="btn-outline p-3 h-auto text-left flex items-center" @click="openTaskModal">
+            <button class="btn-outline hover:bg-black/60 transition-all duration-500 cursor-pointer rounded-lg p-3 h-auto text-left flex items-center" @click="openTaskModal">
               <Icon icon="mdi:clipboard-check" class="mr-2 text-zayit-blue" />
-              <span>Add Task</span>
+              <span>Add Tarefa</span>
             </button>
           </div>
         </div>
@@ -243,20 +237,21 @@
         <!-- Tasks -->
         <div class="bg-surface rounded-lg p-6">
           <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-semibold text-white">Tasks</h2>
-            <button 
-              @click="openTaskModal"
-              class="btn-primary btn-sm"
-            >
-              <Icon icon="mdi:plus" class="mr-1" />
-              New Task
-            </button>
+            <h2 class="text-lg font-semibold text-white">Tarefas</h2>
+            <DefaultButton
+                variant="primary"
+                size="sm"
+                icon="mdi:plus"
+                @click="openTaskModal"
+              >
+                Nova Tarefa
+              </DefaultButton>
           </div>
           
           <div v-if="!tasks.length" class="text-center py-8 text-white/60">
             <Icon icon="mdi:checkbox-marked-circle-outline" class="text-4xl mx-auto mb-2" />
-            <p>No tasks yet</p>
-            <p class="text-sm">Create your first task for this lead</p>
+            <p>Sem Tarefas Ainda</p>
+            <p class="text-sm">Crie sua primeiria tarefa para esse lead</p>
           </div>
           
           <div v-else class="space-y-3">
@@ -288,13 +283,13 @@
                     {{ formatDate(task.dueDate) }}
                   </div>
                   
-                  <button 
+                  <DefaultButton 
+                    class="text-zayit-danger"
                     @click="deleteTask(task.id)"
-                    class="text-white/50 hover:text-zayit-danger p-1"
                     title="Delete task"
                   >
                     <Icon icon="mdi:delete" />
-                  </button>
+                  </DefaultButton>
                 </div>
               </div>
             </div>
@@ -304,20 +299,21 @@
         <!-- Files -->
         <div class="bg-surface rounded-lg p-6">
           <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-semibold text-white">Files</h2>
-            <button 
+            <h2 class="text-lg font-semibold text-white">Arquivos</h2>
+            <DefaultButton 
               @click="openFileUploader"
-              class="btn-primary btn-sm"
+              size="sm"
+              variant="primary"
             >
               <Icon icon="mdi:upload" class="mr-1" />
               Upload
-            </button>
+            </DefaultButton>
           </div>
           
           <div v-if="!files.length" class="text-center py-8 text-white/60">
             <Icon icon="mdi:file-document-outline" class="text-4xl mx-auto mb-2" />
-            <p>No files yet</p>
-            <p class="text-sm">Upload documents related to this lead</p>
+            <p>Sem Arquivos Ainda</p>
+            <p class="text-sm">Faça upload de arquivos para esse lead</p>
           </div>
           
           <div v-else class="space-y-2">
@@ -338,29 +334,32 @@
               </div>
               
               <div class="flex gap-1">
-                <button 
+                <DefaultButton 
+                  variant="info"
+                  size="sm" 
                   @click="viewFile(file)"
-                  class="text-white/70 hover:text-zayit-blue p-1.5 rounded-full bg-white/5 hover:bg-white/10"
-                  title="View file"
+                  title="Ver Arquivo"
                 >
                   <Icon icon="mdi:eye" />
-                </button>
+                </DefaultButton >
                 
-                <button 
+                <DefaultButton 
+                  variant="primary"
+                  size="sm" 
                   @click="downloadFile(file)"
-                  class="text-white/70 hover:text-zayit-blue p-1.5 rounded-full bg-white/5 hover:bg-white/10"
-                  title="Download file"
+                  title="Baixar Arquivo"
                 >
                   <Icon icon="mdi:download" />
-                </button>
+                </DefaultButton >
                 
-                <button 
+                <DefaultButton 
+                  variant="danger"
+                  size="sm" 
                   @click="deleteFile(file.id)"
-                  class="text-white/70 hover:text-zayit-danger p-1.5 rounded-full bg-white/5 hover:bg-white/10"
-                  title="Delete file"
+                  title="Excluir Arquivo"
                 >
                   <Icon icon="mdi:delete" />
-                </button>
+                </DefaultButton >
               </div>
             </div>
           </div>
@@ -371,18 +370,18 @@
       <div v-if="showContactModal" class="fixed inset-0 flex items-center justify-center z-50">
         <div class="absolute inset-0 bg-black/50" @click="showContactModal = false"></div>
         <div class="bg-card rounded-lg p-6 w-full max-w-md relative z-10">
-          <h3 class="text-lg font-medium text-white mb-4">Record Contact</h3>
+          <h3 class="text-lg font-medium text-white mb-4">Registro de Contato</h3>
           
-          <FormControl label="Contact Type" forLabel="contactType">
+          <FormControl label="Tipo de Contato" forLabel="contactType">
             <BaseSelect 
               v-model="newContact.type" 
               id="contactType" 
               :options="contactTypeOptions" 
-              placeholder="Select contact type" 
+              placeholder="Selecione um tipo de contato" 
             />
           </FormControl>
           
-          <FormControl label="Date & Time" forLabel="contactDate" class="mt-4">
+          <FormControl label="Data & Hora" forLabel="contactDate" class="mt-4">
             <BaseInput 
               v-model="newContact.date" 
               id="contactDate" 
@@ -390,31 +389,31 @@
             />
           </FormControl>
           
-          <FormControl label="Description" forLabel="contactDescription" class="mt-4">
+          <FormControl label="Descrição" forLabel="contactDescription" class="mt-4">
             <BaseTextarea 
               v-model="newContact.description" 
               id="contactDescription" 
-              placeholder="Describe the interaction" 
+              placeholder="Descreva a Interação" 
               :rows="3"
             />
           </FormControl>
           
           <div class="flex justify-end gap-3 mt-6">
-            <button 
-              type="button" 
-              class="btn-secondary" 
+            <DefaultButton 
+              variant="default"
+              size="sm"
               @click="showContactModal = false"
             >
-              Cancel
-            </button>
-            <button 
-              type="button" 
-              class="btn-primary"
+              Cancelar
+            </DefaultButton>
+            <DefaultButton 
+              variant="primary"
+              size="sm"
               @click="addContact"
               :disabled="!newContact.type || !newContact.description"
             >
-              Save Contact
-            </button>
+              Salvar Contato
+            </DefaultButton>
           </div>
         </div>
       </div>
@@ -425,15 +424,15 @@
         <div class="bg-card rounded-lg p-6 w-full max-w-md relative z-10">
           <h3 class="text-lg font-medium text-white mb-4">Add Task</h3>
           
-          <FormControl label="Task Title" forLabel="taskTitle">
+          <FormControl label="Titulo da Tarefa" forLabel="taskTitle">
             <BaseInput 
               v-model="newTask.title" 
               id="taskTitle" 
-              placeholder="Enter task title" 
+              placeholder="Digite o título da tarefa" 
             />
           </FormControl>
           
-          <FormControl label="Due Date" forLabel="taskDueDate" class="mt-4">
+          <FormControl label="Data Prevista" forLabel="taskDueDate" class="mt-4">
             <BaseInput 
               v-model="newTask.dueDate" 
               id="taskDueDate" 
@@ -442,21 +441,21 @@
           </FormControl>
           
           <div class="flex justify-end gap-3 mt-6">
-            <button 
-              type="button" 
-              class="btn-secondary" 
+            <DefaultButton
+              variant="default"
+              size="sm" 
               @click="showTaskModal = false"
             >
-              Cancel
-            </button>
-            <button 
-              type="button" 
-              class="btn-primary"
+              Cancelar
+            </DefaultButton>
+            <DefaultButton
+              variant="primary"
+              size="sm" 
               @click="addTask"
               :disabled="!newTask.title || !newTask.dueDate"
             >
-              Add Task
-            </button>
+              Add Tarefa
+            </DefaultButton>
           </div>
         </div>
       </div>
@@ -465,7 +464,7 @@
       <div v-if="showFileModal" class="fixed inset-0 flex items-center justify-center z-50">
         <div class="absolute inset-0 bg-black/50" @click="showFileModal = false"></div>
         <div class="bg-card rounded-lg p-6 w-full max-w-md relative z-10">
-          <h3 class="text-lg font-medium text-white mb-4">Upload File</h3>
+          <h3 class="text-lg font-medium text-white mb-4">Subir Arquivo</h3>
           
           <BaseFileInput 
             ref="fileInputRef"
@@ -476,21 +475,21 @@
           />
           
           <div class="flex justify-end gap-3 mt-6">
-            <button 
-              type="button" 
-              class="btn-secondary" 
+            <DefaultButton 
+              variant="default"
+              size="sm"
               @click="showFileModal = false"
             >
               Cancel
-            </button>
-            <button 
-              type="button" 
-              class="btn-primary"
+            </DefaultButton>
+            <DefaultButton 
+              variant="primary"
+              size="sm"
               @click="uploadFile"
               :disabled="!fileUpload"
             >
               Upload
-            </button>
+            </DefaultButton>
           </div>
         </div>
       </div>
@@ -504,15 +503,15 @@
   import { useToast } from '@/composables/useToast';
   import { useModal } from '@/composables/useModal';
   import { Icon } from '@iconify/vue';
-  import type { Lead, LeadStatus, Contact } from '@/types/client.types';
+  import type { Lead, LeadStatus, Contact, NewContact } from '@/types/client.types';
   import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
-  
+  import LeadTags from './LeadTags.vue';
   import FormControl from '@/components/ui/forms/FormControl.vue';
   import BaseInput from '@/components/ui/forms/BaseInput.vue';
   import BaseTextarea from '@/components/ui/forms/BaseTextarea.vue';
   import BaseSelect from '@/components/ui/forms/BaseSelect.vue';
   import BaseFileInput from '@/components/ui/forms/BaseFileInput.vue';
-  
+  import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
   const props = defineProps<{
     leadId: string;
   }>();
@@ -548,12 +547,11 @@
   const showFileModal = ref(false);
   
   // New contact form
-  const newContact = reactive({
-    type: '',
-    date: new Date().toISOString().slice(0, 16),
-    description: ''
-  });
-  
+  const newContact = reactive<NewContact>({
+  type: '',
+  date: new Date().toISOString().slice(0, 16),
+  description: ''
+});
   // New task form
   const newTask = reactive({
     title: '',
@@ -690,7 +688,7 @@
     
     const diffDays = Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     
-    if (diffDays < 0) {
+    if (diffDays < 0 ) {
       return 'text-zayit-danger'; // Overdue
     } else if (diffDays === 0) {
       return 'text-zayit-warning'; // Due today
@@ -716,10 +714,10 @@
   }
   
   // Action methods
-  function editLead() {
-    router.push(`/leads/${props.leadId}/edit`);
-  }
-  
+  function editLead(lead: Lead) {
+  router.push({ name: 'EditLead', params: { id: props.leadId } });
+}
+
   async function confirmDelete() {
     try {
       const confirmed = await modal.open(ConfirmModal, {

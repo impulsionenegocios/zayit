@@ -3,7 +3,7 @@
     <!-- Ícone à esquerda -->
     <div
       v-if="$slots.icon"
-      class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+      class="absolute text-white inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
     >
       <slot name="icon" />
     </div>
@@ -36,7 +36,16 @@ import { computed } from 'vue';
 const props = defineProps<{
   modelValue: string;
   name?: string;
-  type?: 'text' | 'password' | 'email' | 'date' | 'datetime-local' | 'number' | 'search' | 'tel' | 'url';
+  type?:
+    | 'text'
+    | 'password'
+    | 'email'
+    | 'date'
+    | 'datetime-local'
+    | 'number'
+    | 'search'
+    | 'tel'
+    | 'url';
   placeholder?: string;
   loading?: boolean;
   disabled?: boolean;
