@@ -147,6 +147,10 @@ const menuItems = ref([
       label: 'Leads & Clients',
       to: { name: 'LeadList' },
     },
+    {
+        label: 'Tags',
+        to: { name: 'TagsList' },
+      },
     // {
     //   label: 'Tasks',
     //   to: { name: 'VerKanban' },

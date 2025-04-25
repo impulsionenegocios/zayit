@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineProps, defineEmits } from 'vue';
+import { ref, computed } from 'vue';
 
 type SelectOption = {
   label: string;
@@ -44,15 +44,15 @@ type SelectOption = {
 };
 
 const props = defineProps<{
-  modelValue: string | number | null;
+  modelValue?: string | number | null;
   options: SelectOption[];
   placeholder?: string;
   disabled?: boolean;
-  error?: string;
+  error?: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string | number): void;
+  (e: 'update:modelValue', value: string | number | null): void;
 }>();
 
 const isOpen = ref(false);

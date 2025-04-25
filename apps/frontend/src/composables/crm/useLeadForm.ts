@@ -1,129 +1,138 @@
-import { ref, reactive, computed } from 'vue';
+// src/composables/crm/useLeadForm.ts
+
+import { ref, reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from '@/composables/useToast';
-import type { Lead, LeadSource, LeadStatus } from '@/types/lead.types';
+import type {
+  LeadSource,
+  LeadStatus,
+  LeadCreatePayload,
+  LeadUpdatePayload,
+  Tag
+} from '@/types/lead.types';
 import { createLead, updateLead, getLeadById } from '@/services/crm';
+import { getTags } from '@/services/tagService';
 
 export function useLeadForm(leadId?: string) {
   const router = useRouter();
   const toast = useToast();
   const isSubmitting = ref(false);
-  const isEditing = computed(() => !!leadId);
-  
-  // Form data
-  const form = reactive<{
-    name: string;
-    email: string;
-    phone: string;
-    address?: string;
-    birthDate?: string;
-    source?: LeadSource;
-    status: LeadStatus;
-    tags: string[];
-  }>({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
+  const isEditing   = computed(() => !!leadId);
+
+  // Só IDs de tag
+  const selectedTagIds = ref<string[]>([]);
+  // Todas as tags para lookup
+  const availableTags  = ref<Tag[]>([]);
+
+  // Estado do form (sem form.tags)
+  const form = reactive({
+    name:      '',
+    email:     '',
+    phone:     '',
+    address:   '',
     birthDate: '',
-    source: undefined,
-    status: 'lead',
-    tags: []
+    source:    undefined as LeadSource | undefined,
+    status:    'lead' as LeadStatus
   });
 
-  // Form validation
-  const errors = reactive<Record<string, string>>({});
+  const errors = reactive<Record<string,string>>({});
 
-  // Options for dropdowns
-  const sourceOptions = [
-    { label: 'Organic', value: 'organic' },
+  // Tipagem explícita para evitar any[]
+  const sourceOptions: { label: string; value: LeadSource }[] = [
+    { label: 'Organic',       value: 'organic' },
     { label: 'Advertisement', value: 'advertisement' },
-    { label: 'Referral', value: 'referral' },
-    { label: 'Social Media', value: 'social' },
-    { label: 'Other', value: 'other' }
+    { label: 'Referral',      value: 'referral' },
+    { label: 'Social Media',  value: 'social' },
+    { label: 'Other',         value: 'other' }
   ];
 
-  const statusOptions = [
-    { label: 'Lead', value: 'lead' },
+  const statusOptions: { label: string; value: LeadStatus }[] = [
+    { label: 'Lead',        value: 'lead' },
     { label: 'Opportunity', value: 'opportunity' },
-    { label: 'Client', value: 'client' },
-    { label: 'Lost', value: 'lost' }
+    { label: 'Client',      value: 'client' },
+    { label: 'Lost',        value: 'lost' }
   ];
-  
-  // Load lead data if editing
-  if (leadId) {
-    loadLead(leadId);
+
+  async function loadAvailableTags() {
+    try {
+      const { data } = await getTags();
+      availableTags.value = data;
+    } catch (err) {
+      console.error('Error loading tags', err);
+    }
   }
-  
+
   async function loadLead(id: string) {
     try {
-      const response = await getLeadById(id);
-      const lead = response.data;
-      
-      form.name = lead.name;
-      form.email = lead.email;
-      form.phone = lead.phone;
-      form.address = lead.address;
-      form.birthDate = lead.birthDate;
-      form.source = lead.source;
-      form.status = lead.status;
-      form.tags = lead.tags.map(tag => tag.id);
-    } catch (error) {
-      console.error('Error loading lead:', error);
-      toast.error('Failed to load lead data');
+      await loadAvailableTags();
+      const { data: lead } = await getLeadById(id);
+      form.name      = lead.name;
+      form.email     = lead.email;
+      form.phone     = lead.phone;
+      form.address   = lead.address || '';
+      form.birthDate = lead.birthDate || '';
+      form.source    = lead.source;
+      form.status    = lead.status;
+      // Aqui anotamos explicitamente o tipo de `t`
+      selectedTagIds.value = lead.tags.map((t: Tag) => t.id);
+    } catch {
+      toast.error('Failed to load lead');
       router.push('/crm/leads');
     }
   }
 
-  // Validate form
   function validateForm() {
-    errors.name = !form.name.trim() ? 'Name is required' : '';
-    errors.email = !form.email.trim() ? 'Email is required' : '';
-    
-    // Email format validation
+    errors.name   = !form.name.trim()  ? 'Name is required'  : '';
+    errors.email  = !form.email.trim() ? 'Email is required' : '';
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       errors.email = 'Invalid email format';
     }
-    
-    errors.phone = !form.phone.trim() ? 'Phone is required' : '';
-    errors.status = !form.status ? 'Status is required' : '';
-    
-    return !Object.values(errors).some(error => error);
+    errors.phone  = !form.phone.trim() ? 'Phone is required' : '';
+    errors.status = !form.status       ? 'Status is required': '';
+    return !Object.values(errors).some(e => e);
   }
 
-  // Form submission
   async function handleSubmit() {
     if (!validateForm()) {
       toast.error('Please fix the errors in the form');
       return;
     }
-    
     isSubmitting.value = true;
-    
+
+    const payload: LeadCreatePayload | LeadUpdatePayload = {
+      name:      form.name,
+      email:     form.email,
+      phone:     form.phone,
+      address:   form.address,
+      birthDate: form.birthDate,
+      source:    form.source,
+      status:    form.status,
+      tags:      selectedTagIds.value    // somente string[]
+    };
+
     try {
       if (isEditing.value && leadId) {
-        await updateLead(leadId, form);
+        await updateLead(leadId, payload as LeadUpdatePayload);
         toast.success('Lead updated successfully');
       } else {
-        await createLead(form);
+        await createLead(payload as LeadCreatePayload);
         toast.success('Lead created successfully');
       }
-      
-      // Navigate back to list
       router.push('/crm/leads');
-    } catch (error) {
-      console.error('Error saving lead:', error);
+    } catch {
       toast.error('Failed to save lead');
     } finally {
       isSubmitting.value = false;
     }
   }
 
-  // Cancel form
   function cancel() {
     router.push('/crm/leads');
   }
-  
+
+  if (leadId) loadLead(leadId);
+  else         loadAvailableTags();
+
   return {
     form,
     errors,
@@ -131,6 +140,7 @@ export function useLeadForm(leadId?: string) {
     isEditing,
     sourceOptions,
     statusOptions,
+    selectedTagIds,
     handleSubmit,
     cancel
   };
