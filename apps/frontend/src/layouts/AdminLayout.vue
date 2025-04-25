@@ -51,9 +51,9 @@ const closeSidebar = () => (sidebarOpen.value = false);
           <component :is="actionButton.component" v-if="actionButton.component" />
         </nav>
         <BackButton 
-              label="Back" 
+              label="Voltar" 
               class="lg:mt-20 mt-28  mx-4"
-              aria-label="Go back to previous page"
+              aria-label="Voltar para a página anterior"
               fallback-route="/"
             />
         <router-view class="mt-8" />
