@@ -44,13 +44,15 @@ from services.lead_service import (
 router = APIRouter(prefix="/crm/leads", tags=["crm"])
 
 # Leads endpoints
-@router.post("/", response_model=LeadCreate)
+@router.post("/", response_model=Lead)
 async def create_lead(
     lead: LeadCreate,
-    user_data=Depends(verify_role(["superadmin"]))
+    user_data = Depends(verify_role(["superadmin"]))
 ):
+    """
+    Cria um novo lead. Só superadmins conseguem.
+    """
     return create_lead_service(lead, user_data)
-
 
 @router.get("/", response_model=List[Lead])
 async def get_leads(
@@ -121,7 +123,6 @@ async def delete_lead_comment(
         raise HTTPException(status_code=404, detail="Comment not found")
     return {"message": "Comment deleted successfully"}
 
-# Contacts endpoints
 # Contacts endpoints
 @router.get("/{lead_id}/contacts", response_model=List[Contact])
 async def get_lead_contacts(

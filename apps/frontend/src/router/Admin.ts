@@ -87,6 +87,29 @@ export default [
           }
         ]
       },
+      {
+        path: 'tags',
+        meta: { breadcrumb: 'Tags' },
+        children: [
+          {
+            path: '',
+            name: 'TagsList',
+            component: () => import('@/pages/crm/tags/TagsPage.vue'),
+          },
+          {
+            path: 'new',
+            name: 'CreateTag',
+            component: () => import('@/pages/crm/tags/CreateTag.vue'),
+            meta: { breadcrumb: 'Create Tag' },
+          },
+          {
+            path: 'editar/:id',
+            name: 'EditTag',
+            component: () => import('@/pages/crm/tags/EditTag.vue'),
+            meta: { breadcrumb: 'Edit Tag' },
+          },
+        ],
+      },
       // {
       //   path: 'Crm',
       //   meta: { breadcrumb: 'Crm' },

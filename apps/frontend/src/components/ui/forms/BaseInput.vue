@@ -17,6 +17,7 @@
       :readonly="readonly"
       :class="['input-base', $slots.icon ? 'pl-10' : '', loading ? 'pr-10' : '']"
       v-model="inputValue"
+      @focus="$emit('focus')"
       @blur="$emit('blur')"
     />
 
@@ -35,7 +36,7 @@ import { computed } from 'vue';
 const props = defineProps<{
   modelValue: string;
   name?: string;
-  type?: 'text' | 'password' | 'email';
+  type?: 'text' | 'password' | 'email' | 'date' | 'datetime-local' | 'number' | 'search' | 'tel' | 'url';
   placeholder?: string;
   loading?: boolean;
   disabled?: boolean;
@@ -45,6 +46,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void;
   (e: 'blur'): void;
+  (e: 'focus'): void;
 }>();
 
 const inputValue = computed({
