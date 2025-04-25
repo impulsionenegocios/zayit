@@ -10,18 +10,9 @@ export interface Tag {
   color: string;
 }
 
-export type LeadSource =
-  | 'organic'
-  | 'advertisement'
-  | 'referral'
-  | 'social'
-  | 'other';
+export type LeadSource = 'organic' | 'advertisement' | 'referral' | 'social' | 'other';
 
-export type LeadStatus =
-  | 'lead'
-  | 'opportunity'
-  | 'client'
-  | 'lost';
+export type LeadStatus = 'lead' | 'opportunity' | 'client' | 'lost';
 
 export interface Lead {
   id: string;
@@ -73,7 +64,6 @@ export interface Task {
   completed: boolean;
   assignedTo?: string;
 }
-
 
 // ————————————————————————————————————————————
 // Payloads para criação/atualização (envio ao back-end)

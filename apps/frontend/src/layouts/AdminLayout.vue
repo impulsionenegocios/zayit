@@ -5,7 +5,7 @@ import Breadcrumb from '@/components/layout/Breadcrumb.vue';
 import TopBar from '@/components/layout/TopBar.vue';
 import Sidebar from '@/components/layout/Sidebar.vue';
 import { useActionButton } from '@/stores/layout/actionButton';
-
+import BackButton from '@/components/ui/buttons/BackButton.vue';
 const sidebarOpen = ref(false);
 const actionButton = useActionButton();
 const route = useRoute();
@@ -41,16 +41,22 @@ const closeSidebar = () => (sidebarOpen.value = false);
     <Sidebar :open="sidebarOpen" @close="closeSidebar" />
     <div class="flex h-screen">
       <div
-        class="flex-1 custom-scroll mt-8 overflow-y-auto lg:ml-64 2xl:ml-76 bg-surface rounded-2xl lg:mr-4 lg:mb-4 lg:mr-8 lg:mb-8"
+        class="flex-1 relative custom-scroll mt-8 overflow-y-auto lg:ml-64 2xl:ml-76 bg-surface rounded-2xl lg:mr-8 lg:mb-8"
       >
-        <nav class="flex items-center justify-between p-4 fixed h-16 mt-12 w-full">
+        <nav class="flex items-center justify-between p-4 absolute h-16 pt-4 mt-8 lg:mt-0 bg-card w-full">
           <div class="flex items-center space-x-4">
             <span class="text-2xl text-gray-100">{{ route.name || 'Página' }}</span>
             <Breadcrumb />
           </div>
           <component :is="actionButton.component" v-if="actionButton.component" />
         </nav>
-        <router-view class="mt-28 lg:mt-16" />
+        <BackButton 
+              label="Back" 
+              class="lg:mt-20 mt-28  mx-4"
+              aria-label="Go back to previous page"
+              fallback-route="/"
+            />
+        <router-view class="mt-8" />
       </div>
     </div>
   </div>

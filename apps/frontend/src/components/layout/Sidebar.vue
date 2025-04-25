@@ -138,29 +138,29 @@ const menuItems = ref([
   //   ]
   // },
   {
-  label: 'CRM',
-  icon: 'mdi:account-group',
-  dropdownOpen: false,
-  dropdownIcon: 'lsicon:down-outline',
-  subitems: [
-    {
-      label: 'Leads & Clients',
-      to: { name: 'LeadList' },
-    },
-    {
+    label: 'CRM',
+    icon: 'mdi:account-group',
+    dropdownOpen: false,
+    dropdownIcon: 'lsicon:down-outline',
+    subitems: [
+      {
+        label: 'Leads & Clients',
+        to: { name: 'LeadList' },
+      },
+      {
         label: 'Tags',
         to: { name: 'TagsList' },
       },
-    // {
-    //   label: 'Tasks',
-    //   to: { name: 'VerKanban' },
-    // },
-    // {
-    //   label: 'Dashboard',
-    //   to: { name: 'Dashboard' },
-    // },
-  ],
-},
+      // {
+      //   label: 'Tasks',
+      //   to: { name: 'VerKanban' },
+      // },
+      // {
+      //   label: 'Dashboard',
+      //   to: { name: 'Dashboard' },
+      // },
+    ],
+  },
   {
     label: 'Docs',
     icon: 'material-symbols:docs',

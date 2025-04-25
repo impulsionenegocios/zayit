@@ -46,7 +46,7 @@ export function useTagList() {
   const bulkDeleteTags = async (ids: string[]) => {
     isLoading.value = true;
     try {
-      await Promise.all(ids.map(id => deleteTag(id)));
+      await Promise.all(ids.map((id) => deleteTag(id)));
       toast.success(`${ids.length} tags deleted successfully`);
       await fetchTags(); // Refresh the list
     } catch (err) {
@@ -63,6 +63,6 @@ export function useTagList() {
     error,
     fetchTags,
     removeTag,
-    bulkDeleteTags
+    bulkDeleteTags,
   };
 }

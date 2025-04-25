@@ -65,27 +65,27 @@ export default [
             path: '',
             name: 'LeadList',
             component: () => import('@/pages/crm/leads/LeadListView.vue'),
-            meta: { breadcrumb: 'Leads & Clients' }
+            meta: { breadcrumb: 'Leads & Clients' },
           },
           {
             path: 'new',
             name: 'CreateLead',
             component: () => import('@/pages/crm/leads/LeadFormView.vue'),
-            meta: { breadcrumb: 'Create Lead' }
+            meta: { breadcrumb: 'Create Lead' },
           },
           {
             path: ':id',
             name: 'LeadDetail',
             component: () => import('@/pages/crm/leads/LeadDetailView.vue'),
-            meta: { breadcrumb: 'Lead Details' }
+            meta: { breadcrumb: 'Lead Details' },
           },
           {
             path: ':id/edit',
             name: 'EditLead',
             component: () => import('@/pages/crm/leads/LeadFormView.vue'),
-            meta: { breadcrumb: 'Edit Lead' }
-          }
-        ]
+            meta: { breadcrumb: 'Edit Lead' },
+          },
+        ],
       },
       {
         path: 'tags',

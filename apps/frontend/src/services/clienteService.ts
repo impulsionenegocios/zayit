@@ -15,12 +15,10 @@ export async function criarCliente(payload: FormData): Promise<Cliente> {
   return data;
 }
 
-
 export async function atualizarCliente(id: string, payload: FormData): Promise<Cliente> {
   const { data } = await api.put<Cliente>(`/clientes/${id}`, payload);
   return data;
 }
-
 
 export async function deletarCliente(id: string | number): Promise<void> {
   await api.delete(`/clientes/${id}`);

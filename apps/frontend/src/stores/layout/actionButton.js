@@ -2,6 +2,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 export const useActionButton = defineStore('layout', () => {
-    const component = ref(null);
-    return { component };
+  const component = ref(null);
+  return { component };
 });
