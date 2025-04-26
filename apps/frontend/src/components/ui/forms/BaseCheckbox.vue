@@ -14,7 +14,7 @@
     />
 
     <div
-      class="w-5 h-5 flex items-center justify-center border rounded bg-surface transition-all duration-150"
+      class="w-5 h-5 flex items-center cursor-pointer justify-center border rounded bg-surface transition-all duration-150"
       :class="[
         error ? 'border-red-500' : 'border-gray-600',
         checked ? 'bg-zayit-blue border-zayit-blue' : '',

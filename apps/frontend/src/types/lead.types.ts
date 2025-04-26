@@ -24,8 +24,8 @@ export interface Lead {
   source?: LeadSource;
   status: LeadStatus;
   tags: Tag[];
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Comment {
@@ -33,7 +33,7 @@ export interface Comment {
   leadId: string;
   userId: string;
   text: string;
-  createdAt: string;
+  created_at: string;
 }
 
 export interface Contact {

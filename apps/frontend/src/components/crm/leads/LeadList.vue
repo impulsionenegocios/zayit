@@ -93,7 +93,7 @@
                 </div>
                 <div class="ml-4">
                   <div class="text-sm font-medium text-white">{{ lead.name }}</div>
-                  <div class="text-sm text-gray-400">Added {{ formatDate(lead.createdAt) }}</div>
+                  <div class="text-sm text-gray-400">Criado {{ formatDate(lead.created_at) }}</div>
                 </div>
               </div>
             </td>
@@ -179,7 +179,7 @@ import { useToast } from '@/composables/useToast';
 import type { Lead, LeadStatus } from '@/types/client.types';
 import { useModal } from '@/composables/useModal';
 import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
-
+import {formatDate} from '@/utils/dateFormatter'
 const clientStore = useLeadStore();
 const toast = useToast();
 const modal = useModal();
@@ -220,14 +220,6 @@ const filteredLeads = computed(() => {
   return result;
 });
 
-// Format methods
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
 
 function formatSource(source?: string) {
   if (!source) return 'Unknown';

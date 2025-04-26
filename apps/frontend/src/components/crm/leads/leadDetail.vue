@@ -116,48 +116,7 @@
         
         <!-- Contact History -->
         <div class="bg-surface rounded-lg p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-semibold text-white">Histórico de Contatos</h2>
-            <DefaultButton 
-              variant="primary"
-              size="md"
-              @click="openNewContactModal"
-            >
-              <Icon icon="mdi:plus" class="mr-1" />
-              Add Contato
-            </DefaultButton>
-          </div>
-          
-          <div v-if="!contactHistory.length" class="text-center py-8 text-white/60">
-            <Icon icon="mdi:history" class="text-4xl mx-auto mb-2" />
-            <p>Sem Histórico de Contatos Ainda</p>
-            <p class="text-sm">Grave sua primeira interação com esse lead</p>
-          </div>
-          
-          <div v-else class="space-y-4">
-            <div 
-              v-for="contact in contactHistory" 
-              :key="contact.id"
-              class="bg-card rounded-lg p-4"
-            >
-              <div class="flex items-start">
-                <div 
-                  class="rounded-full p-2.5 mr-3" 
-                  :class="getContactTypeClass(contact.type)"
-                >
-                  <Icon :icon="getContactTypeIcon(contact.type)" class="text-lg" />
-                </div>
-                
-                <div class="flex-1">
-                  <div class="flex items-center justify-between">
-                    <div class="font-medium text-white">{{ getContactTypeLabel(contact.type) }}</div>
-                    <div class="text-sm text-gray-400">{{ formatDateTime(contact.date) }}</div>
-                  </div>
-                  <p class="mt-1 text-white/80">{{ contact.description }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ContactHistory :leadId="leadId" />
         </div>
         
         <!-- Comments -->
@@ -264,7 +223,7 @@
                 <input 
                   type="checkbox" 
                   :checked="task.completed" 
-                  @change="toggleTaskStatus(task)"
+                  @change="toggleTaskStatus(task.id)"
                   class="w-4 h-4 rounded-sm bg-white/10 border-white/30 text-zayit-blue focus:ring-zayit-blue"
                 />
               </div>
@@ -278,9 +237,9 @@
                 </div>
                 
                 <div class="flex items-center justify-between mt-1">
-                  <div class="text-sm" :class="getTaskDueClass(task.dueDate)">
+                  <div class="text-sm" :class="getTaskDueClass(task.due_date)">
                     <Icon icon="mdi:calendar" class="mr-1" />
-                    {{ formatDate(task.dueDate) }}
+                    {{ formatDate(task.due_date) }}
                   </div>
                   
                   <DefaultButton 
@@ -375,8 +334,8 @@
           <FormControl label="Tipo de Contato" forLabel="contactType">
             <BaseSelect 
               v-model="newContact.type" 
+              :options="[]"
               id="contactType" 
-              :options="contactTypeOptions" 
               placeholder="Selecione um tipo de contato" 
             />
           </FormControl>
@@ -434,7 +393,7 @@
           
           <FormControl label="Data Prevista" forLabel="taskDueDate" class="mt-4">
             <BaseInput 
-              v-model="newTask.dueDate" 
+              v-model="newTask.due_date" 
               id="taskDueDate" 
               type="date" 
             />
@@ -452,7 +411,7 @@
               variant="primary"
               size="sm" 
               @click="addTask"
-              :disabled="!newTask.title || !newTask.dueDate"
+              :disabled="!newTask.title || !newTask.due_date"
             >
               Add Tarefa
             </DefaultButton>
@@ -512,6 +471,11 @@
   import BaseSelect from '@/components/ui/forms/BaseSelect.vue';
   import BaseFileInput from '@/components/ui/forms/BaseFileInput.vue';
   import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
+  import ContactHistory from '../contacts/ContactHistory.vue';
+  import { useTaskManager } from '@/composables/crm/useTaskManager';
+  import {formatDate, formatDateTime} from '@/utils/dateFormatter'
+  import { formatFileSize } from '@/utils/formatFiles'
+  import {formatStatus} from '@/utils/statusColors'
   const props = defineProps<{
     leadId: string;
   }>();
@@ -536,7 +500,16 @@
   
   const contactHistory = ref<Contact[]>([]);
   const comments = ref<any[]>([]);
-  const tasks = ref<any[]>([]);
+    const {
+  tasks,
+  isLoading: isLoadingTasks,
+  newTask,
+  loadTasks,
+  addTask,
+  deleteTask,
+  toggleTaskStatus
+} = useTaskManager(props.leadId);
+
   const files = ref<any[]>([]);
   
   // Form states
@@ -552,12 +525,7 @@
   date: new Date().toISOString().slice(0, 16),
   description: ''
 });
-  // New task form
-  const newTask = reactive({
-    title: '',
-    dueDate: new Date().toISOString().slice(0, 10),
-    completed: false
-  });
+
   
   // Status styling
   const statusClasses = {
@@ -567,13 +535,7 @@
     lost: 'bg-zayit-danger/20 text-zayit-danger'
   };
   
-  // Contact type options
-  const contactTypeOptions = [
-    { label: 'Phone Call', value: 'call' },
-    { label: 'WhatsApp', value: 'whatsapp' },
-    { label: 'Email', value: 'email' },
-    { label: 'Meeting', value: 'meeting' }
-  ];
+
   
   // Load data
   onMounted(async () => {
@@ -588,7 +550,6 @@
       lead.value = result;
       
       // Load additional data
-      await loadContactHistory();
       await loadComments();
       await loadTasks();
       await loadFiles();
@@ -598,47 +559,13 @@
     }
   });
   
-  // Format methods
-  function formatDate(date: string) {
-    return new Date(date).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
-  }
-  
-  function formatDateTime(date: string) {
-    return new Date(date).toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric'
-    });
-  }
   
   function formatSource(source?: string) {
     if (!source) return 'Unknown';
     return source.charAt(0).toUpperCase() + source.slice(1);
   }
   
-  function formatStatus(status: LeadStatus) {
-    switch (status) {
-      case 'lead': return 'Lead';
-      case 'opportunity': return 'Opportunity';
-      case 'client': return 'Client';
-      case 'lost': return 'Lost';
-      default: return 'Unknown';
-    }
-  }
-  
-  function formatFileSize(bytes: number) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
+
   
   function getInitials(name: string) {
     return name
@@ -649,41 +576,13 @@
       .slice(0, 2);
   }
   
-  function getContactTypeLabel(type: string) {
-    switch (type) {
-      case 'call': return 'Phone Call';
-      case 'whatsapp': return 'WhatsApp Message';
-      case 'email': return 'Email';
-      case 'meeting': return 'Meeting';
-      default: return 'Contact';
-    }
-  }
+
   
-  function getContactTypeIcon(type: string) {
-    switch (type) {
-      case 'call': return 'mdi:phone';
-      case 'whatsapp': return 'mdi:whatsapp';
-      case 'email': return 'mdi:email';
-      case 'meeting': return 'mdi:account-group';
-      default: return 'mdi:account';
-    }
-  }
-  
-  function getContactTypeClass(type: string) {
-    switch (type) {
-      case 'call': return 'bg-green-500/20 text-green-500';
-      case 'whatsapp': return 'bg-green-500/20 text-green-500';
-      case 'email': return 'bg-blue-500/20 text-blue-500';
-      case 'meeting': return 'bg-purple-500/20 text-purple-500';
-      default: return 'bg-gray-500/20 text-gray-500';
-    }
-  }
-  
-  function getTaskDueClass(dueDate: string) {
+  function getTaskDueClass(due_date: string) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    const due = new Date(dueDate);
+    const due = new Date(due_date);
     due.setHours(0, 0, 0, 0);
     
     const diffDays = Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
@@ -721,9 +620,9 @@
   async function confirmDelete() {
     try {
       const confirmed = await modal.open(ConfirmModal, {
-        title: 'Delete Lead',
+        title: 'Apagar Lead',
         props: {
-          message: `Are you sure you want to delete ${lead.value.name}? This action cannot be undone.`
+          message: `Tem certeza que quer deletar ${lead.value.name}? Essa ação não pode ser desfeita.`
         },
         size: 'sm'
       });
@@ -731,10 +630,10 @@
       if (confirmed) {
         const success = await clientStore.deleteLead(props.leadId);
         if (success) {
-          toast.success(`Lead "${lead.value.name}" deleted successfully`);
+          toast.success(`Lead "${lead.value.name}" Apagado com Sucesso!`);
           router.push('/leads');
         } else {
-          toast.error('Failed to delete lead');
+          toast.error('Erro ao tentar apagar esse Lead');
         }
       }
     } catch (error) {
@@ -752,28 +651,7 @@
     window.location.href = `mailto:${lead.value.email}`;
   }
   
-  // Load additional data
-  async function loadContactHistory() {
-    // This would normally be an API call
-    contactHistory.value = [
-      {
-        id: '1',
-        leadId: props.leadId,
-        type: 'call',
-        description: 'Initial contact call. Discussed potential partnership.',
-        date: new Date().toISOString(),
-        userId: 'user1'
-      },
-      {
-        id: '2',
-        leadId: props.leadId,
-        type: 'email',
-        description: 'Sent follow-up email with our service offerings.',
-        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-        userId: 'user1'
-      }
-    ];
-  }
+
   
   async function loadComments() {
     // This would normally be an API call
@@ -789,26 +667,6 @@
     ];
   }
   
-  async function loadTasks() {
-  // This would normally be an API call
-  tasks.value = [
-    {
-      id: '1',
-      leadId: props.leadId,
-      title: 'Send proposal document',
-      dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      completed: false
-    },
-    {
-      id: '2',
-      leadId: props.leadId,
-      title: 'Schedule follow-up call',
-      dueDate: new Date().toISOString().split('T')[0],
-      completed: false
-    }
-  ];
-}
-
 async function loadFiles() {
   // This would normally be an API call
   files.value = [
@@ -825,16 +683,9 @@ async function loadFiles() {
 }
 
 // Modal actions
-function openNewContactModal() {
-  newContact.type = '';
-  newContact.date = new Date().toISOString().slice(0, 16);
-  newContact.description = '';
-  showContactModal.value = true;
-}
-
 function openTaskModal() {
   newTask.title = '';
-  newTask.dueDate = new Date().toISOString().slice(0, 10);
+  newTask.due_date = new Date().toISOString().slice(0, 10);
   newTask.completed = false;
   showTaskModal.value = true;
 }
@@ -881,38 +732,6 @@ async function addContact() {
   showContactModal.value = false;
   
   toast.success('Contact history recorded');
-}
-
-async function addTask() {
-  if (!newTask.title || !newTask.dueDate) return;
-  
-  const task = {
-    id: Date.now().toString(),
-    leadId: props.leadId,
-    title: newTask.title,
-    dueDate: newTask.dueDate,
-    completed: false
-  };
-  
-  // Add to local state (would normally be an API call)
-  tasks.value.push(task);
-  showTaskModal.value = false;
-  
-  toast.success('Task added');
-}
-
-async function toggleTaskStatus(task: any) {
-  // Update local state (would normally be an API call)
-  task.completed = !task.completed;
-  
-  toast.success(`Task marked as ${task.completed ? 'completed' : 'incomplete'}`);
-}
-
-async function deleteTask(taskId: string) {
-  // Update local state (would normally be an API call)
-  tasks.value = tasks.value.filter(task => task.id !== taskId);
-  
-  toast.success('Task deleted');
 }
 
 async function uploadFile() {
