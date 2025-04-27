@@ -72,6 +72,7 @@ def get_leads_service(user_data):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting leads: {str(e)}")
 
+
 def get_lead_by_id_service(lead_id: str, user_data):
     try:
         doc_ref = db.collection("leads").document(lead_id)
