@@ -174,7 +174,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
-import { useLeadStore } from '@/stores/crm/client';
+import { useLeadStore } from '@/stores/crm/lead';
 import { useToast } from '@/composables/useToast';
 import type { Lead, LeadStatus } from '@/types/client.types';
 import { useModal } from '@/composables/useModal';

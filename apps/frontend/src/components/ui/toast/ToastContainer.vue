@@ -18,7 +18,7 @@
         </div>
 
         <!-- Fechar -->
-        <button @click="remove(toast.id)" class="text-white/60 hover:text-white text-xs ml-1">
+        <button @click="remove(toast.id)" class="text-white/60 hover:text-white text-xs ml-1 cursor-pointer">
           ✕
         </button>
       </div>

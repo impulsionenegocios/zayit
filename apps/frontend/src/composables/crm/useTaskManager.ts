@@ -62,12 +62,17 @@ export function useTaskManager(leadId: string) {
       const task = tasks.value.find((t) => t.id === taskId);
       if (task) {
         task.completed = completed;
-        toast.success(completed ? 'Task marcada como concluída' : 'Task marcada como pendente');
+        if (completed) {
+          toast.success('Task marcada como concluída');
+        } else {
+          toast.warning('Task marcada como pendente');
+        }
       }
     } catch (error) {
-      toast.error('Failed to toggle task status');
+      toast.error('Falha ao alterar o status da task');
     }
   }
+  
 
   return {
     tasks,

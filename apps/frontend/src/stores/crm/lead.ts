@@ -9,6 +9,7 @@ export const useLeadStore = defineStore('lead', () => {
   const selectedLead = ref<Lead | null>(null);
   const isLoading = ref(false);
   const tags = ref<Tag[]>([]);
+  const dragInProgress = ref(false);
 
   // Getters
   const leadsByStatus = computed(() => {
@@ -24,6 +25,16 @@ export const useLeadStore = defineStore('lead', () => {
     });
 
     return result;
+  });
+
+  // For Kanban view - returns array of column data
+  const kanbanColumns = computed(() => {
+    const statuses: LeadStatus[] = ['lead', 'opportunity', 'client', 'lost'];
+    
+    return statuses.map(status => ({
+      status,
+      leads: leads.value.filter(lead => lead.status === status)
+    }));
   });
 
   // Actions
@@ -70,9 +81,9 @@ export const useLeadStore = defineStore('lead', () => {
   async function updateLead(id: string, lead: LeadUpdatePayload) {
     isLoading.value = true;
     try {
-      const response = await crmService.updateLead(id, lead); // <- Aqui já vem o Lead corrigido
+      const response = await crmService.updateLead(id, lead);
   
-      // Atualiza usando a resposta, não usando o que foi enviado
+      // Update using the response
       const updatedLead = response.data as Lead;
   
       const index = leads.value.findIndex((l) => l.id === id);
@@ -90,6 +101,33 @@ export const useLeadStore = defineStore('lead', () => {
       return null;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  // Update lead status directly (for drag-and-drop in Kanban)
+  async function updateLeadStatus(id: string, newStatus: LeadStatus) {
+    // Optimistically update the UI first
+    const leadIndex = leads.value.findIndex(lead => lead.id === id);
+    if (leadIndex === -1) return false;
+
+    // Store the original status in case we need to revert
+    const originalStatus = leads.value[leadIndex].status;
+    
+    // Update local state immediately
+    leads.value[leadIndex].status = newStatus;
+    dragInProgress.value = true;
+
+    try {
+      // Then send to backend
+      const result = await updateLead(id, { status: newStatus });
+      return !!result;
+    } catch (error) {
+      // If failed, revert the optimistic update
+      console.error(`Error updating lead status for ${id}:`, error);
+      leads.value[leadIndex].status = originalStatus;
+      return false;
+    } finally {
+      dragInProgress.value = false;
     }
   }
   
@@ -125,15 +163,18 @@ export const useLeadStore = defineStore('lead', () => {
     selectedLead,
     isLoading,
     tags,
+    dragInProgress,
 
     // Getters
     leadsByStatus,
+    kanbanColumns,
 
     // Actions
     fetchLeads,
     fetchLeadById,
     createLead,
     updateLead,
+    updateLeadStatus,
     deleteLead,
     fetchTags,
   };

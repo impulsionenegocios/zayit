@@ -114,40 +114,10 @@
       </div>
 
       <!-- Comments -->
-      <div class="bg-surface rounded-lg p-6">
-        <h2 class="text-lg font-semibold text-white mb-4">Comentários</h2>
-
-        <div class="space-y-4">
-          <div v-if="!comments.length" class="text-center py-4 text-white/60">
-            Sem comentários Ainda
-          </div>
-
-          <div v-for="comment in comments" :key="comment.id" class="bg-card rounded-lg p-4">
-            <div class="flex justify-between items-start">
-              <div class="font-medium text-white">{{ comment.userName || 'User' }}</div>
-              <div class="text-sm text-gray-400">{{ formatDateTime(comment.createdAt) }}</div>
-            </div>
-            <p class="mt-1 text-white/80">{{ comment.text }}</p>
-          </div>
-
-          <div class="pt-4">
-            <FormControl label="Add Comment">
-              <BaseTextarea v-model="newComment" placeholder="Escreva um comentário..." :rows="3" />
-            </FormControl>
-
-            <div class="flex justify-end mt-2">
-              <DefaultButton
-                variant="primary"
-                size="sm"
-                @click="addComment"
-                :disabled="!newComment.trim()"
-              >
-                Post Comment
-              </DefaultButton>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Comments -->
+<div class="bg-surface rounded-lg p-6">
+  <CommentList :leadId="leadId" />
+</div>
     </div>
 
     <!-- Right Column - Tasks & Files -->
@@ -190,7 +160,7 @@
         </div>
       </div>
       <!-- Tasks -->
-      <Tasks :leadId="leadId" />
+      <Tasks class="lg:pr-16 lg:pl-8 px-8 pb-8" :leadId="leadId" />
       </div>
   </div>
 </template>
@@ -214,7 +184,7 @@ import { formatDate, formatDateTime } from '@/utils/dateFormatter';
 import { formatFileSize } from '@/utils/formatFiles';
 import { formatStatus } from '@/utils/statusColors';
 import Tasks from '@/components/crm/tasks/TaskList.vue';
-
+import CommentList from '@/components/crm/comments/CommentList.vue';
 const props = defineProps<{
   leadId: string;
 }>();

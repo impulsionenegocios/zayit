@@ -21,7 +21,6 @@
           </div>
   
           <DefaultButton
-            class="text-zayit-danger"
             size="sm"
             variant="danger"
             @click="$emit('delete-task', task.id)"
