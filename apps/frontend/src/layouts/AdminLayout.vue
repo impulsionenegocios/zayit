@@ -43,19 +43,21 @@ const closeSidebar = () => (sidebarOpen.value = false);
       <div
         class="flex-1 relative custom-scroll mt-8 overflow-y-auto lg:ml-64 2xl:ml-76 bg-surface rounded-2xl lg:mr-8 lg:mb-8"
       >
-        <nav class="flex items-center justify-between p-4 absolute h-16 pt-4 mt-8 lg:mt-0 bg-card w-full">
+        <nav
+          class="flex items-center justify-between p-4 absolute h-16 pt-4 mt-8 lg:mt-0 bg-card w-full"
+        >
           <div class="flex items-center space-x-4">
             <span class="text-2xl text-gray-100">{{ route.name || 'Página' }}</span>
             <Breadcrumb />
           </div>
           <component :is="actionButton.component" v-if="actionButton.component" />
         </nav>
-        <BackButton 
-              label="Voltar" 
-              class="lg:mt-20 mt-28  mx-4"
-              aria-label="Voltar para a página anterior"
-              fallback-route="/"
-            />
+        <BackButton
+          label="Voltar"
+          class="lg:mt-20 mt-28 mx-4"
+          aria-label="Voltar para a página anterior"
+          fallback-route="/"
+        />
         <router-view class="mt-8" />
       </div>
     </div>

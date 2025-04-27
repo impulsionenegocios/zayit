@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center space-x-4">    
+  <div class="flex items-center space-x-4">
     <!-- Original breadcrumb -->
     <nav class="flex" aria-label="Breadcrumb">
       <ol class="flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">

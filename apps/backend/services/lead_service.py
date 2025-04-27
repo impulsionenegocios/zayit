@@ -81,9 +81,25 @@ def get_lead_by_id_service(lead_id: str, user_data):
             return None
         
         lead_data = doc.to_dict()
+        
+        # Verificar se tags são strings (precisa buscar detalhes)
+        tags = lead_data.get("tags", [])
+        if tags and isinstance(tags[0], str):
+            tags_query = db.collection("tags").where("__name__", "in", tags)
+            tags_docs = tags_query.stream()
+            lead_data["tags"] = [
+                {
+                    "id": tag_doc.id,
+                    "name": tag_doc.get("name"),
+                    "color": tag_doc.get("color"),
+                }
+                for tag_doc in tags_docs
+            ]
+
         return lead_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting lead: {str(e)}")
+
 
 def update_lead_service(lead_id: str, lead: LeadUpdate, user_data):
     try:

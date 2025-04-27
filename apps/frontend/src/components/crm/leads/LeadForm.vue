@@ -90,16 +90,11 @@
 
       <!-- Form Actions -->
       <div class="flex justify-end gap-3 pt-4">
-        <DefaultButton
-          variant="default"
-          size="md"
-          @click="cancel"
-          type="button"
-        >
+        <DefaultButton variant="default" size="md" @click="cancel" type="button">
           Cancelar
         </DefaultButton>
 
-        <DefaultButton variant="primary" size="md" type="submit"  :disabled="isSubmitting">
+        <DefaultButton variant="primary" size="md" type="submit" :disabled="isSubmitting">
           <span v-if="isSubmitting">
             <Icon icon="mdi:loading" class="animate-spin mr-1" />
             Salvando...
@@ -141,9 +136,9 @@ const {
   handleSubmit,
   sourceOptions,
   statusOptions,
-  selectedTagIds, 
+  selectedTagIds,
 } = useLeadForm(props.leadId);
 function cancel() {
-    router.push({ name: 'LeadList' });
-  }
+  router.push({ name: 'LeadList' });
+}
 </script>

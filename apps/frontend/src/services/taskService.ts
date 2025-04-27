@@ -1,4 +1,4 @@
-import  api  from '@/lib/axios'; // seu axios instance
+import api from '@/lib/axios'; // seu axios instance
 import type { Task, NewTask } from '@/types/task.types';
 
 export async function getTasksByLeadId(leadId: string) {

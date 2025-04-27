@@ -45,8 +45,8 @@
 import BaseModal from './BaseModal.vue';
 
 const props = defineProps<{
-  title: string;
-  message: string;
+  title?: string;
+  message?: string;
 }>();
 
 const emit = defineEmits<{

@@ -12,7 +12,7 @@
       <button
         v-if="!persistent"
         @click="$emit('close')"
-        class="text-gray-500 hover:text-black text-xl absolute z-[90] right-8 top-4"
+        class="text-gray-500 hover:text-gray-700 text-xl absolute z-[90] right-8 top-4 cursor-pointer"
       >
         ✕
       </button>
@@ -31,7 +31,7 @@
 import { computed } from 'vue';
 
 const props = defineProps<{
-  title: string | null;
+  title?: string | null;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   persistent?: boolean;
 }>();

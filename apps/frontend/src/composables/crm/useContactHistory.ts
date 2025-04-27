@@ -43,14 +43,14 @@ export function useContactHistory(leadId: string) {
       const { data } = await addLeadContact(leadId, newContact.value);
       contacts.value.unshift(data); // Add to beginning of array
       toast.success('Contact record added successfully');
-      
+
       // Reset form
       newContact.value = {
         type: 'call' as ContactType,
         description: '',
         date: new Date().toISOString().slice(0, 16),
       };
-      
+
       return true;
     } catch (error) {
       console.error('Error adding contact:', error);
@@ -66,7 +66,7 @@ export function useContactHistory(leadId: string) {
     isLoading.value = true;
     try {
       await deleteLeadContact(leadId, contactId);
-      contacts.value = contacts.value.filter(contact => contact.id !== contactId);
+      contacts.value = contacts.value.filter((contact) => contact.id !== contactId);
       toast.success('Contact record deleted successfully');
     } catch (error) {
       console.error('Error deleting contact:', error);
@@ -85,6 +85,6 @@ export function useContactHistory(leadId: string) {
     newContact,
     loadContacts,
     addContact,
-    deleteContact
+    deleteContact,
   };
 }

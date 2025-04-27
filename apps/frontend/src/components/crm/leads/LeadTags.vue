@@ -8,7 +8,7 @@
     >
       {{ tag.name }}
     </span>
-    <span v-if="!tags.length" class="text-white/60">No tags</span>
+    <span v-if="!tags.length" class="text-white/60">Nenhuma Tag</span>
   </div>
 </template>
 

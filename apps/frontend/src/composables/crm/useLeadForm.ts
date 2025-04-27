@@ -77,7 +77,7 @@ export function useLeadForm(leadId?: string) {
       selectedTagIds.value = lead.tags.map((t: Tag) => t.id);
     } catch {
       toast.error('Failed to load lead');
-      router.push({ name: 'LeadList', params: {} })
+      router.push({ name: 'LeadList', params: {} });
     }
   }
 
@@ -118,27 +118,31 @@ export function useLeadForm(leadId?: string) {
         await createLead(payload as LeadCreatePayload);
         toast.success('Lead created successfully');
       }
-      router.push({ name: 'LeadList', params: {} })
+      router.push({ name: 'LeadList', params: {} });
     } catch {
       toast.error('Failed to save lead');
     } finally {
       isSubmitting.value = false;
     }
   }
-  console.log(router.resolve({ name: 'LeadList' }))
+  console.log(router.resolve({ name: 'LeadList' }));
 
   function cancel() {
     // const resolved = router.resolve({ name: 'LeadList' });
     // console.log('🔁 Redirecionando para:', resolved.fullPath);
     console.log('⚠️ TODAS AS ROTAS');
-console.table(router.getRoutes().filter(r => r.name === 'LeadList').map(r => ({
-  name: r.name,
-  path: r.path,
-  fullPath: router.resolve({ name: r.name }).fullPath,
-})));
+    console.table(
+      router
+        .getRoutes()
+        .filter((r) => r.name === 'LeadList')
+        .map((r) => ({
+          name: r.name,
+          path: r.path,
+          fullPath: router.resolve({ name: r.name }).fullPath,
+        })),
+    );
     // router.push({ name: 'LeadList' });
   }
-  
 
   if (leadId) loadLead(leadId);
   else loadAvailableTags();

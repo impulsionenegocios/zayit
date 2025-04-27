@@ -179,7 +179,7 @@ import { useToast } from '@/composables/useToast';
 import type { Lead, LeadStatus } from '@/types/client.types';
 import { useModal } from '@/composables/useModal';
 import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
-import {formatDate} from '@/utils/dateFormatter'
+import { formatDate } from '@/utils/dateFormatter';
 const clientStore = useLeadStore();
 const toast = useToast();
 const modal = useModal();
@@ -219,7 +219,6 @@ const filteredLeads = computed(() => {
 
   return result;
 });
-
 
 function formatSource(source?: string) {
   if (!source) return 'Unknown';

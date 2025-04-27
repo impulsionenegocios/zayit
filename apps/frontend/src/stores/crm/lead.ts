@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { Lead, Tag, LeadStatus } from '@/types/lead.types';
+import type { Lead, Tag, LeadStatus, LeadCreatePayload, LeadUpdatePayload } from '@/types/lead.types';
 import * as crmService from '@/services/crm';
 
 export const useLeadStore = defineStore('lead', () => {
@@ -53,7 +53,7 @@ export const useLeadStore = defineStore('lead', () => {
     }
   }
 
-  async function createLead(lead: Partial<Lead>) {
+  async function createLead(lead: LeadCreatePayload) {
     isLoading.value = true;
     try {
       const response = await crmService.createLead(lead);
@@ -67,23 +67,24 @@ export const useLeadStore = defineStore('lead', () => {
     }
   }
 
-  async function updateLead(id: string, lead: Partial<Lead>) {
+  async function updateLead(id: string, lead: LeadUpdatePayload) {
     isLoading.value = true;
     try {
-      const response = await crmService.updateLead(id, lead);
-
-      // Update in the local array too
+      const response = await crmService.updateLead(id, lead); // <- Aqui já vem o Lead corrigido
+  
+      // Atualiza usando a resposta, não usando o que foi enviado
+      const updatedLead = response.data as Lead;
+  
       const index = leads.value.findIndex((l) => l.id === id);
       if (index !== -1) {
-        leads.value[index] = { ...leads.value[index], ...lead };
+        leads.value[index] = updatedLead;
       }
-
-      // Update selected lead if it's the current one
+  
       if (selectedLead.value?.id === id) {
-        selectedLead.value = { ...selectedLead.value, ...lead };
+        selectedLead.value = updatedLead;
       }
-
-      return response.data;
+  
+      return updatedLead;
     } catch (error) {
       console.error(`Error updating lead ${id}:`, error);
       return null;
@@ -91,7 +92,7 @@ export const useLeadStore = defineStore('lead', () => {
       isLoading.value = false;
     }
   }
-
+  
   async function deleteLead(id: string) {
     isLoading.value = true;
     try {

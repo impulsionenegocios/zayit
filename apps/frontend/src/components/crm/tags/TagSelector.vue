@@ -100,10 +100,15 @@
       </FormControl>
 
       <div class="flex justify-end space-x-3 pt-4">
-        <DefaultButton variant="default" size="sm" @click="showCreateModal = false" :disabled="isCreating">
+        <DefaultButton
+          variant="default"
+          size="sm"
+          @click="showCreateModal = false"
+          :disabled="isCreating"
+        >
           Cancelar
         </DefaultButton>
-        <DefaultButton variant="primary" size="sm"  @click="saveNewTag" :disabled="isCreating">
+        <DefaultButton variant="primary" size="sm" @click="saveNewTag" :disabled="isCreating">
           {{ isCreating ? 'Criando...' : 'Criar Tag' }}
         </DefaultButton>
       </div>
