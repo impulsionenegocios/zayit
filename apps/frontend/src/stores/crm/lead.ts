@@ -1,3 +1,4 @@
+// src/stores/crm/lead.ts
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type {
@@ -25,18 +26,14 @@ export const useLeadStore = defineStore('lead', () => {
       client: [],
       lost: [],
     };
-
     leads.value.forEach((lead) => {
       result[lead.status].push(lead);
     });
-
     return result;
   });
 
-  // For Kanban view - returns array of column data
   const kanbanColumns = computed(() => {
     const statuses: LeadStatus[] = ['lead', 'opportunity', 'client', 'lost'];
-
     return statuses.map((status) => ({
       status,
       leads: leads.value.filter((lead) => lead.status === status),
@@ -44,10 +41,10 @@ export const useLeadStore = defineStore('lead', () => {
   });
 
   // Actions
-  async function fetchLeads() {
+  async function fetchLeads(crmId: string) {
     isLoading.value = true;
     try {
-      const response = await crmService.getLeads();
+      const response = await crmService.getLeads(crmId);
       leads.value = response.data;
     } catch (error) {
       console.error('Error fetching leads:', error);
@@ -56,10 +53,10 @@ export const useLeadStore = defineStore('lead', () => {
     }
   }
 
-  async function fetchLeadById(id: string) {
+  async function fetchLeadById(crmId: string, id: string) {
     isLoading.value = true;
     try {
-      const response = await crmService.getLeadById(id);
+      const response = await crmService.getLeadById(crmId, id);
       selectedLead.value = response.data;
       return response.data;
     } catch (error) {
@@ -70,11 +67,11 @@ export const useLeadStore = defineStore('lead', () => {
     }
   }
 
-  async function createLead(lead: LeadCreatePayload) {
+  async function createLead(crmId: string, payload: LeadCreatePayload) {
     isLoading.value = true;
     try {
-      const response = await crmService.createLead(lead);
-      await fetchLeads(); // Refresh the list
+      const response = await crmService.createLead(crmId, payload);
+      await fetchLeads(crmId);
       return response.data;
     } catch (error) {
       console.error('Error creating lead:', error);
@@ -84,24 +81,19 @@ export const useLeadStore = defineStore('lead', () => {
     }
   }
 
-  async function updateLead(id: string, lead: LeadUpdatePayload) {
+  async function updateLead(
+    crmId: string,
+    id: string,
+    payload: LeadUpdatePayload
+  ) {
     isLoading.value = true;
     try {
-      const response = await crmService.updateLead(id, lead);
-
-      // Update using the response
-      const updatedLead = response.data as Lead;
-
-      const index = leads.value.findIndex((l) => l.id === id);
-      if (index !== -1) {
-        leads.value[index] = updatedLead;
-      }
-
-      if (selectedLead.value?.id === id) {
-        selectedLead.value = updatedLead;
-      }
-
-      return updatedLead;
+      const response = await crmService.updateLead(crmId, id, payload);
+      const updated = response.data as Lead;
+      const idx = leads.value.findIndex((l) => l.id === id);
+      if (idx !== -1) leads.value[idx] = updated;
+      if (selectedLead.value?.id === id) selectedLead.value = updated;
+      return updated;
     } catch (error) {
       console.error(`Error updating lead ${id}:`, error);
       return null;
@@ -110,41 +102,34 @@ export const useLeadStore = defineStore('lead', () => {
     }
   }
 
-  // Update lead status directly (for drag-and-drop in Kanban)
-  async function updateLeadStatus(id: string, newStatus: LeadStatus) {
-    // Optimistically update the UI first
-    const leadIndex = leads.value.findIndex((lead) => lead.id === id);
-    if (leadIndex === -1) return false;
-
-    // Store the original status in case we need to revert
-    const originalStatus = leads.value[leadIndex].status;
-
-    // Update local state immediately
-    leads.value[leadIndex].status = newStatus;
+  async function updateLeadStatus(
+    crmId: string,
+    id: string,
+    newStatus: LeadStatus
+  ) {
+    const idx = leads.value.findIndex((l) => l.id === id);
+    if (idx === -1) return false;
+    const original = leads.value[idx].status;
+    leads.value[idx].status = newStatus;
     dragInProgress.value = true;
-
     try {
-      // Then send to backend
-      const result = await updateLead(id, { status: newStatus });
+      const result = await updateLead(crmId, id, { status: newStatus });
       return !!result;
     } catch (error) {
-      // If failed, revert the optimistic update
-      console.error(`Error updating lead status for ${id}:`, error);
-      leads.value[leadIndex].status = originalStatus;
+      console.error(`Error updating status for ${id}:`, error);
+      leads.value[idx].status = original;
       return false;
     } finally {
       dragInProgress.value = false;
     }
   }
 
-  async function deleteLead(id: string) {
+  async function deleteLead(crmId: string, id: string) {
     isLoading.value = true;
     try {
-      await crmService.deleteLead(id);
-      leads.value = leads.value.filter((lead) => lead.id !== id);
-      if (selectedLead.value?.id === id) {
-        selectedLead.value = null;
-      }
+      await crmService.deleteLead(crmId, id);
+      leads.value = leads.value.filter((l) => l.id !== id);
+      if (selectedLead.value?.id === id) selectedLead.value = null;
       return true;
     } catch (error) {
       console.error(`Error deleting lead ${id}:`, error);
@@ -154,9 +139,9 @@ export const useLeadStore = defineStore('lead', () => {
     }
   }
 
-  async function fetchTags() {
+  async function fetchTags(crmId: string) {
     try {
-      const response = await crmService.getTags();
+      const response = await crmService.getTags(crmId);
       tags.value = response.data;
     } catch (error) {
       console.error('Error fetching tags:', error);
@@ -164,18 +149,18 @@ export const useLeadStore = defineStore('lead', () => {
   }
 
   return {
-    // State
+    // state
     leads,
     selectedLead,
     isLoading,
     tags,
     dragInProgress,
 
-    // Getters
+    // getters
     leadsByStatus,
     kanbanColumns,
 
-    // Actions
+    // actions
     fetchLeads,
     fetchLeadById,
     createLead,

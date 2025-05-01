@@ -4,13 +4,11 @@ import { useRouter } from 'vue-router';
 import { useToast } from '@/composables/useToast';
 import type { CRMCreatePayload, CRMUpdatePayload } from '@/types/crm.types';
 import { getCRMById, createCRM, updateCRM } from '@/services/crmService';
-import { useAuth } from '@/composables/useAuth'; // Assuming you have an auth composable
 
 export function useCRMForm(crmId?: string) {
   const router = useRouter();
   const toast = useToast();
-  const { currentUser } = useAuth(); // Get current user for user_id
-  
+
   const isSubmitting = ref(false);
   const isEditing = computed(() => !!crmId);
 
@@ -41,12 +39,7 @@ export function useCRMForm(crmId?: string) {
       toast.error('Please fix the errors in the form');
       return;
     }
-    
-    if (!currentUser.value?.id) {
-      toast.error('User authentication required');
-      return;
-    }
-    
+
     isSubmitting.value = true;
 
     try {
@@ -54,19 +47,18 @@ export function useCRMForm(crmId?: string) {
         const payload: CRMUpdatePayload = {
           name: form.name,
         };
-        
+
         await updateCRM(crmId, payload);
         toast.success('CRM updated successfully');
       } else {
         const payload: CRMCreatePayload = {
           name: form.name,
-          user_id: currentUser.value.id,
         };
-        
+
         await createCRM(payload);
         toast.success('CRM created successfully');
       }
-      
+
       router.push({ name: 'CRMList' });
     } catch {
       toast.error('Failed to save CRM');

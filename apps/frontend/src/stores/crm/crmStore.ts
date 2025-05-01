@@ -12,13 +12,13 @@ export const useCRMStore = defineStore('crm', () => {
 
   // Getters
   const sortedCRMs = computed(() => {
-    return [...crms.value].sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    return [...crms.value].sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
   });
 
   const crmById = computed(() => {
-    return (id: string) => crms.value.find(crm => crm.id === id) || null;
+    return (id: string) => crms.value.find((crm) => crm.id === id) || null;
   });
 
   // Actions

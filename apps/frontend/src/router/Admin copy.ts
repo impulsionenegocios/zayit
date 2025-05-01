@@ -58,6 +58,36 @@ export default [
         ],
       },
       {
+        path: 'leads',
+        meta: { breadcrumb: 'CRM' },
+        children: [
+          {
+            path: '',
+            name: 'LeadList',
+            component: () => import('@/pages/crm/leads/LeadListView.vue'),
+            meta: { breadcrumb: 'Leads & Clients' },
+          },
+          {
+            path: 'new',
+            name: 'CreateLead',
+            component: () => import('@/pages/crm/leads/LeadFormView.vue'),
+            meta: { breadcrumb: 'Create Lead' },
+          },
+          {
+            path: ':id',
+            name: 'LeadDetail',
+            component: () => import('@/pages/crm/leads/LeadDetailView.vue'),
+            meta: { breadcrumb: 'Lead Details' },
+          },
+          {
+            path: ':id/edit',
+            name: 'EditLead',
+            component: () => import('@/pages/crm/leads/LeadFormView.vue'),
+            meta: { breadcrumb: 'Edit Lead' },
+          },
+        ],
+      },
+      {
         path: 'tags',
         meta: { breadcrumb: 'Tags' },
         children: [
@@ -82,10 +112,15 @@ export default [
       },
       {
         path: 'crms',
-        meta: { breadcrumb: 'CRMs' },
+        meta: { breadcrumb: 'Crms' },
         children: [
           {
-            path: '',
+            path: ':id',
+            name: 'CRMDashboard',
+            component: () => import('@/pages/crm/CRMDashboardPage.vue'),
+          },
+          {
+            path: 'list',
             name: 'CRMList',
             component: () => import('@/pages/crm/CRMListPage.vue'),
           },
@@ -95,52 +130,9 @@ export default [
             component: () => import('@/pages/crm/CRMCreatePage.vue'),
           },
           {
-            path: ':crmId',
-            props: true,
-            meta: { breadcrumb: 'CRM Detail' },
-            children: [
-              { path: '', redirect: { name: 'CRMDashboard' } },
-              {
-                path: 'dashboard',
-                name: 'CRMDashboard',
-                component: () => import('@/pages/crm/CRMDashboardPage.vue'),
-              },
-              {
-                path: 'leads',
-                name: 'CRMLeadList',
-                component: () => import('@/pages/crm/leads/LeadListView.vue'),
-              },
-              {
-                path: 'leads/new',
-                name: 'CRMLeadCreate',
-                component: () => import('@/pages/crm/leads/LeadFormView.vue'),
-              },
-              {
-                path: 'leads/manage',
-                name: 'CRMManagement',
-                component: () => import('@/pages/crm/CRMManagementPage.vue'),
-              },
-              {
-                path: 'leads/:leadId',
-                name: 'CRMLeadDetail',
-                component: () => import('@/pages/crm/leads/LeadDetailView.vue'),
-              },
-              {
-                path: 'leads/:leadId/edit',
-                name: 'CRMLeadEdit',
-                component: () => import('@/pages/crm/leads/LeadFormView.vue'),
-              },
-              {
-                path: 'tags',
-                name: 'CRMTags',
-                component: () => import('@/pages/crm/tags/TagsPage.vue'),
-              },
-              {
-                path: 'settings',
-                name: 'CRMEdit',
-                component: () => import('@/pages/crm/CRMEditPage.vue'),
-              },
-            ],
+            path: ':id/edit',
+            name: 'CRMEdit',
+            component: () => import('@/pages/crm/CRMEditPage.vue'),
           },
         ],
       },

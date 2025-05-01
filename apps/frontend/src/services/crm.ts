@@ -1,5 +1,3 @@
-// src/services/crm.ts
-
 import api from '@/lib/axios';
 import type {
   Lead,
@@ -7,7 +5,6 @@ import type {
   Contact,
   Tag,
   Task,
-  LeadFile,
   LeadCreatePayload,
   LeadUpdatePayload,
 } from '@/types/lead.types';
@@ -16,108 +13,91 @@ import type {
 // Leads
 // ————————————————————————————————————
 
-export function getLeads() {
-  return api.get<Lead[]>('/crm/leads/');
+export function getLeads(crmId: string) {
+  return api.get<Lead[]>(`/crms/${crmId}/leads`);
 }
 
-export function getLeadById(id: string) {
-  return api.get<Lead>(`/crm/leads/${id}`);
+export function getLeadById(crmId: string, leadId: string) {
+  return api.get<Lead>(`/crms/${crmId}/leads/${leadId}`);
 }
 
-export function createLead(payload: LeadCreatePayload) {
-  return api.post<Lead>('/crm/leads/', payload);
+export function createLead(crmId: string, payload: LeadCreatePayload) {
+  return api.post<Lead>(`/crms/${crmId}/leads`, payload);
 }
 
-export function updateLead(id: string, payload: LeadUpdatePayload) {
-  return api.put<Lead>(`/crm/leads/${id}`, payload);
+export function updateLead(crmId: string, leadId: string, payload: LeadUpdatePayload) {
+  return api.put<Lead>(`/crms/${crmId}/leads/${leadId}`, payload);
 }
 
-export function deleteLead(id: string) {
-  return api.delete<void>(`/crm/leads/${id}`);
+export function deleteLead(crmId: string, leadId: string) {
+  return api.delete<void>(`/crms/${crmId}/leads/${leadId}`);
 }
 
 // ————————————————————————————————————
 // Comments
 // ————————————————————————————————————
 
-export function getLeadComments(leadId: string) {
-  return api.get<Comment[]>(`/crm/leads/${leadId}/comments`);
+export function getLeadComments(crmId: string, leadId: string) {
+  return api.get<Comment[]>(`/crms/${crmId}/leads/${leadId}/comments`);
 }
 
-export function addLeadComment(leadId: string, text: string) {
-  return api.post<Comment>(`/crm/leads/${leadId}/comments`, { text });
+export function addLeadComment(crmId: string, leadId: string, text: string) {
+  return api.post<Comment>(`/crms/${crmId}/leads/${leadId}/comments`, { text });
 }
 
-export function deleteLeadComment(leadId: string, commentId: string) {
-  return api.delete<void>(`/crm/leads/${leadId}/comments/${commentId}`);
+export function deleteLeadComment(crmId: string, leadId: string, commentId: string) {
+  return api.delete<void>(`/crms/${crmId}/leads/${leadId}/comments/${commentId}`);
 }
 
 // ————————————————————————————————————
 // Contacts
 // ————————————————————————————————————
 
-export function getLeadContacts(leadId: string) {
-  return api.get<Contact[]>(`/crm/leads/${leadId}/contacts`);
+export function getLeadContacts(crmId: string, leadId: string) {
+  return api.get<Contact[]>(`/crms/${crmId}/leads/${leadId}/contacts`);
 }
 
-// envie apenas o objeto sem id; o backend vai devolver o Contact completo
-export function addLeadContact(leadId: string, contact: Omit<Contact, 'id'>) {
-  return api.post<Contact>(`/crm/leads/${leadId}/contacts`, contact);
+export function addLeadContact(crmId: string, leadId: string, contact: Omit<Contact, 'id'>) {
+  return api.post<Contact>(`/crms/${crmId}/leads/${leadId}/contacts`, contact);
 }
 
-export function deleteLeadContact(leadId: string, contactId: string) {
-  return api.delete<void>(`/crm/leads/${leadId}/contacts/${contactId}`);
+export function deleteLeadContact(crmId: string, leadId: string, contactId: string) {
+  return api.delete<void>(`/crms/${crmId}/leads/${leadId}/contacts/${contactId}`);
 }
 
 // ————————————————————————————————————
 // Tags
 // ————————————————————————————————————
 
-export function getTags() {
-  return api.get<Tag[]>('/crm/tags');
+export function getTags(crmId: string) {
+  return api.get<Tag[]>(`/crms/${crmId}/tags`);
 }
 
-export function createTag(tag: Omit<Tag, 'id'>) {
-  return api.post<Tag>('/crm/tags', tag);
+export function createTag(crmId: string, tag: Omit<Tag, 'id'>) {
+  return api.post<Tag>(`/crms/${crmId}/tags`, tag);
 }
 
 // ————————————————————————————————————
 // Tasks
 // ————————————————————————————————————
 
-export function getLeadTasks(leadId: string) {
-  return api.get<Task[]>(`/crm/leads/${leadId}/tasks`);
+export function getLeadTasks(crmId: string, leadId: string) {
+  return api.get<Task[]>(`/crms/${crmId}/leads/${leadId}/tasks`);
 }
 
-// envie apenas o objeto sem id; o backend vai devolver o Task completo
-export function createLeadTask(leadId: string, task: Omit<Task, 'id'>) {
-  return api.post<Task>(`/crm/leads/${leadId}/tasks`, task);
+export function createLeadTask(crmId: string, leadId: string, task: Omit<Task, 'id'>) {
+  return api.post<Task>(`/crms/${crmId}/leads/${leadId}/tasks`, task);
 }
 
-export function updateLeadTask(leadId: string, taskId: string, update: Partial<Task>) {
-  return api.put<Task>(`/crm/leads/${leadId}/tasks/${taskId}`, update);
+export function updateLeadTask(
+  crmId: string,
+  leadId: string,
+  taskId: string,
+  update: Partial<Task>,
+) {
+  return api.put<Task>(`/crms/${crmId}/leads/${leadId}/tasks/${taskId}`, update);
 }
 
-export function deleteLeadTask(leadId: string, taskId: string) {
-  return api.delete<void>(`/crm/leads/${leadId}/tasks/${taskId}`);
-}
-
-// ————————————————————————————————————
-// Files
-// ————————————————————————————————————
-
-export function getLeadFiles(leadId: string) {
-  return api.get<LeadFile[]>(`/crm/leads/${leadId}/files`);
-}
-
-export function uploadLeadFile(leadId: string, file: File) {
-  const formData = new FormData();
-  formData.append('file', file);
-  return api.post<LeadFile>(`/crm/leads/${leadId}/files`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-}
-
-export function deleteLeadFile(leadId: string, fileId: string) {
-  return api.delete<void>(`/crm/leads/${leadId}/files/${fileId}`);
+export function deleteLeadTask(crmId: string, leadId: string, taskId: string) {
+  return api.delete<void>(`/crms/${crmId}/leads/${leadId}/tasks/${taskId}`);
 }

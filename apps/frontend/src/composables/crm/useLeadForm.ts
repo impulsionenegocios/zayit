@@ -1,7 +1,6 @@
 // src/composables/crm/useLeadForm.ts
-
-import { ref, reactive, computed, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, reactive, computed, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useToast } from '@/composables/useToast';
 import type {
   LeadSource,
@@ -13,18 +12,23 @@ import type {
 import { createLead, updateLead, getLeadById } from '@/services/crm';
 import { getTags } from '@/services/tagService';
 
-export function useLeadForm(leadId?: string) {
+export function useLeadForm(leadIdParam?: string) {
+  const route = useRoute();
   const router = useRouter();
   const toast = useToast();
+
+  // 1) Captura o crmId do URL e, se houver, o leadId
+  const crmId = route.params.crmId as string;
+  const leadId = leadIdParam ?? (route.params.leadId as string | undefined);
+
   const isSubmitting = ref(false);
   const isEditing = computed(() => !!leadId);
 
-  // Só IDs de tag
+  // tags selecionadas e disponíveis
   const selectedTagIds = ref<string[]>([]);
-  // Todas as tags para lookup
   const availableTags = ref<Tag[]>([]);
 
-  // Estado do form (sem form.tags)
+  // estado do form
   const form = reactive({
     name: '',
     email: '',
@@ -37,22 +41,22 @@ export function useLeadForm(leadId?: string) {
 
   const errors = reactive<Record<string, string>>({});
 
-  // Tipagem explícita para evitar any[]
-  const sourceOptions: { label: string; value: LeadSource }[] = [
-    { label: 'Organic', value: 'organic' },
-    { label: 'Advertisement', value: 'advertisement' },
-    { label: 'Referral', value: 'referral' },
-    { label: 'Social Media', value: 'social' },
-    { label: 'Other', value: 'other' },
-  ];
+  const sourceOptions = [
+    { label: 'Organic',        value: 'organic' },
+    { label: 'Advertisement',  value: 'advertisement' },
+    { label: 'Referral',       value: 'referral' },
+    { label: 'Social Media',   value: 'social' },
+    { label: 'Other',          value: 'other' },
+  ] as { label: string; value: LeadSource }[];
 
-  const statusOptions: { label: string; value: LeadStatus }[] = [
-    { label: 'Lead', value: 'lead' },
+  const statusOptions = [
+    { label: 'Lead',        value: 'lead' },
     { label: 'Opportunity', value: 'opportunity' },
-    { label: 'Client', value: 'client' },
-    { label: 'Lost', value: 'lost' },
-  ];
+    { label: 'Client',      value: 'client' },
+    { label: 'Lost',        value: 'lost' },
+  ] as { label: string; value: LeadStatus }[];
 
+  // carrega todas as tags
   async function loadAvailableTags() {
     try {
       const { data } = await getTags();
@@ -62,33 +66,33 @@ export function useLeadForm(leadId?: string) {
     }
   }
 
+  // carrega um lead existente para edição
   async function loadLead(id: string) {
     try {
       await loadAvailableTags();
-      const { data: lead } = await getLeadById(id);
-      form.name = lead.name;
-      form.email = lead.email;
-      form.phone = lead.phone;
-      form.address = lead.address || '';
-      form.birthDate = lead.birthDate || '';
-      form.source = lead.source;
-      form.status = lead.status;
-      // Aqui anotamos explicitamente o tipo de `t`
+      const { data: lead } = await getLeadById(crmId, id);
+      form.name       = lead.name;
+      form.email      = lead.email;
+      form.phone      = lead.phone;
+      form.address    = lead.address    || '';
+      form.birthDate  = lead.birthDate  || '';
+      form.source     = lead.source;
+      form.status     = lead.status;
       selectedTagIds.value = lead.tags.map((t: Tag) => t.id);
     } catch {
       toast.error('Failed to load lead');
-      router.push({ name: 'LeadList', params: {} });
+      router.push({ name: 'CRMLeadList', params: { crmId } });
     }
   }
 
   function validateForm() {
-    errors.name = !form.name.trim() ? 'Name is required' : '';
-    errors.email = !form.email.trim() ? 'Email is required' : '';
+    errors.name   = form.name.trim()   ? '' : 'Name is required';
+    errors.email  = form.email.trim()  ? '' : 'Email is required';
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       errors.email = 'Invalid email format';
     }
-    errors.phone = !form.phone.trim() ? 'Phone is required' : '';
-    errors.status = !form.status ? 'Status is required' : '';
+    errors.phone  = form.phone.trim()  ? '' : 'Phone is required';
+    errors.status = form.status       ? '' : 'Status is required';
     return !Object.values(errors).some((e) => e);
   }
 
@@ -99,53 +103,46 @@ export function useLeadForm(leadId?: string) {
     }
     isSubmitting.value = true;
 
-    const payload: LeadCreatePayload | LeadUpdatePayload = {
-      name: form.name,
-      email: form.email,
-      phone: form.phone,
-      address: form.address,
-      birthDate: form.birthDate,
-      source: form.source,
-      status: form.status,
-      tags: selectedTagIds.value, // somente string[]
+    // payload compartilhado
+    const payload = {
+      name:       form.name,
+      email:      form.email,
+      phone:      form.phone,
+      address:    form.address,
+      birthDate:  form.birthDate,
+      source:     form.source,
+      status:     form.status,
+      tags:       selectedTagIds.value,
     };
 
     try {
       if (isEditing.value && leadId) {
-        await updateLead(leadId, payload as LeadUpdatePayload);
+        await updateLead(crmId, leadId, payload as LeadUpdatePayload);
         toast.success('Lead updated successfully');
       } else {
-        await createLead(payload as LeadCreatePayload);
+        await createLead(crmId, payload as LeadCreatePayload);
         toast.success('Lead created successfully');
       }
-      router.push({ name: 'LeadList', params: {} });
+      // volta pra lista de leads desse CRM
+      router.push({ name: 'CRMLeadList', params: { crmId } });
     } catch {
       toast.error('Failed to save lead');
     } finally {
       isSubmitting.value = false;
     }
   }
-  console.log(router.resolve({ name: 'LeadList' }));
 
   function cancel() {
-    // const resolved = router.resolve({ name: 'LeadList' });
-    // console.log('🔁 Redirecionando para:', resolved.fullPath);
-    console.log('⚠️ TODAS AS ROTAS');
-    console.table(
-      router
-        .getRoutes()
-        .filter((r) => r.name === 'LeadList')
-        .map((r) => ({
-          name: r.name,
-          path: r.path,
-          fullPath: router.resolve({ name: r.name }).fullPath,
-        })),
-    );
-    // router.push({ name: 'LeadList' });
+    router.push({ name: 'CRMLeadList', params: { crmId } });
   }
 
-  if (leadId) loadLead(leadId);
-  else loadAvailableTags();
+  onMounted(() => {
+    if (leadId) {
+      loadLead(leadId);
+    } else {
+      loadAvailableTags();
+    }
+  });
 
   return {
     form,
@@ -155,6 +152,7 @@ export function useLeadForm(leadId?: string) {
     sourceOptions,
     statusOptions,
     selectedTagIds,
+    availableTags,
     handleSubmit,
     cancel,
   };

@@ -8,7 +8,9 @@
         :class="
           activeView === 'list'
             ? 'text-zayit-blue border-b-2 border-zayit-blue -mb-px'
-            : 'text-gray-400 hover:text-white'">
+            : 'text-gray-400 hover:text-white'
+        "
+      >
         <Icon icon="mdi:format-list-bulleted" class="mr-2" />
         List View
       </button>
@@ -18,7 +20,9 @@
         :class="
           activeView === 'kanban'
             ? 'text-zayit-blue border-b-2 border-zayit-blue -mb-px'
-            : 'text-gray-400 hover:text-white'">
+            : 'text-gray-400 hover:text-white'
+        "
+      >
         <Icon icon="mdi:view-column" class="mr-2" />
         Kanban View
       </button>
@@ -54,5 +58,4 @@ watch(activeView, (newValue) => {
 function handleViewChange(mode: 'list' | 'kanban') {
   activeView.value = mode;
 }
-
 </script>

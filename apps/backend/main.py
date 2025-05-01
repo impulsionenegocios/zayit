@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from api.routes import auth, clientes, roles
-from api.routes.crm import tags, leads, contacts, tasks, comment
+from api.routes.crm import tags, leads, contacts, tasks, comment, crms, crm_leads
 
 app = FastAPI()
 origins = [
@@ -27,6 +27,8 @@ app.include_router(tags.router)
 app.include_router(contacts.router)
 app.include_router(tasks.router)
 app.include_router(comment.router)
+app.include_router(crms.router)
+app.include_router(crm_leads.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

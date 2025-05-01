@@ -118,7 +118,7 @@ const menuItems = ref([
     ],
   },
   // {
-  //   label: 'Crm',
+  //   label: 'Crm Antigo',
   //   icon: 'mdi:leads',
   //   dropdownOpen: false,
   //   dropdownIcon:'lsicon:down-outline',
@@ -144,13 +144,18 @@ const menuItems = ref([
     dropdownIcon: 'lsicon:down-outline',
     subitems: [
       {
-        label: 'Leads & Clients',
-        to: { name: 'LeadList' },
+        label: 'Listar',
+        to: { name: 'CRMList' },
+      },
+      {
+        label: 'Criar',
+        to: { name: 'CRMCreate' },
       },
       {
         label: 'Tags',
         to: { name: 'TagsList' },
       },
+
       // {
       //   label: 'Tasks',
       //   to: { name: 'VerKanban' },

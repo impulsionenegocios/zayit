@@ -123,7 +123,6 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
@@ -295,8 +294,6 @@ async function onDragEnd(evt: any) {
   }
 }
 
-
-
 // Carrega leads ao montar
 onMounted(async () => {
   try {
@@ -335,5 +332,4 @@ onMounted(async () => {
   opacity: 0;
   transform: translateY(10px);
 }
-
 </style>

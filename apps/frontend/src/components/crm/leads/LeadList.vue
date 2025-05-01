@@ -137,8 +137,8 @@
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
               <div class="flex gap-2 justify-end">
                 <router-link
-                  :to="{ name: 'LeadDetail', params: { id: lead.id } }"
-                  class="text-zayit-blue hover:text-zayit-blue/80 bg-white/5 hover:bg-white/10 transition-colors p-2 rounded-full"
+                :to="{ name: 'CRMLeadDetail', params: { crmId: props.crmId, leadId: lead.id } }"
+                class="text-zayit-blue hover:text-zayit-blue/80 bg-white/5 hover:bg-white/10 transition-colors p-2 rounded-full"
                 >
                   <Icon icon="mdi:eye" />
                 </router-link>
@@ -171,23 +171,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { defineProps, ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import { useLeadStore } from '@/stores/crm/lead';
 import { useToast } from '@/composables/useToast';
-import type { Lead, LeadStatus } from '@/types/client.types';
+import type { Lead, LeadStatus } from '@/types/lead.types';
 import { useModal } from '@/composables/useModal';
 import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
 import { formatDate } from '@/utils/dateFormatter';
-const clientStore = useLeadStore();
+
+// 1) Recebe o crmId vindo do componente pai (via <component :crm-id="crmId" />)
+const props = defineProps<{
+  crmId: string;
+  initialViewMode: 'list' | 'kanban';
+}>();
+
+const leadStore = useLeadStore();
 const toast = useToast();
 const modal = useModal();
 const router = useRouter();
 
 const searchQuery = ref('');
 const statusFilter = ref<'all' | LeadStatus>('all');
-const isLoading = computed(() => clientStore.isLoading);
+const isLoading = computed(() => leadStore.isLoading);
 
 // Status styling
 const statusClasses = {
@@ -199,51 +206,36 @@ const statusClasses = {
 
 // Filtered leads
 const filteredLeads = computed(() => {
-  let result = clientStore.leads;
+  let result = leadStore.leads;
 
-  // Apply status filter
   if (statusFilter.value !== 'all') {
-    result = result.filter((lead) => lead.status === statusFilter.value);
+    result = result.filter((l) => l.status === statusFilter.value);
   }
-
-  // Apply search filter
   if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
+    const q = searchQuery.value.toLowerCase();
     result = result.filter(
-      (lead) =>
-        lead.name.toLowerCase().includes(query) ||
-        lead.email.toLowerCase().includes(query) ||
-        lead.phone.toLowerCase().includes(query),
+      (l) =>
+        l.name.toLowerCase().includes(q) ||
+        l.email.toLowerCase().includes(q) ||
+        l.phone.toLowerCase().includes(q),
     );
   }
-
   return result;
 });
 
 function formatSource(source?: string) {
   if (!source) return 'Unknown';
-  return source.charAt(0).toUpperCase() + source.slice(1);
+  return source[0].toUpperCase() + source.slice(1);
 }
 
 function formatStatus(status: LeadStatus) {
-  switch (status) {
-    case 'lead':
-      return 'Lead';
-    case 'opportunity':
-      return 'Opportunity';
-    case 'client':
-      return 'Client';
-    case 'lost':
-      return 'Lost';
-    default:
-      return 'Unknown';
-  }
+  return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
 function getInitials(name: string) {
   return name
     .split(' ')
-    .map((part) => part.charAt(0))
+    .map((p) => p.charAt(0))
     .join('')
     .toUpperCase()
     .slice(0, 2);
@@ -251,34 +243,34 @@ function getInitials(name: string) {
 
 // Actions
 function editLead(lead: Lead) {
-  router.push({ name: 'EditLead', params: { id: lead.id } });
+  router.push({
+    name: 'CRMLeadEdit',
+    params: { crmId: props.crmId, leadId: lead.id }
+  });
 }
 
-async function confirmDelete(lead: Lead) {
-  try {
-    const confirmed = await modal.open(ConfirmModal, {
-      title: 'Delete Lead',
-      props: {
-        message: `Are you sure you want to delete ${lead.name}? This action cannot be undone.`,
-      },
-      size: 'sm',
-    });
 
-    if (confirmed) {
-      const success = await clientStore.deleteLead(lead.id);
-      if (success) {
-        toast.success(`Lead "${lead.name}" deleted successfully`);
-      } else {
-        toast.error('Failed to delete lead');
-      }
-    }
-  } catch (error) {
-    console.error('Error in delete confirmation:', error);
-  }
+async function confirmDelete(lead: Lead) {
+  const confirmed = await modal.open(ConfirmModal, {
+    title: 'Delete Lead',
+    props: {
+      message: `Are you sure you want to delete ${lead.name}?`,
+    },
+    size: 'sm',
+  });
+  if (!confirmed) return;
+  const ok = await leadStore.deleteLead(props.crmId, lead.id);
+  toast[ok ? 'success' : 'error'](
+    ok ? `Lead "${lead.name}" deleted.` : 'Failed to delete lead'
+  );
 }
 
 // Load data
 onMounted(async () => {
-  await clientStore.fetchLeads();
+  if (!props.crmId) {
+    toast.error('CRM ID is missing');
+    return;
+  }
+  await leadStore.fetchLeads(props.crmId);
 });
 </script>

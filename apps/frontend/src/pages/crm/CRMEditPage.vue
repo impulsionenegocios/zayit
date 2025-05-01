@@ -1,12 +1,12 @@
 <template>
   <div>
-    <CRMDashboard :crm-id="crmId" />
+    <CRMForm :crm-id="crmId" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import CRMDashboard from '@/components/crm/CRMDashboard.vue';
+import CRMForm from '@/components/crm/CRMForm.vue';
 
 const route = useRoute();
 const crmId = route.params.id as string;
