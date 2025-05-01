@@ -115,9 +115,9 @@
 
       <!-- Comments -->
       <!-- Comments -->
-<div class="bg-surface rounded-lg p-6">
-  <CommentList :leadId="leadId" />
-</div>
+      <div class="bg-surface rounded-lg p-6">
+        <CommentList :leadId="leadId" />
+      </div>
     </div>
 
     <!-- Right Column - Tasks & Files -->
@@ -161,7 +161,7 @@
       </div>
       <!-- Tasks -->
       <Tasks class="lg:pr-16 lg:pl-8 px-8 pb-8" :leadId="leadId" />
-      </div>
+    </div>
   </div>
 </template>
 

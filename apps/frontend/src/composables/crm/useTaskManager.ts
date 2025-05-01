@@ -72,7 +72,6 @@ export function useTaskManager(leadId: string) {
       toast.error('Falha ao alterar o status da task');
     }
   }
-  
 
   return {
     tasks,

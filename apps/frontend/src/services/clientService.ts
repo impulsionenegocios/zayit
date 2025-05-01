@@ -1,5 +1,5 @@
 import api from '@/lib/axios';
-import type { Lead, Comment, Contact } from '@/types/client.types';
+import type { Lead, Comment, Contact } from '@/types/lead.types';
 
 // Leads/Clients API
 export async function getLeads() {

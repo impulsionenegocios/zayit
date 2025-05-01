@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { Lead, Tag, LeadStatus, LeadCreatePayload, LeadUpdatePayload } from '@/types/lead.types';
+import type {
+  Lead,
+  Tag,
+  LeadStatus,
+  LeadCreatePayload,
+  LeadUpdatePayload,
+} from '@/types/lead.types';
 import * as crmService from '@/services/crm';
 
 export const useLeadStore = defineStore('lead', () => {
@@ -30,10 +36,10 @@ export const useLeadStore = defineStore('lead', () => {
   // For Kanban view - returns array of column data
   const kanbanColumns = computed(() => {
     const statuses: LeadStatus[] = ['lead', 'opportunity', 'client', 'lost'];
-    
-    return statuses.map(status => ({
+
+    return statuses.map((status) => ({
       status,
-      leads: leads.value.filter(lead => lead.status === status)
+      leads: leads.value.filter((lead) => lead.status === status),
     }));
   });
 
@@ -82,19 +88,19 @@ export const useLeadStore = defineStore('lead', () => {
     isLoading.value = true;
     try {
       const response = await crmService.updateLead(id, lead);
-  
+
       // Update using the response
       const updatedLead = response.data as Lead;
-  
+
       const index = leads.value.findIndex((l) => l.id === id);
       if (index !== -1) {
         leads.value[index] = updatedLead;
       }
-  
+
       if (selectedLead.value?.id === id) {
         selectedLead.value = updatedLead;
       }
-  
+
       return updatedLead;
     } catch (error) {
       console.error(`Error updating lead ${id}:`, error);
@@ -107,12 +113,12 @@ export const useLeadStore = defineStore('lead', () => {
   // Update lead status directly (for drag-and-drop in Kanban)
   async function updateLeadStatus(id: string, newStatus: LeadStatus) {
     // Optimistically update the UI first
-    const leadIndex = leads.value.findIndex(lead => lead.id === id);
+    const leadIndex = leads.value.findIndex((lead) => lead.id === id);
     if (leadIndex === -1) return false;
 
     // Store the original status in case we need to revert
     const originalStatus = leads.value[leadIndex].status;
-    
+
     // Update local state immediately
     leads.value[leadIndex].status = newStatus;
     dragInProgress.value = true;
@@ -130,7 +136,7 @@ export const useLeadStore = defineStore('lead', () => {
       dragInProgress.value = false;
     }
   }
-  
+
   async function deleteLead(id: string) {
     isLoading.value = true;
     try {

@@ -14,17 +14,16 @@
     </div>
 
     <div v-else>
-  <TransitionGroup name="list" tag="div" class="space-y-3">
-    <TaskCard
-      v-for="task in tasks"
-      :key="task.id"
-      :task="task"
-      @toggle-status="toggleTaskStatus"
-      @delete-task="deleteTask"
-    />
-  </TransitionGroup>
-</div>
-
+      <TransitionGroup name="list" tag="div" class="space-y-3">
+        <TaskCard
+          v-for="task in tasks"
+          :key="task.id"
+          :task="task"
+          @toggle-status="toggleTaskStatus"
+          @delete-task="deleteTask"
+        />
+      </TransitionGroup>
+    </div>
 
     <!-- Modal de adicionar tarefa -->
     <div v-if="showTaskModal" class="fixed inset-0 flex items-center justify-center z-50">
@@ -81,8 +80,8 @@ function openTaskModal() {
   showTaskModal.value = true;
 }
 onMounted(() => {
-  loadTasks()
-})
+  loadTasks();
+});
 </script>
 <style scoped>
 .list-enter-active,
@@ -94,5 +93,4 @@ onMounted(() => {
   opacity: 0;
   transform: translateY(20px) scale(0.98);
 }
-
 </style>

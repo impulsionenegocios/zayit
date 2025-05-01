@@ -117,7 +117,8 @@ def update_lead_service(lead_id: str, lead: LeadUpdate, user_data):
         tags = current_data.get("tags", [])
         if lead.tags is not None:
             if lead.tags:
-                tags_ref = db.collection("tags").where(firestore.field_path.FieldPath.document_id(), "in", lead.tags)
+                # Use __name__ directly as in your original code
+                tags_ref = db.collection("tags").where("__name__", "in", lead.tags)
                 tags_docs = tags_ref.stream()
                 tags = [{"id": doc.id, "name": doc.get("name"), "color": doc.get("color")} for doc in tags_docs]
             else:

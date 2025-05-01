@@ -14,11 +14,11 @@
     <div v-if="showContactModal" class="fixed inset-0 flex items-center justify-center z-50">
       <div class="absolute inset-0 bg-black/50" @click="showContactModal = false"></div>
       <ContactForm
-          :show="showContactModal"
-          :form="newContact"
-          @submit="handleAddContact"
-          @cancel="() => (showContactModal = false)"
-        />
+        :show="showContactModal"
+        :form="newContact"
+        @submit="handleAddContact"
+        @cancel="() => (showContactModal = false)"
+      />
     </div>
   </div>
 </template>
@@ -40,7 +40,6 @@ const showContactModal = ref(false);
 
 const { contacts, isLoading, newContact, loadContacts, addContact, deleteContact } =
   useContactHistory(props.leadId);
-
 
 async function handleAddContact() {
   const success = await addContact();
