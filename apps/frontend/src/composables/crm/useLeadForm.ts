@@ -11,7 +11,7 @@ import type {
   LeadUpdatePayload,
   Tag,
 } from '@/types/lead.types';
-import { createLead, updateLead, getLeadById } from '@/services/crm';
+import { createLead, updateLead, getLeadById } from '@/services/crmService';
 import { getTags } from '@/services/tagService';
 
 export function useLeadForm(leadIdParam?: string) {

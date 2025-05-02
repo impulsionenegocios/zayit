@@ -171,7 +171,8 @@ import { useLeadStore } from '@/stores/crm/lead';
 import { useToast } from '@/composables/useToast';
 import { useModal } from '@/composables/useModal';
 import { Icon } from '@iconify/vue';
-import * as crmService from '@/services/crm'; // Mantém o mesmo nome do serviço
+import * as crmService from '@/services/crmService'; 
+import * as commentService from '@/services/commentService';
 import type { Lead } from '@/types/client.types';
 import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
 import LeadTags from './LeadTags.vue';
@@ -296,8 +297,8 @@ function addTask() {
 
 async function loadComments() {
   try {
-    const response = await crmService.getLeadComments(crmId, leadId);
-    comments.value = response.data;
+    const data = await commentService.getCommentsByLeadId(crmId, leadId);
+    comments.value = data;
   } catch (error) {
     console.error('Erro ao carregar comentários:', error);
     // Dados de exemplo como fallback

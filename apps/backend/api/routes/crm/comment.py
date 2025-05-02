@@ -9,7 +9,7 @@ from services.comment_service import (
     update_lead_comment_service,
 )
 
-router = APIRouter(tags=["comments"])
+router = APIRouter(tags=["comments"], deprecated=True)
 
 @router.get("/leads/{lead_id}/comments", response_model=List[Comment])
 async def get_lead_comments(

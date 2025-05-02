@@ -1,6 +1,10 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime
+from schemas.tag import Tag
+from schemas.comment import Comment
+from schemas.contact import Contact
+from schemas.task import Task
 
 
 class BaseSchema(BaseModel):
@@ -11,17 +15,6 @@ class BaseSchema(BaseModel):
         validate_by_name = True
 
 
-class TagBase(BaseSchema):
-    name: str
-    color: str
-
-
-class TagCreate(TagBase):
-    pass
-
-class Tag(TagBase):
-    id: str
-    
 class LeadBase(BaseSchema):
     name:        str             = Field(..., min_length=2)
     email:       EmailStr
@@ -49,57 +42,3 @@ class Lead(LeadBase):
     tags:        List[Tag]            = []
     created_at:  datetime
     updated_at:  datetime
-
-class ContactBase(BaseSchema):
-    type: str = Field(..., pattern="^(call|whatsapp|email|meeting)$")
-    description: str
-    date: str
-
-
-class ContactCreate(ContactBase):
-    pass
-
-
-class Contact(ContactBase):
-    id: str
-    lead_id: str
-
-
-class CommentBase(BaseSchema):
-    text: str
-
-
-class CommentCreate(CommentBase):
-    pass
-
-
-class Comment(CommentBase):
-    id: str
-    lead_id: str
-    user_id: str
-    created_at: datetime
-
-
-class TaskBase(BaseSchema):
-    title: str
-    description: Optional[str] = None
-    due_date: str
-    completed: bool = False
-    assigned_to: Optional[str] = None
-
-
-class TaskCreate(TaskBase):
-    pass
-
-
-class TaskUpdate(BaseSchema):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    due_date: Optional[str] = None
-    completed: Optional[bool] = None
-    assigned_to: Optional[str] = None
-
-
-class Task(TaskBase):
-    id: str
-    lead_id: str

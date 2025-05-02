@@ -41,7 +41,7 @@ from services.lead_service import (
     delete_lead_file_service
 )
 
-router = APIRouter(prefix="/crm/leads", tags=["crm"])
+router = APIRouter(prefix="/crm/leads", tags=["crm"], deprecated=True)
 
 # Leads endpoints
 @router.post("/", response_model=Lead)

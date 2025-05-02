@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { getTags, deleteTag } from '@/services/crm';
+import { getTags, deleteTag } from '@/services/tagService';
 import { useToast } from '@/composables/useToast';
 import type { Tag } from '@/types';
 
