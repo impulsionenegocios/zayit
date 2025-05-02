@@ -9,7 +9,7 @@ from services.task_service import (
     toggle_task_completion_service,
 )
 
-router = APIRouter(tags=["tasks"])
+router = APIRouter(tags=["tasks"], deprecated=True)
 
 @router.get("/leads/{lead_id}/tasks", response_model=List[Task])
 async def get_lead_tasks(

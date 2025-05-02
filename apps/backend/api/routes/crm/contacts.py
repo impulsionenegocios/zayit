@@ -10,7 +10,7 @@ from services.contact_service import (
     delete_lead_contact_service
 )
 
-router = APIRouter(tags=["contacts"])
+router = APIRouter(tags=["contacts"], deprecated=True)
 
 # These endpoints will be included in the main.py under the lead routes
 

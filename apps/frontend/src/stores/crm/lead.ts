@@ -9,6 +9,7 @@ import type {
   LeadUpdatePayload,
 } from '@/types/lead.types';
 import * as crmService from '@/services/crm';
+import * as tagService from '@/services/tagService';
 
 export const useLeadStore = defineStore('lead', () => {
   // State
@@ -133,7 +134,7 @@ export const useLeadStore = defineStore('lead', () => {
 
   async function fetchTags(crmId: string) {
     try {
-      const response = await crmService.getTags(crmId);
+      const response = await tagService.getTags(crmId);
       tags.value = response.data;
     } catch (error) {
       console.error('Error fetching tags:', error);
