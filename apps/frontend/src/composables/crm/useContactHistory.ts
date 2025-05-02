@@ -5,7 +5,7 @@ import { getLeadContacts, addLeadContact, deleteLeadContact } from '@/services/c
 import type { Contact, ContactCreate } from '@/types/contact.types';
 import { ContactType } from '@/constants/contactTypes';
 
-export function useContactHistory(leadId: string) {
+export function useContactHistory(crmId: string, leadId: string) {
   const contacts = ref<Contact[]>([]) as Ref<Contact[]>;
   const isLoading = ref(false);
   const toast = useToast();
@@ -21,7 +21,7 @@ export function useContactHistory(leadId: string) {
   async function loadContacts() {
     isLoading.value = true;
     try {
-      const { data } = await getLeadContacts(leadId);
+      const { data } = await getLeadContacts(crmId, leadId);
       contacts.value = data;
     } catch (error) {
       console.error('Error loading contacts:', error);
@@ -40,7 +40,7 @@ export function useContactHistory(leadId: string) {
 
     isLoading.value = true;
     try {
-      const { data } = await addLeadContact(leadId, newContact.value);
+      const { data } = await addLeadContact(crmId, leadId, newContact.value);
       contacts.value.unshift(data); // Add to beginning of array
       toast.success('Contact record added successfully');
 
@@ -65,7 +65,7 @@ export function useContactHistory(leadId: string) {
   async function deleteContact(contactId: string) {
     isLoading.value = true;
     try {
-      await deleteLeadContact(leadId, contactId);
+      await deleteLeadContact(crmId, leadId, contactId);
       contacts.value = contacts.value.filter((contact) => contact.id !== contactId);
       toast.success('Contact record deleted successfully');
     } catch (error) {

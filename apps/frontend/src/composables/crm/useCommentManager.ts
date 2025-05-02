@@ -8,7 +8,7 @@ import {
   updateComment,
 } from '@/services/commentService';
 
-export function useCommentManager(leadId: string) {
+export function useCommentManager(crmId: string, leadId: string) {
   const toast = useToast();
   const comments = ref<Comment[]>([]);
   const isLoading = ref(false);
@@ -20,7 +20,7 @@ export function useCommentManager(leadId: string) {
   async function loadComments() {
     isLoading.value = true;
     try {
-      comments.value = await getCommentsByLeadId(leadId);
+      comments.value = await getCommentsByLeadId(crmId, leadId);
     } catch (error) {
       toast.error('Failed to load comments');
     } finally {
@@ -32,7 +32,7 @@ export function useCommentManager(leadId: string) {
     if (!newComment.text.trim()) return false;
     isLoading.value = true;
     try {
-      const createdComment = await createComment(leadId, newComment);
+      const createdComment = await createComment(crmId, leadId, newComment);
       comments.value.unshift(createdComment); // Add to the beginning of the array
       toast.success('Comentário criado com sucesso!');
       return true;
@@ -46,7 +46,7 @@ export function useCommentManager(leadId: string) {
 
   async function deleteComment(commentId: string) {
     try {
-      await deleteCommentById(leadId, commentId);
+      await deleteCommentById(crmId, leadId, commentId);
       comments.value = comments.value.filter((comment) => comment.id !== commentId);
       toast.success('Comentário excluído');
     } catch (error) {
@@ -57,7 +57,7 @@ export function useCommentManager(leadId: string) {
   async function editComment(commentId: string, text: string) {
     if (!text.trim()) return false;
     try {
-      const updatedComment = await updateComment(leadId, commentId, text);
+      const updatedComment = await updateComment(crmId, leadId, commentId, text);
       const index = comments.value.findIndex((c) => c.id === commentId);
       if (index !== -1) {
         comments.value[index] = updatedComment;

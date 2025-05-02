@@ -63,7 +63,6 @@ class ContactCreate(ContactBase):
 class Contact(ContactBase):
     id: str
     lead_id: str
-    user_id: str
 
 
 class CommentBase(BaseSchema):

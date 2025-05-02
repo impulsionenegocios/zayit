@@ -41,12 +41,18 @@ import { Icon } from '@iconify/vue';
 import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
 import { formatDate } from '@/utils/dateFormatter';
 import type { Task } from '@/types/task.types';
+import TaskFilter from './TaskFilter.vue';
 
-defineProps<{
+const props = defineProps<{
   task: Task;
 }>();
 
 function getTaskDueClass(due_date: string) {
+  // If the task is completed, return the default class
+  if (props.task.completed) {
+    return 'text-zayit-default';
+  }
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 

@@ -22,7 +22,7 @@
       <!-- Ações -->
       <div class="flex gap-2">
         <router-link
-        :to="{ name: 'CRMLeadDetail', params: { crmId, leadId: lead.id } }"
+          :to="{ name: 'CRMLeadDetail', params: { crmId, leadId: lead.id } }"
           class="text-zayit-blue hover:text-zayit-blue/80"
           title="View"
         >

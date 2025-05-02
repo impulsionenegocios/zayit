@@ -1,9 +1,9 @@
 import { ref } from 'vue';
-import { getTags, deleteTag } from '@/services/tagService';
+import { getTags, deleteTag } from '@/services/crm';
 import { useToast } from '@/composables/useToast';
 import type { Tag } from '@/types';
 
-export function useTagList() {
+export function useTagList(crmId: string) {
   const toast = useToast();
   const tags = ref<Tag[]>([]);
   const isLoading = ref(false);
@@ -15,7 +15,7 @@ export function useTagList() {
     error.value = null;
 
     try {
-      const response = await getTags();
+      const response = await getTags(crmId);
       tags.value = response.data;
       return response;
     } catch (err) {
@@ -31,7 +31,7 @@ export function useTagList() {
   const removeTag = async (id: string) => {
     isLoading.value = true;
     try {
-      await deleteTag(id);
+      await deleteTag(crmId, id);
       toast.success('Tag deleted successfully');
       await fetchTags(); // Refresh the list
     } catch (err) {
@@ -46,7 +46,7 @@ export function useTagList() {
   const bulkDeleteTags = async (ids: string[]) => {
     isLoading.value = true;
     try {
-      await Promise.all(ids.map((id) => deleteTag(id)));
+      await Promise.all(ids.map((id) => deleteTag(crmId, id)));
       toast.success(`${ids.length} tags deleted successfully`);
       await fetchTags(); // Refresh the list
     } catch (err) {

@@ -4,7 +4,7 @@ from auth.permissions import verify_role
 from schemas.task import Task, TaskCreate
 from services.task_service import (
     get_lead_tasks_service,
-    add_lead_task_service,
+    create_lead_task_service,
     delete_lead_task_service,
     toggle_task_completion_service,
 )
@@ -27,7 +27,7 @@ async def add_lead_task(
     user_data=Depends(verify_role(["superadmin", "company"]))
 ):
     """Add a new task to a lead"""
-    return add_lead_task_service(lead_id, task, user_data)
+    return create_lead_task_service(lead_id, task, user_data)
 
 
 @router.delete("/leads/{lead_id}/tasks/{task_id}")

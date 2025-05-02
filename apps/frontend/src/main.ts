@@ -17,8 +17,9 @@ pinia.use(piniaPluginPersistedstate);
 
 app.use(pinia);
 
-// 🔥 Depois do pinia, inicializa a store
+// 🔥 Depois do pinia, inicializa a store e AGUARDA a inicialização
 const auth = useAuthStore();
+// Inicializar auth de forma assíncrona - não bloqueia a montagem da aplicação
 auth.initAuth();
 
 app.use(router);

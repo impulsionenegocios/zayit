@@ -24,22 +24,29 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import { useContactHistory } from '@/composables/crm/useContactHistory';
 import { useModal } from '@/composables/useModal';
 import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
 import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
-import ContactForm from '@/components/crm/contacts/ContactForm.vue'; // <-- Importa o novo form
+import ContactForm from '@/components/crm/contacts/ContactForm.vue';
 import ContactList from '@/components/crm/contacts/ContactList.vue';
+
 const props = defineProps<{
   leadId: string;
+  crmId?: string; // Adicionado como opcional para compatibilidade
 }>();
+
+// Obter crmId da rota se não for fornecido via props
+const route = useRoute();
+const crmId = props.crmId || (route.params.crmId as string);
 
 const modal = useModal();
 const showContactModal = ref(false);
 
 const { contacts, isLoading, newContact, loadContacts, addContact, deleteContact } =
-  useContactHistory(props.leadId);
+  useContactHistory(crmId, props.leadId);
 
 async function handleAddContact() {
   const success = await addContact();

@@ -57,8 +57,8 @@
                   </div>
                   <div class="flex gap-1">
                     <router-link
-                    :to="{ name: 'CRMLeadDetail', params: { crmId, leadId: lead.id } }"
-                    class="text-zayit-blue hover:text-zayit-blue/80 bg-white/5 hover:bg-white/10 transition-colors p-1.5 rounded"
+                      :to="{ name: 'CRMLeadDetail', params: { crmId, leadId: lead.id } }"
+                      class="text-zayit-blue hover:text-zayit-blue/80 bg-white/5 hover:bg-white/10 transition-colors p-1.5 rounded"
                     >
                       <Icon icon="mdi:eye" class="text-sm" />
                     </router-link>
@@ -108,9 +108,10 @@
             <!-- Mensagem se estiver vazio -->
             <template #footer>
               <div
-                v-if="board[status.value].length === 0"
-                class="text-center text-gray-500 text-sm py-8"
-              >
+  v-if="board[status.value].length === 0"
+  class="absolute  left-1/2 -translate-x-1/2  text-center text-gray-500 text-sm py-8 flex flex-col justify-center items-center"
+>
+
                 <Icon :icon="getColumnIcon(status.value)" class="text-2xl mb-2" />
                 <p>Nenhum Lead Aqui ainda</p>
                 <p class="text-xs mt-1">Arraste o lead pra cá</p>
@@ -189,21 +190,31 @@ const board = computed(() => {
 
 function getColumnHeaderClass(status: LeadStatus): string {
   switch (status) {
-    case 'lead': return 'bg-zayit-info/30';
-    case 'opportunity': return 'bg-zayit-warning/30';
-    case 'client': return 'bg-zayit-blue/30';
-    case 'lost': return 'bg-zayit-danger/30';
-    default: return 'bg-gray-700';
+    case 'lead':
+      return 'bg-zayit-info/30';
+    case 'opportunity':
+      return 'bg-zayit-warning/30';
+    case 'client':
+      return 'bg-zayit-blue/30';
+    case 'lost':
+      return 'bg-zayit-danger/30';
+    default:
+      return 'bg-gray-700';
   }
 }
 
 function getColumnIcon(status: LeadStatus): string {
   switch (status) {
-    case 'lead': return 'mdi:account-arrow-right';
-    case 'opportunity': return 'mdi:star-check';
-    case 'client': return 'mdi:handshake';
-    case 'lost': return 'mdi:close-circle';
-    default: return 'mdi:help-circle';
+    case 'lead':
+      return 'mdi:account-arrow-right';
+    case 'opportunity':
+      return 'mdi:star-check';
+    case 'client':
+      return 'mdi:handshake';
+    case 'lost':
+      return 'mdi:close-circle';
+    default:
+      return 'mdi:help-circle';
   }
 }
 
@@ -286,7 +297,6 @@ onMounted(async () => {
   }
 });
 </script>
-
 
 <style scoped>
 /* Scroll horizontal */

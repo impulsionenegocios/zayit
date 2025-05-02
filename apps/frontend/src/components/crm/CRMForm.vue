@@ -10,7 +10,7 @@
       </FormControl>
 
       <div class="flex justify-end space-x-3 mt-8">
-        <DefaultButton type="button" variant="secondary" size="lg" @click="cancel">
+        <DefaultButton type="button" variant="default" size="lg" @click="cancel">
           Cancelar
         </DefaultButton>
         <DefaultButton type="submit" variant="primary" size="lg" :loading="isSubmitting">

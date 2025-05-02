@@ -81,11 +81,7 @@ export const useLeadStore = defineStore('lead', () => {
     }
   }
 
-  async function updateLead(
-    crmId: string,
-    id: string,
-    payload: LeadUpdatePayload
-  ) {
+  async function updateLead(crmId: string, id: string, payload: LeadUpdatePayload) {
     isLoading.value = true;
     try {
       const response = await crmService.updateLead(crmId, id, payload);
@@ -102,11 +98,7 @@ export const useLeadStore = defineStore('lead', () => {
     }
   }
 
-  async function updateLeadStatus(
-    crmId: string,
-    id: string,
-    newStatus: LeadStatus
-  ) {
+  async function updateLeadStatus(crmId: string, id: string, newStatus: LeadStatus) {
     const idx = leads.value.findIndex((l) => l.id === id);
     if (idx === -1) return false;
     const original = leads.value[idx].status;

@@ -17,21 +17,20 @@ def create_crm_service(crm: CRMCreate, user_data) -> CRM:
         # Get user_id from the token data
         user_id = user_data.get("uid")
         
-        # Prepare the payload
-        payload = {
+        # Prepare the complete payload for Firestore
+        firestore_payload = {
             "id": crm_id,
             "name": crm.name,
-            "user_id": user_id,  # Getting user_id from auth token
             "created_at": now,
             "updated_at": now,
+            "user_id": user_id,
         }
 
         # Persist in Firestore
-        db.collection("crms").document(crm_id).set(payload)
+        db.collection("crms").document(crm_id).set(firestore_payload)
 
-        # Return instance of CRM
-        return CRM(**payload)
-
+        # Return the CRM, including user_id
+        return firestore_payload
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating CRM: {e}")
 
@@ -72,7 +71,7 @@ def get_crm_by_id_service(crm_id: str, user_data):
         
         if crm_data.get("user_id") != user_id and role != "superadmin":
             raise HTTPException(status_code=403, detail="You don't have permission to access this CRM")
-        
+            
         return crm_data
     except HTTPException as e:
         raise e
@@ -113,7 +112,9 @@ def update_crm_service(crm_id: str, crm: CRMUpdate, user_data):
         
         # Return the updated CRM
         updated_doc = doc_ref.get()
-        return updated_doc.to_dict()
+        updated_data = updated_doc.to_dict()
+            
+        return updated_data
     except HTTPException as e:
         raise e
     except Exception as e:

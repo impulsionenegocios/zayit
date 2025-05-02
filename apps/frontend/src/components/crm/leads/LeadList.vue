@@ -137,8 +137,8 @@
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
               <div class="flex gap-2 justify-end">
                 <router-link
-                :to="{ name: 'CRMLeadDetail', params: { crmId, leadId: lead.id } }"
-                class="text-zayit-blue hover:text-zayit-blue/80 bg-white/5 hover:bg-white/10 transition-colors p-2 rounded-full"
+                  :to="{ name: 'CRMLeadDetail', params: { crmId, leadId: lead.id } }"
+                  class="text-zayit-blue hover:text-zayit-blue/80 bg-white/5 hover:bg-white/10 transition-colors p-2 rounded-full"
                 >
                   <Icon icon="mdi:eye" />
                 </router-link>
@@ -245,10 +245,9 @@ function getInitials(name: string) {
 function editLead(lead: Lead) {
   router.push({
     name: 'CRMLeadEdit',
-    params: { crmId: props.crmId, leadId: lead.id }
+    params: { crmId: props.crmId, leadId: lead.id },
   });
 }
-
 
 async function confirmDelete(lead: Lead) {
   const confirmed = await modal.open(ConfirmModal, {
@@ -260,9 +259,7 @@ async function confirmDelete(lead: Lead) {
   });
   if (!confirmed) return;
   const ok = await leadStore.deleteLead(props.crmId, lead.id);
-  toast[ok ? 'success' : 'error'](
-    ok ? `Lead "${lead.name}" deleted.` : 'Failed to delete lead'
-  );
+  toast[ok ? 'success' : 'error'](ok ? `Lead "${lead.name}" deleted.` : 'Failed to delete lead');
 }
 
 // Load data

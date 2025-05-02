@@ -1,3 +1,4 @@
+<!--components/crm/tags/TagForm.vue-->
 <template>
   <FormSection :title="tagId ? 'Edit Tag' : 'Create Tag'" class="px-8">
     <form @submit.prevent="submitForm">
@@ -83,7 +84,7 @@ import BaseInput from '@/components/ui/forms/BaseInput.vue';
 const route = useRoute();
 const tagId = route.params.id as string;
 
-// Use tag form composable
+// Use tag form composable (não precisa passar o crmId porque o composable já o extrai da rota)
 const {
   name,
   nameError,

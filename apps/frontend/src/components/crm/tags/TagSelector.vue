@@ -1,3 +1,5 @@
+<!--components/crm/tags/TagSelector.vue-->
+
 <template>
   <div class="space-y-2">
     <!-- Selected Tags -->
@@ -120,6 +122,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { Icon } from '@iconify/vue';
 import { useToast } from '@/composables/useToast';
+import { useRoute } from 'vue-router';
 import { getTags, createTag } from '@/services/tagService';
 import BaseInput from '@/components/ui/forms/BaseInput.vue';
 import BaseModal from '@/components/ui/modals/BaseModal.vue';
@@ -131,11 +134,16 @@ import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
 const props = defineProps<{
   modelValue: string[];
   canCreateTags?: boolean;
+  crmId?: string; // Adicionado como opcional para compatibilidade
 }>();
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string[]): void;
 }>();
+
+// Obter crmId da rota se não for fornecido via props
+const route = useRoute();
+const crmId = props.crmId || (route.params.crmId as string);
 
 // State
 const allTags = ref<TagType[]>([]);
@@ -191,11 +199,11 @@ function createNewTag() {
 }
 
 async function saveNewTag() {
-  if (!newTagName.value.trim()) return;
+  if (!newTagName.value.trim() || !crmId) return;
   isCreating.value = true;
 
   try {
-    const { data } = await createTag({ name: newTagName.value, color: newTagColor.value });
+    const { data } = await createTag(crmId, { name: newTagName.value, color: newTagColor.value });
     const tag: TagType = {
       id: data.id,
       name: newTagName.value,
@@ -225,8 +233,13 @@ function getContrastColor(hex: string) {
 
 // Load tags
 async function loadTags() {
+  if (!crmId) {
+    console.error('CRM ID is missing');
+    return;
+  }
+
   try {
-    const { data } = await getTags();
+    const { data } = await getTags(crmId);
     allTags.value = data;
   } catch {
     console.error('Error loading tags');

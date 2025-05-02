@@ -36,7 +36,6 @@
         :initialViewMode="activeView"
         @view-change="handleViewChange"
       />
-
     </KeepAlive>
   </div>
 </template>
@@ -53,9 +52,8 @@ const props = defineProps<{
 // Tenta pegar o modo salvo no localStorage
 const savedView = localStorage.getItem('activeView');
 const activeView = ref<'list' | 'kanban'>(
-  savedView === 'kanban' || savedView === 'list' ? savedView : 'list'
+  savedView === 'kanban' || savedView === 'list' ? savedView : 'list',
 );
-
 
 // Toda vez que mudar o activeView, salva no localStorage
 watch(activeView, (newValue) => {

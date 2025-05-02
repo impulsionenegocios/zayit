@@ -110,13 +110,12 @@
 
       <!-- Contact History -->
       <div class="bg-surface rounded-lg p-6">
-        <ContactHistory :leadId="leadId" />
+        <ContactHistory :crmId="crmId" :leadId="leadId" />
       </div>
 
       <!-- Comments -->
-      <!-- Comments -->
       <div class="bg-surface rounded-lg p-6">
-        <CommentList :leadId="leadId" />
+        <CommentList :crmId="crmId" :leadId="leadId" />
       </div>
     </div>
 
@@ -152,7 +151,7 @@
 
           <button
             class="btn-outline hover:bg-black/60 transition-all duration-500 cursor-pointer rounded-lg p-3 h-auto text-left flex items-center"
-            @click=""
+            @click="addTask"
           >
             <Icon icon="mdi:clipboard-check" class="mr-2 text-zayit-blue" />
             <span>Add Tarefa</span>
@@ -160,7 +159,7 @@
         </div>
       </div>
       <!-- Tasks -->
-      <Tasks class="lg:pr-16 lg:pl-8 px-8 pb-8" :leadId="leadId" />
+      <Tasks class="lg:pr-16 lg:pl-8 px-8 pb-8" :crmId="crmId" :leadId="leadId" />
     </div>
   </div>
 </template>
@@ -172,24 +171,19 @@ import { useLeadStore } from '@/stores/crm/lead';
 import { useToast } from '@/composables/useToast';
 import { useModal } from '@/composables/useModal';
 import { Icon } from '@iconify/vue';
+import * as crmService from '@/services/crm'; // Mantém o mesmo nome do serviço
 import type { Lead } from '@/types/client.types';
 import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
 import LeadTags from './LeadTags.vue';
-import FormControl from '@/components/ui/forms/FormControl.vue';
-import BaseTextarea from '@/components/ui/forms/BaseTextarea.vue';
-import BaseFileInput from '@/components/ui/forms/BaseFileInput.vue';
 import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
 import ContactHistory from '../contacts/ContactHistory.vue';
 import { formatDate, formatDateTime } from '@/utils/dateFormatter';
-import { formatFileSize } from '@/utils/formatFiles';
 import { formatStatus } from '@/utils/statusColors';
 import Tasks from '@/components/crm/tasks/TaskList.vue';
 import CommentList from '@/components/crm/comments/CommentList.vue';
 
-
 const route = useRoute();
 const leadId = route.params.leadId as string;
-
 
 const router = useRouter();
 const crmId = route.params.crmId as string;
@@ -211,10 +205,6 @@ const lead = ref<Lead>({
 });
 
 const comments = ref<any[]>([]);
-const files = ref<any[]>([]);
-
-// Form states
-const newComment = ref('');
 
 // Status styling
 const statusClasses = {
@@ -294,33 +284,33 @@ function sendEmail() {
   window.location.href = `mailto:${lead.value.email}`;
 }
 
-async function loadComments() {
-  comments.value = [
-    {
-      id: '1',
-      leadId: leadId,
-      userId: 'user1',
-      userName: 'John Doe',
-      text: 'Este lead veio do nosso webinar da semana passada.',
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-  ];
+function addTask() {
+  // Implementar abertura de modal para adicionar tarefa
+  toast.info('Funcionalidade de adicionar tarefa será implementada');
+  // Exemplo:
+  // modal.open(TaskFormModal, {
+  //   title: 'Nova Tarefa',
+  //   props: { leadId, crmId },
+  // });
 }
 
-async function addComment() {
-  if (!newComment.value.trim()) return;
-
-  const comment = {
-    id: Date.now().toString(),
-    leadId: leadId,
-    userId: 'currentUser',
-    userName: 'Current User',
-    text: newComment.value,
-    createdAt: new Date().toISOString(),
-  };
-
-  comments.value.unshift(comment);
-  newComment.value = '';
-  toast.success('Comentário criado');
+async function loadComments() {
+  try {
+    const response = await crmService.getLeadComments(crmId, leadId);
+    comments.value = response.data;
+  } catch (error) {
+    console.error('Erro ao carregar comentários:', error);
+    // Dados de exemplo como fallback
+    comments.value = [
+      {
+        id: '1',
+        leadId: leadId,
+        userId: 'user1',
+        userName: 'John Doe',
+        text: 'Este lead veio do nosso webinar da semana passada.',
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ];
+  }
 }
 </script>

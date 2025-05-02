@@ -1,6 +1,6 @@
 import { useForm, useField } from 'vee-validate';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { createTag, updateTag, getTagById } from '@/services/tagService';
 import { useToast } from '@/composables/useToast';
 import type { TagCreate } from '@/types';
@@ -8,7 +8,11 @@ import type { TagCreate } from '@/types';
 export function useTagForm(tagId?: string) {
   const toast = useToast();
   const router = useRouter();
+  const route = useRoute();
   const isLoading = ref(false);
+
+  // Obter o ID do CRM da rota
+  const crmId = route.params.crmId as string;
 
   // Initialize form with vee-validate
   const { handleSubmit, setValues, resetForm } = useForm<TagCreate>();
@@ -34,7 +38,7 @@ export function useTagForm(tagId?: string) {
 
     isLoading.value = true;
     try {
-      const { data } = await getTagById(tagId);
+      const { data } = await getTagById(crmId, tagId);
       setValues({
         name: data.name,
         color: data.color,
@@ -53,11 +57,11 @@ export function useTagForm(tagId?: string) {
     try {
       if (tagId) {
         // Update existing tag
-        await updateTag(tagId, values);
+        await updateTag(crmId, tagId, values);
         toast.success('Tag updated successfully');
       } else {
         // Create new tag
-        await createTag(values);
+        await createTag(crmId, values);
         toast.success('Tag created successfully');
         resetForm();
       }
@@ -71,7 +75,7 @@ export function useTagForm(tagId?: string) {
 
   // Go back to tags list
   const goBack = () => {
-    router.push({ name: 'TagsList' });
+    router.push({ name: 'TagsList', params: { crmId } });
   };
 
   return {

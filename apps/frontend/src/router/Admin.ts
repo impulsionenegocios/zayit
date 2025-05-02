@@ -105,11 +105,11 @@ export default [
                 name: 'CRMDashboard',
                 component: () => import('@/pages/crm/CRMDashboardPage.vue'),
               },
-              {
-                path: 'leads',
-                name: 'CRMLeadList',
-                component: () => import('@/pages/crm/leads/LeadListView.vue'),
-              },
+              // {
+              //   path: 'leads',
+              //   name: 'CRMLeadList',
+              //   component: () => import('@/pages/crm/leads/LeadListView.vue'),
+              // },
               {
                 path: 'leads/new',
                 name: 'CRMLeadCreate',

@@ -1,3 +1,5 @@
+<!--components/crm/tags/Tag.vue-->
+
 <template>
   <div
     class="inline-flex items-center rounded px-2 py-1 text-xs font-medium transition-colors"

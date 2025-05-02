@@ -8,7 +8,7 @@ import {
   toggleTaskCompletion,
 } from '@/services/taskService';
 
-export function useTaskManager(leadId: string) {
+export function useTaskManager(crmId: string, leadId: string) {
   const toast = useToast();
   const tasks = ref<Task[]>([]);
   const isLoading = ref(false);
@@ -22,7 +22,7 @@ export function useTaskManager(leadId: string) {
   async function loadTasks() {
     isLoading.value = true;
     try {
-      tasks.value = await getTasksByLeadId(leadId);
+      tasks.value = await getTasksByLeadId(crmId, leadId);
     } catch (error) {
       toast.error('Failed to load tasks');
     } finally {
@@ -34,7 +34,7 @@ export function useTaskManager(leadId: string) {
     if (!newTask.title || !newTask.due_date) return false;
     isLoading.value = true;
     try {
-      const createdTask = await createTask(leadId, newTask);
+      const createdTask = await createTask(crmId, leadId, newTask);
       tasks.value.push(createdTask);
       toast.success('Task criada com sucesso!');
       return true;
@@ -48,7 +48,7 @@ export function useTaskManager(leadId: string) {
 
   async function deleteTask(taskId: string) {
     try {
-      await deleteTaskById(leadId, taskId);
+      await deleteTaskById(crmId, leadId, taskId);
       tasks.value = tasks.value.filter((task) => task.id !== taskId);
       toast.success('Task excluída');
     } catch (error) {
@@ -58,7 +58,7 @@ export function useTaskManager(leadId: string) {
 
   async function toggleTaskStatus(taskId: string) {
     try {
-      const { completed } = await toggleTaskCompletion(taskId);
+      const { completed } = await toggleTaskCompletion(crmId, leadId, taskId);
       const task = tasks.value.find((t) => t.id === taskId);
       if (task) {
         task.completed = completed;

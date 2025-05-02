@@ -41,6 +41,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import { useTaskManager } from '@/composables/crm/useTaskManager';
 import TaskCard from './TaskCard.vue';
 import TaskForm from './TaskForm.vue';
@@ -49,7 +50,12 @@ import { Icon } from '@iconify/vue';
 
 const props = defineProps<{
   leadId: string;
+  crmId?: string; // Adicionado como opcional para compatibilidade
 }>();
+
+// Obter crmId da rota se não for fornecido via props
+const route = useRoute();
+const crmId = props.crmId || (route.params.crmId as string);
 
 const {
   tasks,
@@ -59,7 +65,7 @@ const {
   addTask,
   deleteTask,
   toggleTaskStatus,
-} = useTaskManager(props.leadId);
+} = useTaskManager(crmId, props.leadId);
 
 const showTaskModal = ref(false);
 
@@ -79,10 +85,12 @@ function openTaskModal() {
   newTask.completed = false;
   showTaskModal.value = true;
 }
+
 onMounted(() => {
   loadTasks();
 });
 </script>
+
 <style scoped>
 .list-enter-active,
 .list-leave-active {

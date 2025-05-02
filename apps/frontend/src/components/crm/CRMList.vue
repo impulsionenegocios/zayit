@@ -92,7 +92,8 @@ const modal = useModal();
 
 onMounted(() => {
   crmStore.fetchCRMs();
-});undefined
+});
+undefined;
 
 function createCRM() {
   // nome alinhado ao seu router: 'CRMCreate'

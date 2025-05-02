@@ -57,6 +57,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { useCommentManager } from '@/composables/crm/useCommentManager';
 import { Icon } from '@iconify/vue';
 import CommentItem from './CommentItem.vue';
@@ -66,7 +67,12 @@ import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
 
 const props = defineProps<{
   leadId: string;
+  crmId?: string; // Adicionado como opcional para compatibilidade
 }>();
+
+// Obter crmId da rota se não for fornecido via props
+const route = useRoute();
+const crmId = props.crmId || (route.params.crmId as string);
 
 const {
   comments,
@@ -76,7 +82,7 @@ const {
   addComment: submitComment,
   deleteComment,
   editComment,
-} = useCommentManager(props.leadId);
+} = useCommentManager(crmId, props.leadId);
 
 async function addComment() {
   const success = await submitComment();

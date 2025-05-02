@@ -22,8 +22,10 @@ class ContactCreate(ContactBase):
     pass
 
 
-class Contact(ContactBase):
+class Contact(BaseModel):
     id: str
     lead_id: str
-    user_id: str
+    type: str
+    description: str
+    date: datetime
     created_at: Optional[datetime] = None

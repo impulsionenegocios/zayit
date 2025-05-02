@@ -1,44 +1,63 @@
 <template>
   <div class="bg-surface rounded-lg shadow p-6 space-y-6">
-    <form @submit.prevent="handleSubmit" class="space-y-6">
+    <form @submit.prevent="salvar" class="space-y-6">
       <!-- Basic Information -->
       <div class="space-y-4">
         <h3 class="text-lg font-medium text-white">Informações Básicas</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormControl label="Nome" forLabel="name" :error="errors.name" :touched="true">
+          <FormControl label="Nome" forLabel="name" :error="nameError" :touched="nameMeta.touched">
             <BaseInput
-              v-model="form.name"
+              v-model="name"
               id="name"
-              placeholder="Full name"
-              :error="!!errors.name"
+              placeholder="Nome completo"
+              :error="!!nameError"
+              @blur="blurName"
             />
           </FormControl>
 
-          <FormControl label="Email" forLabel="email" :error="errors.email" :touched="true">
+          <FormControl
+            label="Email"
+            forLabel="email"
+            :error="emailError"
+            :touched="emailMeta.touched"
+          >
             <BaseInput
-              v-model="form.email"
+              v-model="email"
               id="email"
               type="email"
-              placeholder="Email address"
-              :error="!!errors.email"
+              placeholder="Endereço de email"
+              :error="!!emailError"
+              @blur="blurEmail"
             />
           </FormControl>
 
-          <FormControl label="Telefone" forLabel="phone" :error="errors.phone" :touched="true">
+          <FormControl
+            label="Telefone"
+            forLabel="phone"
+            :error="phoneError"
+            :touched="phoneMeta.touched"
+          >
             <BaseInput
-              v-model="form.phone"
+              v-model="phone"
               id="phone"
-              placeholder="Phone number"
-              :error="!!errors.phone"
+              placeholder="Número de telefone"
+              :error="!!phoneError"
+              @blur="blurPhone"
             />
           </FormControl>
 
-          <FormControl label="Data de Nascimento" forLabel="birthDate">
+          <FormControl
+            label="Data de Nascimento"
+            forLabel="birthDate"
+            :error="birthDateError"
+            :touched="birthDateMeta.touched"
+          >
             <BaseInput
-              v-model="form.birthDate"
+              v-model="birthDate"
               id="birthDate"
               type="date"
-              placeholder="Birth date (optional)"
+              placeholder="Data de nascimento (opcional)"
+              @blur="blurBirthDate"
             />
           </FormControl>
         </div>
@@ -47,12 +66,18 @@
       <!-- Address -->
       <div class="space-y-4">
         <h3 class="text-lg font-medium text-white">Endereço</h3>
-        <FormControl label="Endereço" forLabel="address">
+        <FormControl
+          label="Endereço"
+          forLabel="address"
+          :error="addressError"
+          :touched="addressMeta.touched"
+        >
           <BaseTextarea
-            v-model="form.address"
+            v-model="address"
             id="address"
-            placeholder="Full address (optional)"
+            placeholder="Endereço completo (opcional)"
             :rows="2"
+            @blur="blurAddress"
           />
         </FormControl>
       </div>
@@ -61,22 +86,34 @@
       <div class="space-y-4">
         <h3 class="text-lg font-medium text-white">Informações do Lead</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormControl label="Fonte" forLabel="source">
+          <FormControl
+            label="Fonte"
+            forLabel="source"
+            :error="sourceError"
+            :touched="sourceMeta.touched"
+          >
             <BaseSelect
-              v-model="form.source"
+              v-model="source"
               id="source"
               :options="sourceOptions"
-              placeholder="Select source"
+              placeholder="Selecione a fonte"
+              @blur="blurSource"
             />
           </FormControl>
 
-          <FormControl label="Status" forLabel="status" :error="errors.status" :touched="true">
+          <FormControl
+            label="Status"
+            forLabel="status"
+            :error="statusError"
+            :touched="statusMeta.touched"
+          >
             <BaseSelect
-              v-model="form.status"
+              v-model="status"
               id="status"
               :options="statusOptions"
-              placeholder="Select status"
-              :error="!!errors.status"
+              placeholder="Selecione o status"
+              :error="!!statusError"
+              @blur="blurStatus"
             />
           </FormControl>
         </div>
@@ -90,12 +127,12 @@
 
       <!-- Form Actions -->
       <div class="flex justify-end gap-3 pt-4">
-        <DefaultButton variant="default" size="md" @click="cancel" type="button">
+        <DefaultButton variant="default" size="md" @click="voltar" type="button">
           Cancelar
         </DefaultButton>
 
-        <DefaultButton variant="primary" size="md" type="submit" :disabled="isSubmitting">
-          <span v-if="isSubmitting">
+        <DefaultButton variant="primary" size="md" type="submit" :disabled="carregando">
+          <span v-if="carregando">
             <Icon icon="mdi:loading" class="animate-spin mr-1" />
             Salvando...
           </span>
@@ -109,8 +146,6 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-import { useToast } from '@/composables/useToast';
 import { useLeadForm } from '@/composables/crm/useLeadForm';
 import { Icon } from '@iconify/vue';
 
@@ -125,20 +160,57 @@ const props = defineProps<{
   leadId?: string;
 }>();
 
-const router = useRouter();
-
-// Use our lead form composable
+// Use our lead form composable with updated naming
 const {
-  form,
-  errors,
-  isSubmitting,
-  isEditing,
-  handleSubmit,
+  // Campos do formulário
+  name,
+  nameError,
+  blurName,
+  nameMeta,
+
+  email,
+  emailError,
+  blurEmail,
+  emailMeta,
+
+  phone,
+  phoneError,
+  blurPhone,
+  phoneMeta,
+
+  address,
+  addressError,
+  blurAddress,
+  addressMeta,
+
+  birthDate,
+  birthDateError,
+  blurBirthDate,
+  birthDateMeta,
+
+  source,
+  sourceError,
+  blurSource,
+  sourceMeta,
+
+  status,
+  statusError,
+  blurStatus,
+  statusMeta,
+
+  // Tags
+  selectedTagIds,
+  availableTags,
+
+  // Options
   sourceOptions,
   statusOptions,
-  selectedTagIds,
+
+  // Ações
+  salvar,
+  carregarLeadParaEdicao,
+  carregando,
+  isEditing,
+  voltar,
 } = useLeadForm(props.leadId);
-function cancel() {
-  router.push({ name: 'LeadList' });
-}
 </script>

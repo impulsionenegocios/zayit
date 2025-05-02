@@ -1,3 +1,4 @@
+<!--components/crm/tags/TagsList.vue-->
 <template>
   <BaseTable
     :items="tags"
@@ -51,7 +52,7 @@
 
 <script setup lang="ts">
 import { h, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import { useTagList } from '@/composables/crm/useTagList';
 import { usePageActionButton } from '@/composables/usePageActionButton';
@@ -61,8 +62,14 @@ import BaseTable from '@/components/layout/BaseTable.vue';
 import type { Tag } from '@/types';
 
 const router = useRouter();
+const route = useRoute();
 const modal = useModal();
-const { tags, isLoading, fetchTags, removeTag, bulkDeleteTags } = useTagList();
+
+// Obter o ID do CRM da rota
+const crmId = route.params.crmId as string;
+
+// Agora passamos o crmId para o useTagList
+const { tags, isLoading, fetchTags, removeTag, bulkDeleteTags } = useTagList(crmId);
 
 // Table columns definition
 const columns = [
@@ -73,7 +80,7 @@ const columns = [
 
 // Navigate to edit page
 const editTag = (tag: Tag) => {
-  router.push({ name: 'EditTag', params: { id: tag.id } });
+  router.push({ name: 'EditTag', params: { crmId, id: tag.id } });
 };
 
 // Confirm and delete a tag
@@ -137,7 +144,7 @@ usePageActionButton(
     title: 'Create Tag',
     variant: 'primary',
     onClick: () => {
-      router.push({ name: 'CreateTag' });
+      router.push({ name: 'CreateTag', params: { crmId } });
     },
     loading: false,
   },
@@ -148,6 +155,11 @@ usePageActionButton(
 
 // Load tags on component mount
 onMounted(async () => {
+  if (!crmId) {
+    console.error('CRM ID is missing');
+    return;
+  }
+
   await fetchTags();
 });
 </script>
