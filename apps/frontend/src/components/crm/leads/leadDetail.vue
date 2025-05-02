@@ -167,7 +167,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useLeadStore } from '@/stores/crm/lead';
 import { useToast } from '@/composables/useToast';
 import { useModal } from '@/composables/useModal';
@@ -185,14 +185,18 @@ import { formatFileSize } from '@/utils/formatFiles';
 import { formatStatus } from '@/utils/statusColors';
 import Tasks from '@/components/crm/tasks/TaskList.vue';
 import CommentList from '@/components/crm/comments/CommentList.vue';
-const props = defineProps<{
-  leadId: string;
-}>();
+
+
+const route = useRoute();
+const leadId = route.params.leadId as string;
+
+
+const router = useRouter();
+const crmId = route.params.crmId as string;
 
 const clientStore = useLeadStore();
 const toast = useToast();
 const modal = useModal();
-const router = useRouter();
 
 // Data
 const lead = ref<Lead>({
@@ -207,7 +211,6 @@ const lead = ref<Lead>({
 });
 
 const comments = ref<any[]>([]);
-
 const files = ref<any[]>([]);
 
 // Form states
@@ -223,20 +226,19 @@ const statusClasses = {
 
 // Load data
 onMounted(async () => {
-  if (!props.leadId) {
-    toast.error('Lead ID is required');
-    router.push({ name: 'LeadList' });
+  if (!leadId || !crmId) {
+    toast.error('Lead ou CRM ID ausente');
+    router.push({ name: 'CRMLeadList', params: { crmId } });
     return;
   }
 
-  const result = await clientStore.fetchLeadById(props.leadId);
+  const result = await clientStore.fetchLeadById(crmId, leadId);
   if (result) {
     lead.value = result;
-    // Load additional data
     await loadComments();
   } else {
-    toast.error('Failed to load lead');
-    router.push({ name: 'LeadList', params: { id: props.leadId } });
+    toast.error('Falha ao carregar lead');
+    router.push({ name: 'CRMLeadList', params: { crmId } });
   }
 });
 
@@ -254,10 +256,11 @@ function getInitials(name: string) {
     .slice(0, 2);
 }
 
-// Action methods
+// Actions
 function editLead() {
-  router.push({ name: 'EditLead', params: { id: props.leadId } });
+  router.push({ name: 'CRMLeadEdit', params: { crmId, leadId: leadId } });
 }
+
 async function confirmDelete() {
   try {
     const confirmed = await modal.open(ConfirmModal, {
@@ -269,21 +272,20 @@ async function confirmDelete() {
     });
 
     if (confirmed) {
-      const success = await clientStore.deleteLead(props.leadId);
+      const success = await clientStore.deleteLead(crmId, leadId);
       if (success) {
-        toast.success(`Lead "${lead.value.name}" Apagado com Sucesso!`);
-        router.push({ name: 'LeadList' });
+        toast.success(`Lead "${lead.value.name}" apagado com sucesso`);
+        router.push({ name: 'CRMLeadList', params: { crmId } });
       } else {
         toast.error('Erro ao tentar apagar esse Lead');
       }
     }
   } catch (error) {
-    console.error('Error in delete confirmation:', error);
+    console.error('Erro ao confirmar exclusão:', error);
   }
 }
 
 function openWhatsApp(phone: string) {
-  // Remove non-numeric characters
   const cleanPhone = phone.replace(/\D/g, '');
   window.open(`https://wa.me/${cleanPhone}`, '_blank');
 }
@@ -293,36 +295,32 @@ function sendEmail() {
 }
 
 async function loadComments() {
-  // This would normally be an API call
   comments.value = [
     {
       id: '1',
-      leadId: props.leadId,
+      leadId: leadId,
       userId: 'user1',
       userName: 'John Doe',
-      text: 'This lead came from our webinar last week. They showed a lot of interest in our premium services.',
+      text: 'Este lead veio do nosso webinar da semana passada.',
       createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     },
   ];
 }
 
-// Data manipulation
 async function addComment() {
   if (!newComment.value.trim()) return;
 
   const comment = {
     id: Date.now().toString(),
-    leadId: props.leadId,
-    userId: 'currentUser', // This would normally come from auth
-    userName: 'Current User', // This would normally come from auth
+    leadId: leadId,
+    userId: 'currentUser',
+    userName: 'Current User',
     text: newComment.value,
     createdAt: new Date().toISOString(),
   };
 
-  // Add to local state (would normally be an API call)
   comments.value.unshift(comment);
   newComment.value = '';
-
-  toast.success('Comentário Criado');
+  toast.success('Comentário criado');
 }
 </script>

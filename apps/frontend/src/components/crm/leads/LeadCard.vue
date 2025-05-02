@@ -22,7 +22,7 @@
       <!-- Ações -->
       <div class="flex gap-2">
         <router-link
-          :to="{ name: 'LeadDetail', params: { id: lead.id } }"
+        :to="{ name: 'CRMLeadDetail', params: { crmId, leadId: lead.id } }"
           class="text-zayit-blue hover:text-zayit-blue/80"
           title="View"
         >
@@ -61,7 +61,10 @@
 
 <script setup lang="ts">
 import type { Lead } from '@/types/lead.types';
+import { useRouter, useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
+const route = useRoute();
+const crmId = route.params.crmId as string;
 
 const props = defineProps<{
   lead: Lead;

@@ -151,3 +151,22 @@ def create_lead_for_crm_service(crm_id: str, lead: LeadCreate, user_data):
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating lead for CRM: {str(e)}")
+def get_lead_by_id_service(crm_id: str, lead_id: str, user_data):
+    user_id = user_data.get("uid")
+    role = user_data.get("role", "")
+
+    # Verifica se o CRM pertence ao usuário
+    crm_doc = db.collection("crms").document(crm_id).get()
+    if not crm_doc.exists:
+        raise HTTPException(status_code=404, detail="CRM not found")
+
+    crm_data = crm_doc.to_dict()
+    if crm_data.get("user_id") != user_id and role != "superadmin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    # Busca o lead
+    lead_doc = db.collection("leads").document(lead_id).get()
+    if not lead_doc.exists:
+        raise HTTPException(status_code=404, detail="Lead not found")
+
+    return lead_doc.to_dict()

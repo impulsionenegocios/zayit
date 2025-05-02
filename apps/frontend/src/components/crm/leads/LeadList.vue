@@ -137,7 +137,7 @@
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
               <div class="flex gap-2 justify-end">
                 <router-link
-                :to="{ name: 'CRMLeadDetail', params: { crmId: props.crmId, leadId: lead.id } }"
+                :to="{ name: 'CRMLeadDetail', params: { crmId, leadId: lead.id } }"
                 class="text-zayit-blue hover:text-zayit-blue/80 bg-white/5 hover:bg-white/10 transition-colors p-2 rounded-full"
                 >
                   <Icon icon="mdi:eye" />

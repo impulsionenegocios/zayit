@@ -32,9 +32,11 @@
     <KeepAlive>
       <component
         :is="activeView === 'list' ? LeadList : LeadKanban"
+        :crmId="props.crmId"
         :initialViewMode="activeView"
         @view-change="handleViewChange"
       />
+
     </KeepAlive>
   </div>
 </template>
@@ -44,10 +46,16 @@ import { ref, watch } from 'vue';
 import { Icon } from '@iconify/vue';
 import LeadList from './LeadList.vue';
 import LeadKanban from './LeadKanban.vue';
-
+const props = defineProps<{
+  crmId: string;
+  initialViewMode?: 'list' | 'kanban';
+}>();
 // Tenta pegar o modo salvo no localStorage
-const savedView = localStorage.getItem('activeView') as 'list' | 'kanban' | null;
-const activeView = ref<'list' | 'kanban'>(savedView || 'list');
+const savedView = localStorage.getItem('activeView');
+const activeView = ref<'list' | 'kanban'>(
+  savedView === 'kanban' || savedView === 'list' ? savedView : 'list'
+);
+
 
 // Toda vez que mudar o activeView, salva no localStorage
 watch(activeView, (newValue) => {

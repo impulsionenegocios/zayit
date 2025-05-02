@@ -8,7 +8,8 @@ from services.crm_lead_service import (
     associate_lead_to_crm_service,
     remove_lead_from_crm_service,
     get_crm_leads_service,
-    create_lead_for_crm_service
+    create_lead_for_crm_service,
+    get_lead_by_id_service
 )
 
 router = APIRouter(prefix="/crms", tags=["crm"])
@@ -23,6 +24,10 @@ async def get_crm_leads(
     Get all leads associated with a CRM.
     """
     return get_crm_leads_service(crm_id, user_data)
+
+@router.get("/{crm_id}/leads/{lead_id}", response_model=Lead)
+async def get_lead_by_id_for_crm(crm_id: str, lead_id: str, user_data = Depends(verify_token)):
+    return get_lead_by_id_service(crm_id, lead_id, user_data)
 
 
 @router.post("/{crm_id}/leads", response_model=Lead)

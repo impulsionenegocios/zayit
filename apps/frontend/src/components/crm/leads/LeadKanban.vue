@@ -57,8 +57,8 @@
                   </div>
                   <div class="flex gap-1">
                     <router-link
-                      :to="{ name: 'LeadDetail', params: { id: lead.id } }"
-                      class="text-zayit-blue hover:text-zayit-blue/80 bg-white/5 hover:bg-white/10 transition-colors p-1.5 rounded"
+                    :to="{ name: 'CRMLeadDetail', params: { crmId, leadId: lead.id } }"
+                    class="text-zayit-blue hover:text-zayit-blue/80 bg-white/5 hover:bg-white/10 transition-colors p-1.5 rounded"
                     >
                       <Icon icon="mdi:eye" class="text-sm" />
                     </router-link>
@@ -125,13 +125,20 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import draggable from 'vuedraggable';
 import { useLeadStore } from '@/stores/crm/lead';
 import { useToast } from '@/composables/useToast';
 import type { Lead, LeadStatus } from '@/types/lead.types';
 import { formatDate } from '@/utils/dateFormatter';
+
+const route = useRoute();
+const router = useRouter();
+const toast = useToast();
+const leadStore = useLeadStore();
+
+const crmId = route.params.crmId as string;
 
 const props = defineProps<{
   initialViewMode?: 'list' | 'kanban';
@@ -141,16 +148,11 @@ const emit = defineEmits<{
   (e: 'view-change', mode: 'list' | 'kanban'): void;
 }>();
 
-// Store, toast e router
-const leadStore = useLeadStore();
-const toast = useToast();
-const router = useRouter();
-
-// Delete modal state
+// Estado de exclusão
 const showDeleteModal = ref(false);
 const leadToDelete = ref<Lead | null>(null);
 
-// Configuração das colunas
+// Colunas Kanban
 const statuses: Array<{ value: LeadStatus; label: string }> = [
   { value: 'lead', label: 'Leads' },
   { value: 'opportunity', label: 'Opportunities' },
@@ -158,10 +160,9 @@ const statuses: Array<{ value: LeadStatus; label: string }> = [
   { value: 'lost', label: 'Lost' },
 ];
 
-// Search
 const searchQuery = ref('');
 
-// Agrupa leads por status em um objeto reativo
+// Computa os leads agrupados
 const board = computed(() => {
   const obj = { lead: [], opportunity: [], client: [], lost: [] } as Record<LeadStatus, Lead[]>;
 
@@ -171,7 +172,6 @@ const board = computed(() => {
     }
   });
 
-  // Aplica filtro de busca
   if (searchQuery.value.trim()) {
     const q = searchQuery.value.toLowerCase();
     for (const key of Object.keys(obj) as LeadStatus[]) {
@@ -187,34 +187,23 @@ const board = computed(() => {
   return obj;
 });
 
-// Funções de estilo e ícones das colunas
 function getColumnHeaderClass(status: LeadStatus): string {
   switch (status) {
-    case 'lead':
-      return 'bg-zayit-info/30';
-    case 'opportunity':
-      return 'bg-zayit-warning/30';
-    case 'client':
-      return 'bg-zayit-blue/30';
-    case 'lost':
-      return 'bg-zayit-danger/30';
-    default:
-      return 'bg-gray-700';
+    case 'lead': return 'bg-zayit-info/30';
+    case 'opportunity': return 'bg-zayit-warning/30';
+    case 'client': return 'bg-zayit-blue/30';
+    case 'lost': return 'bg-zayit-danger/30';
+    default: return 'bg-gray-700';
   }
 }
 
 function getColumnIcon(status: LeadStatus): string {
   switch (status) {
-    case 'lead':
-      return 'mdi:account-arrow-right';
-    case 'opportunity':
-      return 'mdi:star-check';
-    case 'client':
-      return 'mdi:handshake';
-    case 'lost':
-      return 'mdi:close-circle';
-    default:
-      return 'mdi:help-circle';
+    case 'lead': return 'mdi:account-arrow-right';
+    case 'opportunity': return 'mdi:star-check';
+    case 'client': return 'mdi:handshake';
+    case 'lost': return 'mdi:close-circle';
+    default: return 'mdi:help-circle';
   }
 }
 
@@ -228,23 +217,20 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-// Abre a edição de lead
 function editLead(lead: Lead) {
-  router.push({ name: 'EditLead', params: { id: lead.id } });
+  router.push({ name: 'CRMLeadEdit', params: { crmId, leadId: lead.id } });
 }
 
-// Open delete confirmation
 function deleteLead(lead: Lead) {
   leadToDelete.value = lead;
   showDeleteModal.value = true;
 }
 
-// Confirm delete action
 async function confirmDelete() {
   if (!leadToDelete.value) return;
 
   try {
-    const success = await leadStore.deleteLead(leadToDelete.value.id);
+    const success = await leadStore.deleteLead(crmId, leadToDelete.value.id);
 
     if (success) {
       toast.success(`Lead "${leadToDelete.value.name}" deleted successfully`);
@@ -260,7 +246,6 @@ async function confirmDelete() {
   }
 }
 
-// Ao soltar o card, atualiza status se mudou de coluna
 async function onDragEnd(evt: any) {
   const item: Lead = evt.item.__draggable_context.element;
   const newStatus = (evt.to as HTMLElement).dataset.status as LeadStatus;
@@ -268,12 +253,10 @@ async function onDragEnd(evt: any) {
 
   if (!item || !newStatus || item.status === newStatus) return;
 
-  // 👉 Atualiza imediatamente o status localmente para o usuário ver
   item.status = newStatus;
 
   try {
-    // ✅ Faz o update no backend em background
-    const success = await leadStore.updateLead(item.id, { status: newStatus });
+    const success = await leadStore.updateLead(crmId, item.id, { status: newStatus });
 
     if (success) {
       const statusLabel = statuses.find((s) => s.value === newStatus)?.label || 'Unknown';
@@ -283,27 +266,27 @@ async function onDragEnd(evt: any) {
     }
   } catch (error) {
     console.error('Erro atualizando lead:', error);
-
-    // ❌ Se falhou, reverte localmente
     item.status = oldStatus;
-
-    // 🔄 Opcional: recarrega leads do servidor se quiser garantir 100%
-    await leadStore.fetchLeads();
-
+    await leadStore.fetchLeads(crmId);
     toast.error(`Erro ao mover o lead "${item.name}".`);
   }
 }
 
-// Carrega leads ao montar
 onMounted(async () => {
   try {
-    await leadStore.fetchLeads();
+    if (!crmId) {
+      toast.error('CRM ID não encontrado');
+      return;
+    }
+
+    await leadStore.fetchLeads(crmId);
   } catch (error) {
     console.error('Error loading leads:', error);
     toast.error('Failed to load leads');
   }
 });
 </script>
+
 
 <style scoped>
 /* Scroll horizontal */
