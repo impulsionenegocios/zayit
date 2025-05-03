@@ -6,6 +6,28 @@ from typing import List, Optional
 
 from auth.client import db
 from schemas.crm import CRMCreate, CRMUpdate, CRM
+from schemas.status import StatusCreate
+from schemas.source import SourceCreate
+
+
+def create_default_statuses(crm_id: str, user_data: dict):
+    """Create default statuses for a new CRM"""
+    default_statuses = [
+        {"name": "Lead", "color": "#3B82F6", "order": 1, "description": "Novo lead"},
+        {"name": "Oportunidade", "color": "#F59E0B", "order": 2, "description": "Lead qualificado"},
+        {"name": "Cliente", "color": "#10B981", "order": 3, "description": "Cliente convertido"},
+        {"name": "Perdido", "color": "#EF4444", "order": 4, "description": "Lead perdido"}
+    ]
+    
+    for status_data in default_statuses:
+        status = StatusCreate(**status_data)
+        status_id = str(uuid.uuid4())
+        
+        firestore_data = status.dict()
+        firestore_data["crm_id"] = crm_id
+        firestore_data["created_at"] = datetime.now()
+        
+        db.collection("statuses").document(status_id).set(firestore_data)
 
 
 def create_crm_service(crm: CRMCreate, user_data) -> CRM:
@@ -28,6 +50,8 @@ def create_crm_service(crm: CRMCreate, user_data) -> CRM:
 
         # Persist in Firestore
         db.collection("crms").document(crm_id).set(firestore_payload)
+        
+        create_default_statuses(crm_id, user_data)
 
         # Return the CRM, including user_id
         return firestore_payload

@@ -17,30 +17,35 @@
 
     <!-- Kanban board -->
     <div class="overflow-x-auto pb-4">
-      <div class="flex gap-4 min-w-max">
-        <div v-for="status in statuses" :key="status.value" class="w-72 flex-shrink-0">
+      <div v-if="isLoadingStatuses" class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-zayit-blue"></div>
+      </div>
+      
+      <div v-else class="flex gap-4 min-w-max">
+        <div v-for="status in statuses" :key="status.id" class="w-72 flex-shrink-0">
           <!-- Cabeçalho da coluna -->
           <div
             class="mb-3 px-4 py-2 rounded-lg text-white font-medium text-sm flex justify-between items-center"
-            :class="getColumnHeaderClass(status.value)"
+            :style="{ backgroundColor: status.color }"
+            :class="getColumnHeaderClass(status)"
           >
             <span class="flex items-center">
-              <Icon :icon="getColumnIcon(status.value)" class="mr-2" />
-              {{ status.label }}
+              <Icon :icon="getColumnIcon(status)" class="mr-2" />
+              {{ status.name }}
             </span>
             <span class="bg-white/20 px-2 py-0.5 rounded-full text-xs">
-              {{ board[status.value].length }}
+              {{ board[status.id]?.length || 0 }}
             </span>
           </div>
 
           <!-- Lista dragável -->
           <draggable
             tag="div"
-            :list="board[status.value]"
+            :list="board[status.id] || []"
             :group="{ name: 'leads', pull: true, put: true }"
             item-key="id"
             class="space-y-3 min-h-[calc(100vh-250px)] relative"
-            :data-status="status.value"
+            :data-status="status.id"
             @end="onDragEnd"
             ghost-class="opacity-50"
             :animation="250"
@@ -108,11 +113,11 @@
             <!-- Mensagem se estiver vazio -->
             <template #footer>
               <div
-  v-if="board[status.value].length === 0"
+  v-if="(board[status.id]?.length || 0) === 0"
   class="absolute  left-1/2 -translate-x-1/2  text-center text-gray-500 text-sm py-8 flex flex-col justify-center items-center"
 >
 
-                <Icon :icon="getColumnIcon(status.value)" class="text-2xl mb-2" />
+                <Icon :icon="getColumnIcon(status)" class="text-2xl mb-2" />
                 <p>Nenhum Lead Aqui ainda</p>
                 <p class="text-xs mt-1">Arraste o lead pra cá</p>
               </div>
@@ -131,13 +136,16 @@ import { Icon } from '@iconify/vue';
 import draggable from 'vuedraggable';
 import { useLeadStore } from '@/stores/crm/lead';
 import { useToast } from '@/composables/useToast';
-import type { Lead, LeadStatus } from '@/types/lead.types';
+import { useStatusList } from '@/composables/crm/useStatusList';
+import type { Lead, LeadStatus, LeadStatusType } from '@/types/lead.types';
+import type { Status } from '@/types/status.types';
 import { formatDate } from '@/utils/dateFormatter';
 
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
 const leadStore = useLeadStore();
+const { statuses, isLoading: isLoadingStatuses, fetchStatuses } = useStatusList(route.params.crmId as string);
 
 const crmId = route.params.crmId as string;
 
@@ -153,69 +161,70 @@ const emit = defineEmits<{
 const showDeleteModal = ref(false);
 const leadToDelete = ref<Lead | null>(null);
 
-// Colunas Kanban
-const statuses: Array<{ value: LeadStatus; label: string }> = [
-  { value: 'lead', label: 'Leads' },
-  { value: 'opportunity', label: 'Opportunities' },
-  { value: 'client', label: 'Clients' },
-  { value: 'lost', label: 'Lost' },
-];
+// Colunas Kanban são carregadas dinamicamente do backend
 
 const searchQuery = ref('');
 
-// Computa os leads agrupados
+// Computa os leads agrupados por status
 const board = computed(() => {
-  const obj = { lead: [], opportunity: [], client: [], lost: [] } as Record<LeadStatus, Lead[]>;
-
-  leadStore.leads.forEach((l) => {
-    if (l.status && obj[l.status]) {
-      obj[l.status].push(l);
-    }
+  // Inicializa um objeto vazio para armazenar os leads agrupados por status
+  const obj: Record<string, Lead[]> = {};
+  
+  // Inicializa cada status com um array vazio
+  statuses.value.forEach(status => {
+    obj[status.id] = [];
   });
 
-  if (searchQuery.value.trim()) {
-    const q = searchQuery.value.toLowerCase();
-    for (const key of Object.keys(obj) as LeadStatus[]) {
-      obj[key] = obj[key].filter(
-        (lead) =>
-          lead.name?.toLowerCase().includes(q) ||
-          lead.email?.toLowerCase().includes(q) ||
-          lead.phone?.toLowerCase().includes(q),
-      );
+  // Filtra os leads se houver uma busca
+  const filteredLeads = searchQuery.value.trim() 
+    ? leadStore.leads.filter(
+        lead => 
+          lead.name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+          lead.email?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+          lead.phone?.toLowerCase().includes(searchQuery.value.toLowerCase())
+      )
+    : leadStore.leads;
+
+  // Agrupa os leads por status
+  filteredLeads.forEach(lead => {
+    if (lead.statusId && obj[lead.statusId]) {
+      obj[lead.statusId].push(lead);
+    } else if (lead.status) {
+      // Fallback para compatibilidade com leads antigos que não têm statusId
+      const statusObj = statuses.value.find(s => s.name.toLowerCase() === lead.status.toLowerCase());
+      if (statusObj) {
+        obj[statusObj.id].push(lead);
+      }
     }
-  }
+  });
 
   return obj;
 });
 
-function getColumnHeaderClass(status: LeadStatus): string {
-  switch (status) {
-    case 'lead':
-      return 'bg-zayit-info/30';
-    case 'opportunity':
-      return 'bg-zayit-warning/30';
-    case 'client':
-      return 'bg-zayit-blue/30';
-    case 'lost':
-      return 'bg-zayit-danger/30';
-    default:
-      return 'bg-gray-700';
-  }
+function getColumnHeaderClass(status: Status): string {
+  // Usa a cor definida no status ou uma cor padrão
+  return status.color ? `bg-opacity-30` : 'bg-gray-700';
 }
 
-function getColumnIcon(status: LeadStatus): string {
-  switch (status) {
-    case 'lead':
-      return 'mdi:account-arrow-right';
-    case 'opportunity':
-      return 'mdi:star-check';
-    case 'client':
-      return 'mdi:handshake';
-    case 'lost':
-      return 'mdi:close-circle';
-    default:
-      return 'mdi:help-circle';
+function getColumnIcon(status: Status): string {
+  // Mapeamento de nomes de status para ícones
+  const iconMap: Record<string, string> = {
+    'lead': 'mdi:account-arrow-right',
+    'oportunidade': 'mdi:star-check',
+    'cliente': 'mdi:handshake',
+    'perdido': 'mdi:close-circle'
+  };
+  
+  // Tenta encontrar um ícone pelo nome do status (case insensitive)
+  const statusNameLower = status.name.toLowerCase();
+  for (const [key, icon] of Object.entries(iconMap)) {
+    if (statusNameLower.includes(key.toLowerCase())) {
+      return icon;
+    }
   }
+  
+  // Ícone padrão se não encontrar correspondência
+  return 'mdi:help-circle';
 }
 
 function getInitials(name: string): string {
@@ -259,24 +268,34 @@ async function confirmDelete() {
 
 async function onDragEnd(evt: any) {
   const item: Lead = evt.item.__draggable_context.element;
-  const newStatus = (evt.to as HTMLElement).dataset.status as LeadStatus;
+  const newStatusId = (evt.to as HTMLElement).dataset.status;
+  const oldStatusId = item.statusId;
   const oldStatus = item.status;
 
-  if (!item || !newStatus || item.status === newStatus) return;
+  if (!item || !newStatusId || item.statusId === newStatusId) return;
 
-  item.status = newStatus;
+  // Encontra o objeto de status correspondente ao ID
+  const newStatusObj = statuses.value.find(s => s.id === newStatusId);
+  if (!newStatusObj) return;
+
+  // Atualiza o lead com o novo status
+  item.statusId = newStatusId;
+  item.status = newStatusObj.name;
 
   try {
-    const success = await leadStore.updateLead(crmId, item.id, { status: newStatus });
+    const success = await leadStore.updateLead(crmId, item.id, { 
+      status: newStatusObj.name,
+      statusId: newStatusId 
+    });
 
     if (success) {
-      const statusLabel = statuses.find((s) => s.value === newStatus)?.label || 'Unknown';
-      toast.success(`Lead "${item.name}" movido para ${statusLabel}`);
+      toast.success(`Lead "${item.name}" movido para ${newStatusObj.name}`);
     } else {
       throw new Error('Failed to update on server');
     }
   } catch (error) {
     console.error('Erro atualizando lead:', error);
+    item.statusId = oldStatusId;
     item.status = oldStatus;
     await leadStore.fetchLeads(crmId);
     toast.error(`Erro ao mover o lead "${item.name}".`);
@@ -290,10 +309,14 @@ onMounted(async () => {
       return;
     }
 
-    await leadStore.fetchLeads(crmId);
+    // Carrega os status e leads em paralelo
+    await Promise.all([
+      fetchStatuses(),
+      leadStore.fetchLeads(crmId)
+    ]);
   } catch (error) {
-    console.error('Error loading leads:', error);
-    toast.error('Failed to load leads');
+    console.error('Error loading data:', error);
+    toast.error('Failed to load data');
   }
 });
 </script>

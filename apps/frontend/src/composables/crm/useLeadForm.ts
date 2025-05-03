@@ -5,14 +5,18 @@ import { useToast } from '@/composables/useToast';
 import { useForm, useField } from 'vee-validate';
 
 import type {
-  LeadSource,
-  LeadStatus,
+  LeadSourceType,
+  LeadStatusType,
   LeadCreatePayload,
   LeadUpdatePayload,
   Tag,
 } from '@/types/lead.types';
+import type { Source } from '@/types/source.types';
+import type { Status } from '@/types/status.types';
 import { createLead, updateLead, getLeadById } from '@/services/crmService';
 import { getTags } from '@/services/tagService';
+import { useSourceList } from '@/composables/crm/useSourceList';
+import { useStatusList } from '@/composables/crm/useStatusList';
 
 export function useLeadForm(leadIdParam?: string) {
   const route = useRoute();
@@ -29,21 +33,25 @@ export function useLeadForm(leadIdParam?: string) {
   // tags selecionadas e disponíveis
   const selectedTagIds = ref<string[]>([]);
   const availableTags = ref<Tag[]>([]);
+  
+  const { sources, isLoading: isLoadingSources, fetchSources } = useSourceList(crmId);
+  const { statuses, isLoading: isLoadingStatuses, fetchStatuses } = useStatusList(crmId);
+  
+  const sourceOptions = computed(() => {
+    return sources.value.map(source => ({
+      label: source.name,
+      value: source.id
+    }));
+  });
 
-  const sourceOptions = [
-    { label: 'Organic', value: 'organic' },
-    { label: 'Advertisement', value: 'advertisement' },
-    { label: 'Referral', value: 'referral' },
-    { label: 'Social Media', value: 'social' },
-    { label: 'Other', value: 'other' },
-  ] as { label: string; value: LeadSource }[];
-
-  const statusOptions = [
-    { label: 'Lead', value: 'lead' },
-    { label: 'Opportunity', value: 'opportunity' },
-    { label: 'Client', value: 'client' },
-    { label: 'Lost', value: 'lost' },
-  ] as { label: string; value: LeadStatus }[];
+  const statusOptions = computed(() => {
+    return [...statuses.value]
+      .sort((a, b) => a.order - b.order)
+      .map(status => ({
+        label: status.name,
+        value: status.id
+      }));
+  });
 
   // Setup vee-validate form com valores iniciais
   const { handleSubmit, setValues, resetForm } = useForm({
@@ -53,8 +61,8 @@ export function useLeadForm(leadIdParam?: string) {
       phone: '',
       address: '',
       birthDate: '',
-      source: undefined as LeadSource | undefined,
-      status: 'lead' as LeadStatus,
+      sourceId: undefined as string | undefined,
+      statusId: undefined as string | undefined,
     },
   });
 
@@ -95,18 +103,18 @@ export function useLeadForm(leadIdParam?: string) {
   } = useField<string>('birthDate');
 
   const {
-    value: source,
+    value: sourceId,
     errorMessage: sourceError,
     handleBlur: blurSource,
     meta: sourceMeta,
-  } = useField<LeadSource | undefined>('source');
+  } = useField<string | undefined>('sourceId');
 
   const {
-    value: status,
+    value: statusId,
     errorMessage: statusError,
     handleBlur: blurStatus,
     meta: statusMeta,
-  } = useField<LeadStatus>('status', 'required');
+  } = useField<string | undefined>('statusId', 'required');
 
   // carrega todas as tags
   async function loadAvailableTags() {
@@ -125,7 +133,12 @@ export function useLeadForm(leadIdParam?: string) {
 
     carregando.value = true;
     try {
-      await loadAvailableTags();
+      await Promise.all([
+        loadAvailableTags(),
+        fetchSources(),
+        fetchStatuses()
+      ]);
+      
       const { data: lead } = await getLeadById(crmId, leadId);
 
       // Garantir que todos os valores são strings ou valores definidos
@@ -135,9 +148,26 @@ export function useLeadForm(leadIdParam?: string) {
         phone: lead.phone || '',
         address: lead.address || '',
         birthDate: lead.birthDate || '',
-        source: lead.source || undefined,
-        status: lead.status || 'lead',
+        sourceId: lead.sourceId || undefined,
+        statusId: lead.statusId || undefined,
       });
+      
+      if (!lead.statusId && lead.status) {
+        const matchingStatus = statuses.value.find(s => s.name.toLowerCase() === lead.status.toLowerCase());
+        if (matchingStatus) {
+          statusId.value = matchingStatus.id;
+        } else if (statuses.value.length > 0) {
+          statusId.value = statuses.value[0].id;
+        }
+      }
+      
+      if (!lead.sourceId && lead.source) {
+        const sourceStr = String(lead.source);
+        const matchingSource = sources.value.find(s => s.name.toLowerCase() === sourceStr.toLowerCase());
+        if (matchingSource) {
+          sourceId.value = matchingSource.id;
+        }
+      }
 
       selectedTagIds.value = lead.tags?.map((t: Tag) => t.id) || [];
     } catch (err) {
@@ -152,6 +182,9 @@ export function useLeadForm(leadIdParam?: string) {
   const salvar = handleSubmit(async (values) => {
     carregando.value = true;
 
+    const selectedStatus = statuses.value.find(s => s.id === values.statusId);
+    const selectedSource = sources.value.find(s => s.id === values.sourceId);
+
     // Garantir que todos os valores são tratados corretamente
     const payload = {
       name: values.name || '',
@@ -159,17 +192,19 @@ export function useLeadForm(leadIdParam?: string) {
       phone: values.phone || '',
       address: values.address || '',
       birthDate: values.birthDate || '',
-      source: values.source,
-      status: values.status || 'lead',
+      sourceId: values.sourceId,
+      source: selectedSource?.name,
+      statusId: values.statusId,
+      status: selectedStatus?.name || 'lead',
       tags: selectedTagIds.value,
     };
 
     try {
       if (isEditing.value && leadId) {
-        await updateLead(crmId, leadId, payload as LeadUpdatePayload);
+        await updateLead(crmId, leadId, payload);
         toast.success('Lead atualizado com sucesso!');
       } else {
-        await createLead(crmId, payload as LeadCreatePayload);
+        await createLead(crmId, payload);
         toast.success('Lead criado com sucesso!');
 
         // Limpar o formulário após criar um novo lead
@@ -180,8 +215,8 @@ export function useLeadForm(leadIdParam?: string) {
             phone: '',
             address: '',
             birthDate: '',
-            source: undefined,
-            status: 'lead',
+            sourceId: undefined,
+            statusId: undefined,
           },
         });
         selectedTagIds.value = [];
@@ -200,9 +235,18 @@ export function useLeadForm(leadIdParam?: string) {
     router.push({ name: 'CRMManagement', params: { crmId } });
   };
 
-  onMounted(() => {
-    loadAvailableTags();
-    if (leadId) carregarLeadParaEdicao();
+  onMounted(async () => {
+    await Promise.all([
+      loadAvailableTags(),
+      fetchSources(),
+      fetchStatuses()
+    ]);
+    
+    if (leadId) {
+      carregarLeadParaEdicao();
+    } else if (statuses.value.length > 0) {
+      statusId.value = statuses.value.find(s => s.order === 1)?.id || statuses.value[0].id;
+    }
   });
 
   return {
@@ -232,12 +276,12 @@ export function useLeadForm(leadIdParam?: string) {
     blurBirthDate,
     birthDateMeta,
 
-    source,
+    sourceId,
     sourceError,
     blurSource,
     sourceMeta,
 
-    status,
+    statusId,
     statusError,
     blurStatus,
     statusMeta,
@@ -249,6 +293,9 @@ export function useLeadForm(leadIdParam?: string) {
     // Options
     sourceOptions,
     statusOptions,
+    
+    isLoadingSources,
+    isLoadingStatuses,
 
     // Ações
     salvar,

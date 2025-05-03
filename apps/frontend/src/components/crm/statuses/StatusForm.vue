@@ -49,8 +49,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import { useToast } from '@/composables/useToast';
+import { useStatusList } from '@/composables/crm/useStatusList';
 import FormControl from '@/components/ui/forms/FormControl.vue';
 import BaseInput from '@/components/ui/forms/BaseInput.vue';
 import BaseTextarea from '@/components/ui/forms/BaseTextarea.vue';
@@ -72,6 +73,13 @@ const emit = defineEmits<{
 const toast = useToast();
 const isSubmitting = ref(false);
 const isEditing = computed(() => !!props.status);
+const { statuses, fetchStatuses } = useStatusList(props.crmId);
+
+// Compute the suggested next order value
+const suggestedOrder = computed(() => {
+  if (statuses.value.length === 0) return 1;
+  return Math.max(...statuses.value.map(s => s.order)) + 1;
+});
 
 const form = reactive<StatusCreatePayload>({
   name: props.status?.name || '',
@@ -109,6 +117,14 @@ const validateForm = () => {
     isValid = false;
   }
 
+  // Check if the order is already in use by another status (only for new statuses)
+  if (!isEditing.value) {
+    const orderExists = statuses.value.some(s => s.order === form.order);
+    if (orderExists) {
+      errors.order = 'Esta ordem já está em uso. Sugerimos usar ' + suggestedOrder.value;
+    }
+  }
+
   return isValid;
 };
 
@@ -143,6 +159,14 @@ const handleSubmit = async () => {
 const cancel = () => {
   emit('cancel');
 };
+
+// Initialize form with suggested order when not editing
+onMounted(async () => {
+  await fetchStatuses();
+  if (!isEditing.value) {
+    form.order = suggestedOrder.value;
+  }
+});
 
 defineExpose({
   handleSubmit,

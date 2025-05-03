@@ -1,10 +1,9 @@
 <template>
-  <div class="bg-surface rounded-lg shadow p-6 space-y-6">
+  <div class="bg-surface rounded-lg shadow p-6">
     <form @submit.prevent="salvar" class="space-y-6">
       <!-- Basic Information -->
-      <div class="space-y-4">
-        <h3 class="text-lg font-medium text-white">Informações Básicas</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <FormSection title="Informações Básicas">
+        <FormGrid :cols="{ base: 1, md: 2 }" gap="4">
           <FormControl label="Nome" forLabel="name" :error="nameError" :touched="nameMeta.touched">
             <BaseInput
               v-model="name"
@@ -60,12 +59,11 @@
               @blur="blurBirthDate"
             />
           </FormControl>
-        </div>
-      </div>
+        </FormGrid>
+      </FormSection>
 
       <!-- Address -->
-      <div class="space-y-4">
-        <h3 class="text-lg font-medium text-white">Endereço</h3>
+      <FormSection title="Endereço">
         <FormControl
           label="Endereço"
           forLabel="address"
@@ -80,12 +78,11 @@
             @blur="blurAddress"
           />
         </FormControl>
-      </div>
+      </FormSection>
 
       <!-- Lead Information -->
-      <div class="space-y-4">
-        <h3 class="text-lg font-medium text-white">Informações do Lead</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <FormSection title="Informações do Lead">
+        <FormGrid :cols="{ base: 1, md: 2 }" gap="4">
           <FormControl
             label="Fonte"
             forLabel="source"
@@ -93,11 +90,12 @@
             :touched="sourceMeta.touched"
           >
             <BaseSelect
-              v-model="source"
+              v-model="sourceId"
               id="source"
               :options="sourceOptions"
               placeholder="Selecione a fonte"
               @blur="blurSource"
+              :loading="isLoadingSources"
             />
           </FormControl>
 
@@ -108,22 +106,22 @@
             :touched="statusMeta.touched"
           >
             <BaseSelect
-              v-model="status"
+              v-model="statusId"
               id="status"
               :options="statusOptions"
               placeholder="Selecione o status"
               :error="!!statusError"
               @blur="blurStatus"
+              :loading="isLoadingStatuses"
             />
           </FormControl>
-        </div>
-      </div>
+        </FormGrid>
+      </FormSection>
 
       <!-- Tags -->
-      <div class="space-y-4">
-        <h3 class="text-lg font-medium text-white">Tags</h3>
+      <FormSection title="Tags">
         <TagSelector v-model="selectedTagIds" :canCreateTags="true" />
-      </div>
+      </FormSection>
 
       <!-- Form Actions -->
       <div class="flex justify-end gap-3 pt-4">
@@ -149,6 +147,8 @@
 import { useLeadForm } from '@/composables/crm/useLeadForm';
 import { Icon } from '@iconify/vue';
 
+import FormSection from '@/components/ui/forms/FormSection.vue';
+import FormGrid from '@/components/ui/forms/FormGrid.vue';
 import FormControl from '@/components/ui/forms/FormControl.vue';
 import BaseInput from '@/components/ui/forms/BaseInput.vue';
 import BaseTextarea from '@/components/ui/forms/BaseTextarea.vue';
@@ -188,12 +188,12 @@ const {
   blurBirthDate,
   birthDateMeta,
 
-  source,
+  sourceId,
   sourceError,
   blurSource,
   sourceMeta,
 
-  status,
+  statusId,
   statusError,
   blurStatus,
   statusMeta,
@@ -205,6 +205,10 @@ const {
   // Options
   sourceOptions,
   statusOptions,
+  
+  // Loading states
+  isLoadingSources,
+  isLoadingStatuses,
 
   // Ações
   salvar,
