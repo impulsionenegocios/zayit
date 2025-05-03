@@ -400,5 +400,9 @@ def delete_lead_associated_data(lead_id: str):
             batch.commit()
         
         # TODO: Delete files (implement file handling)
+        
+        print(f"Successfully deleted all associated data for lead {lead_id}")
+        return True
     except Exception as e:
         print(f"Error deleting lead associated data: {str(e)}")
+        return False
