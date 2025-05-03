@@ -4,7 +4,7 @@ import { ref, computed } from 'vue';
 import type {
   Lead,
   Tag,
-  LeadStatus,
+  LeadStatusType,
   LeadCreatePayload,
   LeadUpdatePayload,
 } from '@/types/lead.types';
@@ -21,7 +21,7 @@ export const useLeadStore = defineStore('lead', () => {
 
   // Getters
   const leadsByStatus = computed(() => {
-    const result: Record<LeadStatus, Lead[]> = {
+    const result: Record<LeadStatusType, Lead[]> = {
       lead: [],
       opportunity: [],
       client: [],
@@ -34,7 +34,7 @@ export const useLeadStore = defineStore('lead', () => {
   });
 
   const kanbanColumns = computed(() => {
-    const statuses: LeadStatus[] = ['lead', 'opportunity', 'client', 'lost'];
+    const statuses: LeadStatusType[] = ['lead', 'opportunity', 'client', 'lost'];
     return statuses.map((status) => ({
       status,
       leads: leads.value.filter((lead) => lead.status === status),
@@ -99,7 +99,7 @@ export const useLeadStore = defineStore('lead', () => {
     }
   }
 
-  async function updateLeadStatus(crmId: string, id: string, newStatus: LeadStatus) {
+  async function updateLeadStatus(crmId: string, id: string, newStatus: LeadStatusType) {
     const idx = leads.value.findIndex((l) => l.id === id);
     if (idx === -1) return false;
     const original = leads.value[idx].status;

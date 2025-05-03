@@ -301,8 +301,12 @@ def update_lead_service(crm_id: str, lead_id: str, lead: LeadUpdate, user_data):
             update_data["birth_date"] = lead.birth_date
         if lead.source is not None:
             update_data["source"] = lead.source
+        if lead.source_id is not None:
+            update_data["source_id"] = lead.source_id
         if lead.status is not None:
             update_data["status"] = lead.status
+        if lead.status_id is not None:
+            update_data["status_id"] = lead.status_id
         if lead.tags is not None:
             update_data["tags"] = tags
         
