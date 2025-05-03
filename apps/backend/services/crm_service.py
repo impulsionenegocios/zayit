@@ -146,7 +146,7 @@ def update_crm_service(crm_id: str, crm: CRMUpdate, user_data):
 
 
 def delete_crm_service(crm_id: str, user_data):
-    """Delete a CRM"""
+    """Delete a CRM and all its associated leads"""
     try:
         doc_ref = db.collection("crms").document(crm_id)
         doc = doc_ref.get()
@@ -163,9 +163,34 @@ def delete_crm_service(crm_id: str, user_data):
         if crm_data.get("user_id") != user_id and role != "superadmin":
             raise HTTPException(status_code=403, detail="You don't have permission to delete this CRM")
         
+        from services.crm_lead_service import get_crm_leads_service, delete_lead_service
+        
+        leads = get_crm_leads_service(crm_id, user_data)
+        
+        deleted_leads_count = 0
+        failed_leads_count = 0
+        
+        for lead in leads:
+            try:
+                lead_id = lead.get("id")
+                if lead_id:
+                    delete_lead_service(crm_id, lead_id, user_data)
+                    deleted_leads_count += 1
+            except Exception as lead_error:
+                failed_leads_count += 1
+                print(f"Error deleting lead {lead.get('id')} during CRM deletion: {str(lead_error)}")
+        
+        print(f"CRM {crm_id} deletion: {deleted_leads_count} leads deleted successfully, {failed_leads_count} leads failed to delete")
+        
         # Delete the CRM
         doc_ref.delete()
-        return True
+        
+        return {
+            "success": True,
+            "crm_id": crm_id,
+            "leads_deleted": deleted_leads_count,
+            "leads_failed": failed_leads_count
+        }
     except HTTPException as e:
         raise e
     except Exception as e:
