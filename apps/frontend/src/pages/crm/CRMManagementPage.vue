@@ -18,7 +18,7 @@
         Tags
       </RouterLink>
 
-      <<RouterLink
+      <RouterLink
         :to="{ name: 'CRMEdit', params: { crmId } }"
         class="text-sm font-medium"
         :class="tabClass('CRMEdit')"

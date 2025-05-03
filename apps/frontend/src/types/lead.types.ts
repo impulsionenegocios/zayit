@@ -10,9 +10,22 @@ export interface Tag {
   color: string;
 }
 
-export type LeadSource = 'organic' | 'advertisement' | 'referral' | 'social' | 'other';
+export interface LeadSource {
+  id: string;
+  name: string;
+  description?: string;
+}
 
-export type LeadStatus = 'lead' | 'opportunity' | 'client' | 'lost';
+export interface LeadStatus {
+  id: string;
+  name: string;
+  color: string;
+  order: number;
+  description?: string;
+}
+
+export type LeadSourceType = string;
+export type LeadStatusType = string;
 
 export interface Lead {
   id: string;
@@ -21,8 +34,10 @@ export interface Lead {
   phone: string;
   address?: string;
   birthDate?: string;
-  source?: LeadSource;
-  status: LeadStatus;
+  source?: LeadSourceType;
+  sourceId?: string;
+  status: LeadStatusType;
+  statusId?: string;
   tags: Tag[];
   created_at: string;
   updated_at: string;
@@ -76,8 +91,10 @@ export interface LeadCreatePayload {
   phone: string;
   address?: string;
   birthDate?: string;
-  source?: LeadSource;
-  status: LeadStatus;
+  source?: LeadSourceType;
+  sourceId?: string;
+  status: LeadStatusType;
+  statusId?: string;
   tags: string[];
 }
 
@@ -88,7 +105,9 @@ export interface LeadUpdatePayload {
   phone?: string;
   address?: string;
   birthDate?: string;
-  source?: LeadSource;
-  status?: LeadStatus;
+  source?: LeadSourceType;
+  sourceId?: string;
+  status?: LeadStatusType;
+  statusId?: string;
   tags?: string[];
 }
