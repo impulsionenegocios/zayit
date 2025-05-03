@@ -110,7 +110,6 @@ export default [
                 component: () => import('@/pages/crm/leads/LeadFormView.vue'),
               },
 
-              // → Aqui as rotas de Tags ANINHADAS sob /superadmin/crms/:crmId/tags
               {
                 path: 'tags',
                 meta: { breadcrumb: 'Tags' },
@@ -118,7 +117,7 @@ export default [
                   {
                     path: '',
                     name: 'CRMTags',
-                    component: () => import('@/pages/crm/tags/TagsPage.vue'),
+                    component: () => import('@/pages/crm/CRMManagementPage.vue'),
                   },
                   {
                     path: 'new',
@@ -138,7 +137,7 @@ export default [
               {
                 path: 'settings',
                 name: 'CRMEdit',
-                component: () => import('@/pages/crm/CRMEditPage.vue'),
+                component: () => import('@/pages/crm/CRMManagementPage.vue'),
               },
             ],
           },
