@@ -173,7 +173,7 @@ import { useModal } from '@/composables/useModal';
 import { Icon } from '@iconify/vue';
 import * as crmService from '@/services/crmService'; 
 import * as commentService from '@/services/commentService';
-import type { Lead } from '@/types/client.types';
+import type { Lead, LeadStatusType } from '@/types/lead.types';
 import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
 import LeadTags from './LeadTags.vue';
 import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';

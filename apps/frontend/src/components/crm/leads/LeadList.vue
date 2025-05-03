@@ -176,7 +176,7 @@ import { useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import { useLeadStore } from '@/stores/crm/lead';
 import { useToast } from '@/composables/useToast';
-import type { Lead, LeadStatus } from '@/types/lead.types';
+import type { Lead, LeadStatusType } from '@/types/lead.types';
 import { useModal } from '@/composables/useModal';
 import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
 import { formatDate } from '@/utils/dateFormatter';
@@ -193,7 +193,7 @@ const modal = useModal();
 const router = useRouter();
 
 const searchQuery = ref('');
-const statusFilter = ref<'all' | LeadStatus>('all');
+const statusFilter = ref<'all' | LeadStatusType>('all');
 const isLoading = computed(() => leadStore.isLoading);
 
 // Status styling
@@ -228,7 +228,7 @@ function formatSource(source?: string) {
   return source[0].toUpperCase() + source.slice(1);
 }
 
-function formatStatus(status: LeadStatus) {
+function formatStatus(status: LeadStatusType) {
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
 

@@ -1,5 +1,5 @@
-import { LeadStatus } from '@/types/lead.types';
-export function formatStatus(status: LeadStatus) {
+import { LeadStatusType } from '@/types/lead.types';
+export function formatStatus(status: LeadStatusType) {
   switch (status) {
     case 'lead':
       return 'Lead';
