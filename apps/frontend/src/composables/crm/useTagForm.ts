@@ -75,7 +75,7 @@ export function useTagForm(tagId?: string) {
 
   // Go back to tags list
   const goBack = () => {
-    router.push({ name: 'TagsList', params: { crmId } });
+    router.push({ name: 'CRMTags', params: { crmId } });
   };
 
   return {

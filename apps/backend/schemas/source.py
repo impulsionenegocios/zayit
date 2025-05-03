@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+from datetime import datetime
 
 class BaseSchema(BaseModel):
     class Config:
@@ -18,7 +19,10 @@ class SourceCreate(SourceBase):
 class SourceUpdate(BaseSchema):
     name: Optional[str] = None
     description: Optional[str] = None
+    updated_at: Optional[datetime] = None
 
 class Source(SourceBase):
     id: str
     crm_id: str
+    created_at: datetime
+    updated_at: Optional[datetime] = None

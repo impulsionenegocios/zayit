@@ -63,7 +63,7 @@
       :message="`Tem certeza que deseja excluir a fonte '${sourceToDelete?.name}'? Esta ação não pode ser desfeita.`"
       confirm-text="Excluir"
       cancel-text="Cancelar"
-      @confirm="deleteSource"
+      @confirm="handleDeleteSource"
       @cancel="showDeleteConfirm = false"
     />
   </div>
@@ -118,11 +118,11 @@ const confirmDelete = (source: Source) => {
   showDeleteConfirm.value = true;
 };
 
-const deleteSource = async () => {
+const handleDeleteSource = async () => {
   if (!sourceToDelete.value) return;
-  
+
   try {
-    await deleteSource(props.crmId, sourceToDelete.value.id);
+    await deleteSource(props.crmId, sourceToDelete.value.id); // aqui está chamando a função do service
     toast.success('Fonte excluída com sucesso!');
     await fetchSources();
   } catch (error) {
@@ -133,4 +133,5 @@ const deleteSource = async () => {
     sourceToDelete.value = null;
   }
 };
+
 </script>

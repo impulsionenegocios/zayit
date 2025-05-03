@@ -90,6 +90,7 @@ const props = defineProps<{ open: boolean }>();
 const emit = defineEmits<{ (e: 'close'): void }>();
 
 const route = useRoute();
+const crmId = route.params.crmId as string;
 
 const menuItems = ref([
   {
@@ -151,11 +152,6 @@ const menuItems = ref([
         label: 'Criar',
         to: { name: 'CRMCreate' },
       },
-      {
-        label: 'Tags',
-        to: { name: 'TagsList' },
-      },
-
       // {
       //   label: 'Tasks',
       //   to: { name: 'VerKanban' },

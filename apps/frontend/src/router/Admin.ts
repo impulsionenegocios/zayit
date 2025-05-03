@@ -6,11 +6,14 @@ export default [
     component: SuperAdminLayout,
     meta: { requiresAuth: true, role: 'superadmin', breadcrumb: 'Dashboard' },
     children: [
+      // Dashboard
       {
         path: '',
         name: 'Dashboard',
         component: () => import('@/pages/admin/DashboardPage.vue'),
       },
+
+      // Clientes
       {
         path: 'clientes',
         meta: { breadcrumb: 'Clientes' },
@@ -34,6 +37,8 @@ export default [
           },
         ],
       },
+
+      // Roles
       {
         path: 'roles',
         meta: { breadcrumb: 'Roles' },
@@ -57,29 +62,8 @@ export default [
           },
         ],
       },
-      {
-        path: 'tags',
-        meta: { breadcrumb: 'Tags' },
-        children: [
-          {
-            path: '',
-            name: 'TagsList',
-            component: () => import('@/pages/crm/tags/TagsPage.vue'),
-          },
-          {
-            path: 'new',
-            name: 'CreateTag',
-            component: () => import('@/pages/crm/tags/CreateTag.vue'),
-            meta: { breadcrumb: 'Create Tag' },
-          },
-          {
-            path: 'editar/:id',
-            name: 'EditTag',
-            component: () => import('@/pages/crm/tags/EditTag.vue'),
-            meta: { breadcrumb: 'Edit Tag' },
-          },
-        ],
-      },
+
+      // CRMs e tudo que é scoped por CRM, incluindo Tags dentro de cada CRM
       {
         path: 'crms',
         meta: { breadcrumb: 'CRMs' },
@@ -105,11 +89,6 @@ export default [
                 name: 'CRMDashboard',
                 component: () => import('@/pages/crm/CRMDashboardPage.vue'),
               },
-              // {
-              //   path: 'leads',
-              //   name: 'CRMLeadList',
-              //   component: () => import('@/pages/crm/leads/LeadListView.vue'),
-              // },
               {
                 path: 'leads/new',
                 name: 'CRMLeadCreate',
@@ -130,11 +109,32 @@ export default [
                 name: 'CRMLeadEdit',
                 component: () => import('@/pages/crm/leads/LeadFormView.vue'),
               },
+
+              // → Aqui as rotas de Tags ANINHADAS sob /superadmin/crms/:crmId/tags
               {
                 path: 'tags',
-                name: 'CRMTags',
-                component: () => import('@/pages/crm/tags/TagsPage.vue'),
+                meta: { breadcrumb: 'Tags' },
+                children: [
+                  {
+                    path: '',
+                    name: 'CRMTags',
+                    component: () => import('@/pages/crm/tags/TagsPage.vue'),
+                  },
+                  {
+                    path: 'new',
+                    name: 'CreateTag',
+                    component: () => import('@/pages/crm/tags/CreateTag.vue'),
+                    meta: { breadcrumb: 'Criar Tag' },
+                  },
+                  {
+                    path: 'editar/:id',
+                    name: 'EditTag',
+                    component: () => import('@/pages/crm/tags/EditTag.vue'),
+                    meta: { breadcrumb: 'Editar Tag' },
+                  },
+                ],
               },
+
               {
                 path: 'settings',
                 name: 'CRMEdit',
@@ -146,4 +146,4 @@ export default [
       },
     ],
   },
-];
+]

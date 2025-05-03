@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 
 from api.routes import auth, clientes, roles
 from api.routes.crm import (
-    tags, leads, contacts, tasks, comment, crms, 
+    tags, crms, 
     crm_leads, crm_comments, crm_contacts, crm_tasks,
     crm_sources, crm_statuses
 )

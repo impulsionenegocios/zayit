@@ -72,7 +72,7 @@
       :message="`Tem certeza que deseja excluir o status '${statusToDelete?.name}'? Esta ação não pode ser desfeita.`"
       confirm-text="Excluir"
       cancel-text="Cancelar"
-      @confirm="deleteStatus"
+      @confirm="HandleDeleteStatus"
       @cancel="showDeleteConfirm = false"
     />
   </div>
@@ -131,7 +131,7 @@ const confirmDelete = (status: Status) => {
   showDeleteConfirm.value = true;
 };
 
-const deleteStatus = async () => {
+const HandleDeleteStatus = async () => {
   if (!statusToDelete.value) return;
   
   try {

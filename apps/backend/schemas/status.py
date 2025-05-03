@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+from datetime import datetime
 
 class BaseSchema(BaseModel):
     class Config:
@@ -22,7 +23,9 @@ class StatusUpdate(BaseSchema):
     color: Optional[str] = None
     order: Optional[int] = Field(None, ge=0)
     description: Optional[str] = None
-
+    updated_at: Optional[datetime] = None
 class Status(StatusBase):
     id: str
     crm_id: str
+    created_at: datetime
+    updated_at: Optional[datetime] = None
