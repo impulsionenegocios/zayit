@@ -5,7 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from api.routes import auth, clientes, roles
 from api.routes.crm import (
     tags, leads, contacts, tasks, comment, crms, 
-    crm_leads, crm_comments, crm_contacts, crm_tasks
+    crm_leads, crm_comments, crm_contacts, crm_tasks,
+    crm_sources, crm_statuses
 )
 
 app = FastAPI()
@@ -35,6 +36,8 @@ app.include_router(crm_leads.router)
 app.include_router(crm_comments.router)
 app.include_router(crm_contacts.router)
 app.include_router(crm_tasks.router)
+app.include_router(crm_sources.router)
+app.include_router(crm_statuses.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
