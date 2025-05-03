@@ -3,19 +3,11 @@ from typing import List, Optional
 
 from auth.permissions import verify_role
 from auth.auth import verify_token
-from schemas.lead import (
-    Lead, 
-    LeadCreate, 
-    LeadUpdate, 
-    Comment, 
-    CommentCreate, 
-    Contact, 
-    ContactCreate, 
-    Task, 
-    TaskCreate, 
-    TaskUpdate,
-    Tag
-)
+from schemas.lead import Lead, LeadCreate, LeadUpdate
+from schemas.comment import Comment, CommentCreate
+from schemas.contact import Contact, ContactCreate
+from schemas.task import Task, TaskCreate, TaskUpdate
+from schemas.tag import Tag
 from services.lead_service import (
     create_lead_service,
     get_leads_service,
