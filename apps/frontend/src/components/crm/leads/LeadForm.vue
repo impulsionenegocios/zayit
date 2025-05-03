@@ -3,7 +3,7 @@
     <form @submit.prevent="salvar" class="space-y-6">
       <!-- Basic Information -->
       <FormSection title="Informações Básicas">
-        <FormGrid :cols="{ base: 1, md: 2 }" gap="4">
+        <FormGrid :cols="{ base: 1, md: 2 }" :gap=4>
           <FormControl label="Nome" forLabel="name" :error="nameError" :touched="nameMeta.touched">
             <BaseInput
               v-model="name"
@@ -82,7 +82,7 @@
 
       <!-- Lead Information -->
       <FormSection title="Informações do Lead">
-        <FormGrid :cols="{ base: 1, md: 2 }" gap="4">
+        <FormGrid :cols="{ base: 1, md: 2 }" :gap=4>
           <FormControl
             label="Fonte"
             forLabel="source"
