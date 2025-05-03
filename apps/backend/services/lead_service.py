@@ -10,13 +10,13 @@ from auth.client import db
 from schemas.lead import (
     LeadCreate, 
     LeadUpdate,
-    Lead, 
-    CommentCreate, 
-    ContactCreate, 
-    TaskCreate, 
-    TaskUpdate,
+    Lead,
     Tag
 )
+from schemas.comment import (CommentCreate)
+from schemas.contact  import (ContactCreate)
+from schemas.task import (TaskCreate, TaskUpdate)
+
 def create_lead_service(lead: LeadCreate, user_data) -> Lead:
     try:
         lead_id = str(uuid.uuid4())

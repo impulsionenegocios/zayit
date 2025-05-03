@@ -62,3 +62,6 @@ def require_company(user_data: Dict[str, Any] = Depends(verify_role(["company", 
 
 def require_user(user_data: Dict[str, Any] = Depends(verify_role(["user", "company", "superadmin"]))):
     return user_data
+
+
+

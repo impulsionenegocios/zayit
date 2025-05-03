@@ -18,7 +18,7 @@ router = APIRouter(prefix="/crms", tags=["crm"])
 @router.post("/", response_model=CRM)
 async def create_crm(
     crm: CRMCreate,
-    user_data = Depends(verify_token)  # Using verify_token to get user data from token
+    user_data=Depends(verify_role(["superadmin", "company"]))
 ):
     """
     Create a new CRM for the authenticated user.
@@ -28,7 +28,7 @@ async def create_crm(
 
 @router.get("/", response_model=List[CRM])
 async def get_crms(
-    user_data = Depends(verify_token)  # Using verify_token to get user data from token
+    user_data = Depends(verify_token)  
 ):
     """
     Get all CRMs belonging to the authenticated user.
@@ -39,7 +39,7 @@ async def get_crms(
 @router.get("/{crm_id}", response_model=CRM)
 async def get_crm_by_id(
     crm_id: str,
-    user_data = Depends(verify_token)  # Using verify_token to get user data from token
+    user_data = Depends(verify_token)  
 ):
     """
     Get a specific CRM by ID.
@@ -54,7 +54,7 @@ async def get_crm_by_id(
 async def update_crm(
     crm_id: str,
     crm: CRMUpdate,
-    user_data = Depends(verify_token)  # Using verify_token to get user data from token
+    user_data = Depends(verify_token)  
 ):
     """
     Update a CRM.
@@ -68,7 +68,7 @@ async def update_crm(
 @router.delete("/{crm_id}")
 async def delete_crm(
     crm_id: str,
-    user_data = Depends(verify_token)  # Using verify_token to get user data from token
+    user_data = Depends(verify_token)  
 ):
     """
     Delete a CRM.

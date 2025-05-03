@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, Form, UploadFile
 from typing import List, Optional
 
-from auth.permissions import verify_role
+from auth.permissions import verify_role,  require_superadmin
 from schemas.cliente import ClienteIn, ClienteOut, ClienteUpdate
 from services.cliente_service import (
     criar_cliente_service,
@@ -41,7 +41,7 @@ def map_form_to_update_schema(
 async def criar_cliente(
     cliente: ClienteIn = Depends(map_form_to_schema),
     logo: Optional[UploadFile] = None,
-    user_data=Depends(verify_role(["superadmin"]))
+    user_data=Depends(verify_role(require_superadmin))
 ):
     return criar_cliente_service(cliente, logo)
 
@@ -49,7 +49,7 @@ async def criar_cliente(
 # ✅ GET - Listar todos os clientes
 @router.get("/", response_model=List[ClienteOut])
 async def listar_clientes(
-    user_data=Depends(verify_role(["superadmin"]))
+    user_data=Depends(verify_role(require_superadmin))
 ):
     return listar_clientes_service()
 
@@ -58,7 +58,7 @@ async def listar_clientes(
 @router.get("/{cliente_id}", response_model=ClienteOut)
 async def obter_cliente(
     cliente_id: str,
-    user_data=Depends(verify_role(["superadmin"]))
+    user_data=Depends(verify_role(require_superadmin))
 ):
     return obter_cliente_service(cliente_id)
 
@@ -70,7 +70,7 @@ async def atualizar_cliente(
     cliente: ClienteUpdate = Depends(map_form_to_update_schema),
     logo: Optional[UploadFile] = None,
     remover_logo: bool = Form(False),
-    user_data=Depends(verify_role(["superadmin"]))
+    user_data=Depends(verify_role(require_superadmin))
 ):
     return atualizar_cliente_service(
         cliente_id=cliente_id,
@@ -84,6 +84,6 @@ async def atualizar_cliente(
 @router.delete("/{cliente_id}")
 async def deletar_cliente(
     cliente_id: str,
-    user_data=Depends(verify_role(["superadmin"]))
+    user_data=Depends(verify_role(require_superadmin))
 ):
     return deletar_cliente_service(cliente_id)
