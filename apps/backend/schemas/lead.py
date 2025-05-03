@@ -22,7 +22,10 @@ class LeadBase(BaseSchema):
     address:     Optional[str]   = None
     birth_date:  Optional[str]   = Field(None, alias="birthDate")
     source:      Optional[str]   = None
-    status:      str             = Field(..., pattern="^(lead|opportunity|client|lost)$")
+    status:      str             = Field(...)
+    source_id: Optional[str] = Field(None, alias="sourceId")
+    status_id: Optional[str] = Field(None, alias="statusId")
+    
 
 class LeadCreate(LeadBase):
     tags: Optional[List[str]] = Field(default_factory=list)
@@ -34,8 +37,11 @@ class LeadUpdate(BaseSchema):
     address:     Optional[str]         = None
     birth_date:  Optional[str]         = Field(None, alias="birthDate")
     source:      Optional[str]         = None
-    status:      Optional[str]         = Field(None, pattern="^(lead|opportunity|client|lost)$")
+    status:      Optional[str]         = Field(None)
     tags:        Optional[List[str]]   = None
+    status_id: Optional[str] = Field(None, alias="statusId")
+    source_id: Optional[str] = Field(None, alias="sourceId")
+
 
 class Lead(LeadBase):
     id:          str

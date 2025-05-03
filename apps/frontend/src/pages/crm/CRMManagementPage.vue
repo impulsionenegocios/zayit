@@ -78,18 +78,7 @@
       <div v-else-if="activeTab === 'settings'" class="space-y-8">
         <!-- CRM Form -->
         <div class="bg-surface rounded-lg shadow p-6">
-          <h2 class="text-xl font-semibold mb-6">Configurações do CRM</h2>
           <CRMForm :crm-id="crmId" />
-        </div>
-
-        <!-- Status Management -->
-        <div class="bg-surface rounded-lg shadow p-6">
-          <StatusList :crm-id="crmId" />
-        </div>
-
-        <!-- Source Management -->
-        <div class="bg-surface rounded-lg shadow p-6">
-          <SourceList :crm-id="crmId" />
         </div>
       </div>
     </div>
@@ -97,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, h, computed } from 'vue';
+import { ref, watch, onMounted, h, computed, onUnmounted  } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
 
@@ -105,14 +94,14 @@ import LeadList from '@/components/crm/leads/LeadList.vue';
 import LeadKanban from '@/components/crm/leads/LeadKanban.vue';
 import TagsList from '@/components/crm/tags/TagsList.vue';
 import CRMForm from '@/components/crm/CRMForm.vue';
-import StatusList from '@/components/crm/statuses/StatusList.vue';
-import SourceList from '@/components/crm/sources/SourceList.vue';
 import { useCRMStore } from '@/stores/crm/crmStore';
-import { usePageActionButton } from '@/composables/usePageActionButton';
+import { useActionButton } from '@/stores/layout/actionButton';
+import { createActionButton } from '@/helpers/createActionButton';
 
 const route = useRoute();
 const router = useRouter();
 const crmId = route.params.crmId as string;
+const actionButton = useActionButton();
 
 const crmStore = useCRMStore();
 const crmName = ref('');
@@ -152,6 +141,11 @@ onMounted(async () => {
   updateActionButton(activeTab.value);
 });
 
+// Clean up the action button when component is unmounted
+onUnmounted(() => {
+  actionButton.component = null;
+});
+
 function handleViewChange(mode: 'list' | 'kanban') {
   activeView.value = mode;
 }
@@ -164,30 +158,31 @@ function tabClass(tabName: string) {
 
 // Update the action button based on the active tab
 function updateActionButton(tab: string) {
-  let actionConfig;
-  
   if (tab === 'leads') {
-    actionConfig = {
-      title: 'Criar Lead',
-      variant: 'primary',
-      onClick: () => router.push({ name: 'CRMLeadCreate', params: { crmId } }),
-    };
+    actionButton.component = createActionButton(
+      {
+        title: 'Criar Lead',
+        variant: 'primary',
+        onClick: () => router.push({ name: 'CRMLeadCreate', params: { crmId } }),
+      },
+      {
+        icon: () => h(Icon, { icon: 'mdi:plus' }),
+      }
+    );
   } else if (tab === 'tags') {
-    actionConfig = {
-      title: 'Criar Tag',
-      variant: 'primary',
-      onClick: () => document.querySelector('.tag-form-trigger')?.dispatchEvent(new Event('click')),
-    };
+    actionButton.component = createActionButton(
+      {
+        title: 'Criar Tag',
+        variant: 'primary',
+        onClick: () => document.querySelector('.tag-form-trigger')?.dispatchEvent(new Event('click')),
+      },
+      {
+        icon: () => h(Icon, { icon: 'mdi:plus' }),
+      }
+    );
   } else {
     // No action button for settings tab
-    return;
+    actionButton.component = null;
   }
-  
-  usePageActionButton(
-    actionConfig,
-    {
-      icon: () => h(Icon, { icon: 'mdi:plus' }),
-    },
-  );
 }
 </script>
