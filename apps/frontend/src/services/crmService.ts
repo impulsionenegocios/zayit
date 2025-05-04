@@ -2,6 +2,7 @@
 import api from '@/lib/axios';
 import type { CRM, CRMCreatePayload, CRMUpdatePayload } from '@/types/crm.types';
 import type { Lead, LeadCreatePayload, LeadUpdatePayload } from '@/types/lead.types';
+import type { Script, ScriptCreatePayload, ScriptUpdatePayload } from '@/types/script.types';
 
 // CRM API endpoints
 export async function getCRMs() {
@@ -43,4 +44,25 @@ export function updateLead(crmId: string, leadId: string, payload: LeadUpdatePay
 
 export function deleteLead(crmId: string, leadId: string) {
   return api.delete<void>(`/crms/${crmId}/leads/${leadId}`);
+}
+
+// Script API endpoints
+export function getScripts(crmId: string) {
+  return api.get<Script[]>(`/crms/${crmId}/scripts`);
+}
+
+export function getScriptById(crmId: string, scriptId: string) {
+  return api.get<Script>(`/crms/${crmId}/scripts/${scriptId}`);
+}
+
+export function createScript(crmId: string, payload: ScriptCreatePayload) {
+  return api.post<Script>(`/crms/${crmId}/scripts`, payload);
+}
+
+export function updateScript(crmId: string, scriptId: string, payload: ScriptUpdatePayload) {
+  return api.put<Script>(`/crms/${crmId}/scripts/${scriptId}`, payload);
+}
+
+export function deleteScript(crmId: string, scriptId: string) {
+  return api.delete<void>(`/crms/${crmId}/scripts/${scriptId}`);
 }

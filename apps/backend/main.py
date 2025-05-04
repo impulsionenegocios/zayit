@@ -8,6 +8,7 @@ from api.routes.crm import (
     crm_leads, crm_comments, crm_contacts, crm_tasks,
     crm_sources, crm_statuses
 )
+from api.routes.crm.scripts import router as scripts_router
 
 app = FastAPI()
 origins = [
@@ -38,6 +39,7 @@ app.include_router(crm_contacts.router)
 app.include_router(crm_tasks.router)
 app.include_router(crm_sources.router)
 app.include_router(crm_statuses.router)
+app.include_router(scripts_router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
