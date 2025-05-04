@@ -15,6 +15,8 @@
       :placeholder="placeholder"
       :disabled="disabled"
       :readonly="readonly"
+      :min="min"
+      :max="max"
       :class="['input-base', $slots.icon ? 'pl-10' : '', loading ? 'pr-10' : '']"
       v-model="inputValue"
       @focus="$emit('focus')"
@@ -50,6 +52,8 @@ const props = defineProps<{
   loading?: boolean;
   disabled?: boolean;
   readonly?: boolean;
+  min?: string; // Add min property for date inputs
+  max?: string; // Add max property for date inputs
 }>();
 
 const emit = defineEmits<{

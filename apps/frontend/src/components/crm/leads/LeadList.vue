@@ -1,30 +1,64 @@
 <template>
   <div class="bg-surface rounded-lg shadow p-4">
     <!-- Header with filters and search -->
-    <div class="flex justify-between items-center mb-4">
-      <div class="flex gap-3">
-        <!-- Search input -->
-        <div class="relative">
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Search leads..."
-            class="pl-9 pr-4 py-2 rounded-lg bg-card border border-white/10 text-white placeholder-gray-400 w-60"
-          />
-          <Icon icon="mdi:magnify" class="absolute left-3 top-2.5 text-gray-400" />
-        </div>
+    <div class="flex flex-col gap-4 mb-6">
+      <!-- Search and status filter row -->
+      <div class="flex justify-between items-center">
+        <div class="flex gap-3">
+          <!-- Search input -->
+          <div class="relative">
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search leads..."
+              class="pl-9 pr-4 py-2 rounded-lg bg-card border border-white/10 text-white placeholder-gray-400 w-60"
+            />
+            <Icon icon="mdi:magnify" class="absolute left-3 top-2.5 text-gray-400" />
+          </div>
 
-        <!-- Status filter -->
-        <select
-          v-model="statusFilter"
-          class="px-4 py-2 rounded-lg bg-card border border-white/10 text-white"
-        >
-          <option value="all">All Statuses</option>
-          <option value="lead">Leads</option>
-          <option value="opportunity">Opportunities</option>
-          <option value="client">Clients</option>
-          <option value="lost">Lost</option>
-        </select>
+          <!-- Status filter -->
+          <BaseSelect
+            v-model="statusFilter"
+            :options="statusOptions"
+            placeholder="All Statuses"
+            class="w-48"
+          />
+        </div>
+      </div>
+      
+      <!-- Additional filters row -->
+      <div class="flex flex-wrap gap-4">
+        <!-- Date range filter -->
+        <div class="w-full md:w-auto">
+          <label class="block text-sm font-medium text-gray-400 mb-1">Creation Date</label>
+          <DateRangeInput
+            v-model="dateFilter"
+            startPlaceholder="From"
+            endPlaceholder="To"
+          />
+        </div>
+        
+        <!-- Source filter -->
+        <div class="w-full md:w-auto">
+          <label class="block text-sm font-medium text-gray-400 mb-1">Source</label>
+          <BaseSelect
+            v-model="sourceFilter"
+            :options="sourceOptions"
+            placeholder="All Sources"
+            class="w-48"
+          />
+        </div>
+        
+        <!-- Tags filter -->
+        <div class="w-full md:w-auto">
+          <label class="block text-sm font-medium text-gray-400 mb-1">Tags</label>
+          <BaseCombobox
+            v-model="tagFilter"
+            :options="tagOptions"
+            placeholder="Select Tags"
+            class="w-48"
+          />
+        </div>
       </div>
     </div>
 
@@ -80,7 +114,7 @@
         </thead>
         <tbody class="bg-surface divide-y divide-white/10">
           <tr
-            v-for="lead in filteredLeads"
+            v-for="lead in paginatedItems"
             :key="lead.id"
             class="hover:bg-card/50 transition-colors"
           >
@@ -161,6 +195,29 @@
         </tbody>
       </table>
     </div>
+    
+    <!-- Pagination controls -->
+    <div v-if="filteredLeads.length > 0" class="flex justify-between items-center px-6 py-4 bg-card">
+      <div class="text-sm text-gray-400">
+        Showing {{ (currentPage - 1) * 20 + 1 }} to {{ Math.min(currentPage * 20, filteredLeads.length) }} of {{ filteredLeads.length }} leads
+      </div>
+      <div class="flex gap-2">
+        <button 
+          @click="prevPage" 
+          class="px-3 py-1 rounded bg-surface text-white hover:bg-zayit-blue/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="currentPage === 1"
+        >
+          Previous
+        </button>
+        <button 
+          @click="nextPage" 
+          class="px-3 py-1 rounded bg-surface text-white hover:bg-zayit-blue/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
+    </div>
 
     <!-- Empty state -->
     <div v-else class="py-10 text-center">
@@ -171,30 +228,70 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, computed, onMounted } from 'vue';
+import { defineProps, ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import { useLeadStore } from '@/stores/crm/lead';
 import { useToast } from '@/composables/useToast';
+import { useStatusList } from '@/composables/crm/useStatusList';
+import { useSourceList } from '@/composables/crm/useSourceList';
+import { useTagList } from '@/composables/crm/useTagList';
+import { usePagination } from '@/composables/usePagination';
 import type { Lead, LeadStatusType } from '@/types/lead.types';
 import { useModal } from '@/composables/useModal';
 import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
 import { formatDate } from '@/utils/dateFormatter';
+import BaseSelect from '@/components/ui/forms/BaseSelect.vue';
+import BaseCombobox from '@/components/ui/forms/BaseCombobox.vue';
+import DateRangeInput from '@/components/ui/forms/DateRangeInput.vue';
+import { getDefaultDateRange, isDateInRange } from '@/utils/dateFilter';
 
-// 1) Recebe o crmId vindo do componente pai (via <component :crm-id="crmId" />)
+// Props
 const props = defineProps<{
   crmId: string;
   initialViewMode: 'list' | 'kanban';
 }>();
 
+// Composables
 const leadStore = useLeadStore();
 const toast = useToast();
 const modal = useModal();
 const router = useRouter();
+const { statuses, fetchStatuses } = useStatusList(props.crmId);
+const { sources, fetchSources } = useSourceList(props.crmId);
+const { tags, fetchTags } = useTagList(props.crmId);
 
+// Filter states
 const searchQuery = ref('');
 const statusFilter = ref<'all' | LeadStatusType>('all');
+const sourceFilter = ref<string | null>(null);
+const tagFilter = ref<{ value: string; label: string } | null>(null);
+const dateFilter = ref(getDefaultDateRange());
 const isLoading = computed(() => leadStore.isLoading);
+
+// Filter options
+const statusOptions = computed(() => [
+  { value: 'all', label: 'All Statuses' },
+  { value: 'lead', label: 'Leads' },
+  { value: 'opportunity', label: 'Opportunities' },
+  { value: 'client', label: 'Clients' },
+  { value: 'lost', label: 'Lost' }
+]);
+
+const sourceOptions = computed(() => [
+  { value: null, label: 'All Sources' },
+  ...sources.value.map(source => ({
+    value: source.id,
+    label: source.name
+  }))
+]);
+
+const tagOptions = computed(() => 
+  tags.value.map(tag => ({
+    value: tag.id,
+    label: tag.name
+  }))
+);
 
 // Status styling
 const statusClasses = {
@@ -208,9 +305,12 @@ const statusClasses = {
 const filteredLeads = computed(() => {
   let result = leadStore.leads;
 
+  // Apply status filter
   if (statusFilter.value !== 'all') {
     result = result.filter((l) => l.status === statusFilter.value);
   }
+  
+  // Apply search filter
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();
     result = result.filter(
@@ -220,8 +320,32 @@ const filteredLeads = computed(() => {
         l.phone.toLowerCase().includes(q),
     );
   }
+  
+  // Apply source filter
+  if (sourceFilter.value) {
+    result = result.filter(l => l.sourceId === sourceFilter.value);
+  }
+  
+  // Apply tag filter
+  if (tagFilter.value) {
+    result = result.filter(l => 
+      l.tags.some(tag => tag.id === tagFilter.value?.value)
+    );
+  }
+  
+  // Apply date filter
+  if (dateFilter.value.start && dateFilter.value.end) {
+    result = result.filter(l => 
+      isDateInRange(l.created_at, dateFilter.value.start, dateFilter.value.end)
+    );
+  }
+  
   return result;
 });
+
+// Pagination
+const { currentPage, paginatedItems, totalPages, goToPage, nextPage, prevPage } = 
+  usePagination(filteredLeads, 20);
 
 function formatSource(source?: string) {
   if (!source) return 'Unknown';
@@ -268,6 +392,18 @@ onMounted(async () => {
     toast.error('CRM ID is missing');
     return;
   }
-  await leadStore.fetchLeads(props.crmId);
+  
+  // Fetch all required data in parallel
+  await Promise.all([
+    leadStore.fetchLeads(props.crmId),
+    fetchStatuses(),
+    fetchSources(),
+    fetchTags()
+  ]);
+});
+
+// Watch for filter changes to reset pagination
+watch([statusFilter, sourceFilter, tagFilter, dateFilter, searchQuery], () => {
+  goToPage(1);
 });
 </script>
