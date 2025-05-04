@@ -1,32 +1,61 @@
 <!-- /home/ubuntu/repos/zayit/apps/frontend/src/components/crm/scripts/ScriptList.vue -->
 <template>
   <div class="relative px-6"> 
-    <!-- Barra de ações -->
-    <div class="absolute right-4 top-4">
-      <button
-        @click="viewMode = 'list'"
-        class="px-8 py-2 cursor-pointer font-medium text-sm transition-all duration-500 rounded-l-xl"
-        :class="
-          viewMode === 'list'
-            ? 'bg-zayit-blue text-white border-zayit-blue border'
-            : 'bg-surface border border-zayit-blue text-white hover:bg-zayit-pink hover:border-zayit-pink hover:text-white'
-        "
-      >
-        <Icon icon="mdi:format-list-bulleted" class="mr-2" />
-        Lista
-      </button>
-      <button
-        @click="viewMode = 'grid'"
-        class="px-8 py-2 cursor-pointer font-medium text-sm transition-all duration-500 rounded-r-xl"
-        :class="
-          viewMode === 'grid'
-            ? 'bg-zayit-blue text-white border-zayit-blue border'
-            : 'bg-surface border border-zayit-blue text-white hover:bg-zayit-pink hover:border-zayit-pink hover:text-white'
-        "
-      >
-        <Icon icon="mdi:grid" class="mr-2" />
-        Cards
-      </button> 
+    <!-- Barra de ações e filtros -->
+    <div class="flex flex-col gap-4 mb-6">
+      <!-- Primeira linha: Ações e visualização -->
+      <div class="flex justify-between items-center">
+        <!-- Filtros -->
+        <div class="flex gap-3">
+          <!-- Filtro de tipo -->
+          <div class="w-48">
+            <BaseSelect
+              v-model="typeFilter"
+              :options="typeOptions"
+              placeholder="Todos os tipos"
+            />
+          </div>
+          
+          <!-- Filtro de busca -->
+          <div class="relative">
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Buscar scripts..."
+              class="pl-9 pr-4 py-2 rounded-lg bg-card border border-white/10 text-white placeholder-gray-400 w-60"
+            />
+            <Icon icon="mdi:magnify" class="absolute left-3 top-2.5 text-gray-400" />
+          </div>
+        </div>
+        
+        <!-- Botões de visualização -->
+        <div>
+          <button
+            @click="viewMode = 'list'"
+            class="px-8 py-2 cursor-pointer font-medium text-sm transition-all duration-500 rounded-l-xl"
+            :class="
+              viewMode === 'list'
+                ? 'bg-zayit-blue text-white border-zayit-blue border'
+                : 'bg-surface border border-zayit-blue text-white hover:bg-zayit-pink hover:border-zayit-pink hover:text-white'
+            "
+          >
+            <Icon icon="mdi:format-list-bulleted" class="mr-2" />
+            Lista
+          </button>
+          <button
+            @click="viewMode = 'grid'"
+            class="px-8 py-2 cursor-pointer font-medium text-sm transition-all duration-500 rounded-r-xl"
+            :class="
+              viewMode === 'grid'
+                ? 'bg-zayit-blue text-white border-zayit-blue border'
+                : 'bg-surface border border-zayit-blue text-white hover:bg-zayit-pink hover:border-zayit-pink hover:text-white'
+            "
+          >
+            <Icon icon="mdi:grid" class="mr-2" />
+            Cards
+          </button> 
+        </div>
+      </div>
     </div>
 
     <!-- Loading state -->
@@ -52,7 +81,7 @@
     <!-- Table view using BaseTable -->
     <BaseTable
       v-else-if="viewMode === 'list'"
-      :items="scripts"
+      :items="paginatedItems"
       :loading="isLoading"
       :columns="tableColumns"
       @bulkDelete="handleBulkDelete"
@@ -89,6 +118,29 @@
         </div> 
       </template>
     </BaseTable>
+    
+    <!-- Pagination controls for list view -->
+    <div v-if="viewMode === 'list' && filteredScripts.length > 0 && totalPages > 1" class="flex justify-between items-center px-6 py-4 mt-4">
+      <div class="text-sm text-gray-400">
+        Mostrando {{ (currentPage - 1) * 20 + 1 }} a {{ Math.min(currentPage * 20, filteredScripts.length) }} de {{ filteredScripts.length }} scripts
+      </div>
+      <div class="flex gap-2">
+        <button 
+          @click="prevPage" 
+          class="px-3 py-1 rounded bg-surface text-white hover:bg-zayit-blue/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="currentPage === 1"
+        >
+          Anterior
+        </button>
+        <button 
+          @click="nextPage" 
+          class="px-3 py-1 rounded bg-surface text-white hover:bg-zayit-blue/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="currentPage === totalPages"
+        >
+          Próximo
+        </button>
+      </div>
+    </div>
 
     <!-- Grid view -->
     <div
@@ -96,11 +148,34 @@
       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
     >
       <ScriptCard
-        v-for="script in scripts"
+        v-for="script in paginatedItems"
         :key="script.id"
         :script="script"
         :crmId="crmId"
       />
+    </div>
+    
+    <!-- Pagination controls for grid view -->
+    <div v-if="viewMode === 'grid' && filteredScripts.length > 0 && totalPages > 1" class="flex justify-between items-center px-6 py-4 mt-4">
+      <div class="text-sm text-gray-400">
+        Mostrando {{ (currentPage - 1) * 20 + 1 }} a {{ Math.min(currentPage * 20, filteredScripts.length) }} de {{ filteredScripts.length }} scripts
+      </div>
+      <div class="flex gap-2">
+        <button 
+          @click="prevPage" 
+          class="px-3 py-1 rounded bg-surface text-white hover:bg-zayit-blue/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="currentPage === 1"
+        >
+          Anterior
+        </button>
+        <button 
+          @click="nextPage" 
+          class="px-3 py-1 rounded bg-surface text-white hover:bg-zayit-blue/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="currentPage === totalPages"
+        >
+          Próximo
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -118,6 +193,8 @@ import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
 import ScriptCard from './ScriptCard.vue';
 import { useToast } from '@/composables/useToast';
 import BaseTable from '@/components/layout/BaseTable.vue';
+import BaseSelect from '@/components/ui/forms/BaseSelect.vue';
+import { usePagination } from '@/composables/usePagination';
 
 const route = useRoute();
 const router = useRouter();
@@ -128,9 +205,56 @@ const toast = useToast();
 const crmId = computed(() => route.params.crmId as string);
 const viewMode = ref<'list' | 'grid'>('grid');
 
+// Filter states
+const searchQuery = ref('');
+const typeFilter = ref<string | null>(null);
+
 // Get scripts from store
 const scripts = computed(() => scriptStore.sortedScripts);
 const isLoading = computed(() => scriptStore.isLoading);
+
+// Get unique script types for filter options
+const scriptTypes = computed(() => {
+  const types = new Set<string>();
+  scripts.value.forEach(script => {
+    if (script.type) types.add(script.type);
+  });
+  return Array.from(types);
+});
+
+// Type filter options
+const typeOptions = computed(() => [
+  { value: null, label: 'Todos os tipos' },
+  ...scriptTypes.value.map(type => ({
+    value: type,
+    label: type
+  }))
+]);
+
+// Filtered scripts
+const filteredScripts = computed(() => {
+  let result = scripts.value;
+  
+  // Apply type filter
+  if (typeFilter.value) {
+    result = result.filter(script => script.type === typeFilter.value);
+  }
+  
+  // Apply search filter
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    result = result.filter(script => 
+      script.name.toLowerCase().includes(query) || 
+      (script.content && script.content.toLowerCase().includes(query))
+    );
+  }
+  
+  return result;
+});
+
+// Pagination
+const { currentPage, paginatedItems, totalPages, goToPage, nextPage, prevPage } = 
+  usePagination(filteredScripts, 20);
 
 // Define table columns for BaseTable
 const tableColumns = [
@@ -157,6 +281,11 @@ watch(
     }
   }
 );
+
+// Watch for filter changes to reset pagination
+watch([typeFilter, searchQuery], () => {
+  goToPage(1);
+});
 
 // Navigation
 const onAddNew = () => {

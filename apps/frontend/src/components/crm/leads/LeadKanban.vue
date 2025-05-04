@@ -1,16 +1,54 @@
 <template>
   <div class="bg-surface rounded-lg shadow p-4">
-    <!-- Header com search -->
-    <div class="flex flex-wrap justify-between items-center mb-6">
-      <div class="flex gap-3">
-        <div class="relative">
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Pesquisar leads..."
-            class="pl-9 pr-4 py-2 rounded-lg bg-card border border-white/10 text-white placeholder-gray-400 w-60"
+    <!-- Header com search e filtros -->
+    <div class="flex flex-col gap-4 mb-6">
+      <!-- Search row -->
+      <div class="flex justify-between items-center">
+        <div class="flex gap-3">
+          <div class="relative">
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Pesquisar leads..."
+              class="pl-9 pr-4 py-2 rounded-lg bg-card border border-white/10 text-white placeholder-gray-400 w-60"
+            />
+            <Icon icon="mdi:magnify" class="absolute left-3 top-2.5 text-gray-400" />
+          </div>
+        </div>
+      </div>
+      
+      <!-- Filters row -->
+      <div class="flex flex-wrap gap-4">
+        <!-- Date range filter -->
+        <div class="w-full md:w-auto">
+          <label class="block text-sm font-medium text-gray-400 mb-1">Data de Criação</label>
+          <DateRangeInput
+            v-model="dateFilter"
+            startPlaceholder="De"
+            endPlaceholder="Até"
           />
-          <Icon icon="mdi:magnify" class="absolute left-3 top-2.5 text-gray-400" />
+        </div>
+        
+        <!-- Source filter -->
+        <div class="w-full md:w-auto">
+          <label class="block text-sm font-medium text-gray-400 mb-1">Origem</label>
+          <BaseSelect
+            v-model="sourceFilter"
+            :options="sourceOptions"
+            placeholder="Todas as Origens"
+            class="w-48"
+          />
+        </div>
+        
+        <!-- Tags filter -->
+        <div class="w-full md:w-auto">
+          <label class="block text-sm font-medium text-gray-400 mb-1">Tags</label>
+          <BaseCombobox
+            v-model="tagFilter"
+            :options="tagOptions"
+            placeholder="Selecionar Tags"
+            class="w-48"
+          />
         </div>
       </div>
     </div>
@@ -130,22 +168,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import draggable from 'vuedraggable';
 import { useLeadStore } from '@/stores/crm/lead';
 import { useToast } from '@/composables/useToast';
 import { useStatusList } from '@/composables/crm/useStatusList';
+import { useSourceList } from '@/composables/crm/useSourceList';
+import { useTagList } from '@/composables/crm/useTagList';
 import type { Lead, LeadStatus, LeadStatusType } from '@/types/lead.types';
 import type { Status } from '@/types/status.types';
 import { formatDate } from '@/utils/dateFormatter';
+import BaseSelect from '@/components/ui/forms/BaseSelect.vue';
+import BaseCombobox from '@/components/ui/forms/BaseCombobox.vue';
+import DateRangeInput from '@/components/ui/forms/DateRangeInput.vue';
+import { getDefaultDateRange, isDateInRange } from '@/utils/dateFilter';
 
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
 const leadStore = useLeadStore();
 const { statuses, isLoading: isLoadingStatuses, fetchStatuses } = useStatusList(route.params.crmId as string);
+const { sources, fetchSources } = useSourceList(route.params.crmId as string);
+const { tags, fetchTags } = useTagList(route.params.crmId as string);
 
 const crmId = route.params.crmId as string;
 
@@ -163,7 +209,27 @@ const leadToDelete = ref<Lead | null>(null);
 
 // Colunas Kanban são carregadas dinamicamente do backend
 
+// Filter states
 const searchQuery = ref('');
+const sourceFilter = ref<string | null>(null);
+const tagFilter = ref<{ value: string; label: string } | null>(null);
+const dateFilter = ref(getDefaultDateRange());
+
+// Filter options
+const sourceOptions = computed(() => [
+  { value: null, label: 'Todas as Origens' },
+  ...sources.value.map(source => ({
+    value: source.id,
+    label: source.name
+  }))
+]);
+
+const tagOptions = computed(() => 
+  tags.value.map(tag => ({
+    value: tag.id,
+    label: tag.name
+  }))
+);
 
 // Computa os leads agrupados por status
 const board = computed(() => {
@@ -175,15 +241,38 @@ const board = computed(() => {
     obj[status.id] = [];
   });
 
+  // Aplica todos os filtros aos leads
+  let filteredLeads = leadStore.leads;
+  
   // Filtra os leads se houver uma busca
-  const filteredLeads = searchQuery.value.trim() 
-    ? leadStore.leads.filter(
-        lead => 
-          lead.name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-          lead.email?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-          lead.phone?.toLowerCase().includes(searchQuery.value.toLowerCase())
-      )
-    : leadStore.leads;
+  if (searchQuery.value.trim()) {
+    const q = searchQuery.value.toLowerCase();
+    filteredLeads = filteredLeads.filter(
+      lead => 
+        lead.name?.toLowerCase().includes(q) ||
+        lead.email?.toLowerCase().includes(q) ||
+        lead.phone?.toLowerCase().includes(q)
+    );
+  }
+  
+  // Aplica filtro de origem
+  if (sourceFilter.value) {
+    filteredLeads = filteredLeads.filter(lead => lead.sourceId === sourceFilter.value);
+  }
+  
+  // Aplica filtro de tag
+  if (tagFilter.value) {
+    filteredLeads = filteredLeads.filter(lead => 
+      lead.tags.some(tag => tag.id === tagFilter.value?.value)
+    );
+  }
+  
+  // Aplica filtro de data
+  if (dateFilter.value.start && dateFilter.value.end) {
+    filteredLeads = filteredLeads.filter(lead => 
+      isDateInRange(lead.created_at, dateFilter.value.start, dateFilter.value.end)
+    );
+  }
 
   // Agrupa os leads por status
   filteredLeads.forEach(lead => {
@@ -309,15 +398,23 @@ onMounted(async () => {
       return;
     }
 
-    // Carrega os status e leads em paralelo
+    // Carrega os status, leads, sources e tags em paralelo
     await Promise.all([
       fetchStatuses(),
+      fetchSources(),
+      fetchTags(),
       leadStore.fetchLeads(crmId)
     ]);
   } catch (error) {
     console.error('Error loading data:', error);
     toast.error('Failed to load data');
   }
+});
+
+// Watch para mudanças nos filtros
+watch([sourceFilter, tagFilter, dateFilter, searchQuery], () => {
+  // Não é necessário resetar paginação aqui pois o Kanban não usa paginação
+  // Apenas observamos as mudanças para garantir reatividade
 });
 </script>
 
