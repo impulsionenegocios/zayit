@@ -49,14 +49,21 @@
           <!-- WhatsApp formatting tools -->
           <WhatsAppFormatter textareaId="content" />
           
-          <!-- Content textarea -->
+          <!-- Content textarea with styled placeholders -->
+          <StyledPlaceholderEditor
+            v-model="content"
+            textareaId="content"
+          />
+          <!-- Hidden textarea for form validation -->
           <BaseTextarea
             v-model="content"
-            id="content"
+            id="content-hidden"
+            class="hidden"
             placeholder="Conteúdo do script"
             :rows="6"
             :error="contentError"
             @blur="blurContent"
+            style="display: none;"
           />
           
           <!-- Live preview -->
@@ -93,9 +100,10 @@
 <script setup lang="ts">
 import { useScriptForm } from '@/composables/crm/useScriptForm';
 import { Icon } from '@iconify/vue';
-import { onMounted, computed } from 'vue';
+import { onMounted, computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { formatWhatsAppPreview } from '@/utils/placeholderUtils';
+import { formatWhatsAppPreview, replacePlaceholders } from '@/utils/placeholderUtils';
+import { useTagList } from '@/composables/crm/useTagList';
 
 import FormSection from '@/components/ui/forms/FormSection.vue';
 import FormGrid from '@/components/ui/forms/FormGrid.vue';
@@ -105,6 +113,7 @@ import BaseTextarea from '@/components/ui/forms/BaseTextarea.vue';
 import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
 import PlaceholderButtons from '@/components/ui/editors/PlaceholderButtons.vue';
 import WhatsAppFormatter from '@/components/ui/editors/WhatsAppFormatter.vue';
+import StyledPlaceholderEditor from '@/components/ui/editors/StyledPlaceholderEditor.vue';
 
 const route = useRoute();
 const props = defineProps<{
@@ -114,6 +123,18 @@ const props = defineProps<{
 // Obtenha o scriptId da rota se não foi passado como prop
 const scriptIdFromRoute = route.params.scriptId as string | undefined;
 const effectiveScriptId = props.scriptId || scriptIdFromRoute;
+
+// Get the CRM ID from the route
+const crmId = route.params.crmId as string;
+
+// Get tags for placeholder preview
+const { tags, fetchTags } = useTagList(crmId);
+
+// Mock lead for preview purposes
+const mockLead = ref({
+  name: 'Nome do Cliente',
+  source: 'Fonte do Lead',
+});
 
 console.log('ScriptForm component initializing with:');
 console.log('- scriptId from props:', props.scriptId);
@@ -145,13 +166,19 @@ const {
   cancel,
 } = useScriptForm(effectiveScriptId);
 
-onMounted(() => {
+onMounted(async () => {
   console.log('ScriptForm component mounted');
   console.log('Current route:', route.name, route.params);
+  
+  // Fetch tags for preview
+  await fetchTags();
 });
 
 // Formatted preview for WhatsApp messages
 const formattedPreview = computed(() => {
-  return formatWhatsAppPreview(content.value);
+  // First replace placeholders with values (especially tag IDs with tag names)
+  const replaced = replacePlaceholders(content.value, mockLead.value, tags.value);
+  // Then apply WhatsApp formatting
+  return formatWhatsAppPreview(replaced);
 });
 </script>
