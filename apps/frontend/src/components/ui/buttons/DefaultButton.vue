@@ -6,6 +6,7 @@
       variantClass,
     ]"
     :disabled="disabled"
+    :type="type"
     @click="$emit('click')"
   >
     <Icon v-if="icon" :icon="icon" class="mr-1" />
@@ -22,7 +23,11 @@ const props = defineProps<{
   size?: 'sm' | 'md' | 'lg';
   icon?: string;
   disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
 }>();
+
+// Default type to 'button' to prevent form submission
+const type = props.type || 'button';
 
 const emit = defineEmits<{
   (e: 'click'): void;
