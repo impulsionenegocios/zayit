@@ -43,6 +43,7 @@
             <button
               v-for="tag in tags"
               :key="tag.id"
+              type="button"
               @click="insertTagPlaceholder(tag)"
               class="flex items-center gap-2 p-2 w-full text-left hover:bg-white/5 rounded transition-colors"
             >
