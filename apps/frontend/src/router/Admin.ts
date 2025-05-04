@@ -135,6 +135,31 @@ export default [
               },
 
               {
+                path: 'scripts',
+                meta: { breadcrumb: 'Scripts' },
+                children: [
+                  {
+                    path: '',
+                    name: 'CRMScripts',
+                    component: () => import('@/pages/crm/CRMManagementPage.vue'),
+                    props: (route: any) => ({ tab: 'scripts' }),
+                  },
+                  {
+                    path: 'new',
+                    name: 'ScriptForm',
+                    component: () => import('@/pages/crm/scripts/ScriptFormPage.vue'),
+                    meta: { breadcrumb: 'Criar Script' },
+                  },
+                  {
+                    path: ':scriptId/edit',
+                    name: 'ScriptEdit',
+                    component: () => import('@/pages/crm/scripts/ScriptFormPage.vue'),
+                    meta: { breadcrumb: 'Editar Script' },
+                  },
+                ],
+              },
+              
+              {
                 path: 'settings',
                 name: 'CRMEdit',
                 component: () => import('@/pages/crm/CRMManagementPage.vue'),

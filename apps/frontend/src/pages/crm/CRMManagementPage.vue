@@ -19,6 +19,14 @@
       </button>
 
       <button
+        @click="activeTab = 'scripts'"
+        class="text-sm font-medium"
+        :class="tabClass('scripts')"
+      >
+        Scripts
+      </button>
+
+      <button
         @click="activeTab = 'settings'"
         class="text-sm font-medium"
         :class="tabClass('settings')"
@@ -74,6 +82,13 @@
         <TagsList :crm-id="crmId" />
       </div>
 
+      <!-- Scripts Tab Content -->
+      <div v-else-if="activeTab === 'scripts'">
+        <KeepAlive>
+          <ScriptList :crm-id="crmId" />
+        </KeepAlive>
+      </div>
+
       <!-- Settings Tab Content -->
       <div v-else-if="activeTab === 'settings'" class="space-y-8">
         <!-- CRM Form -->
@@ -93,6 +108,7 @@ import { Icon } from '@iconify/vue';
 import LeadList from '@/components/crm/leads/LeadList.vue';
 import LeadKanban from '@/components/crm/leads/LeadKanban.vue';
 import TagsList from '@/components/crm/tags/TagsList.vue';
+import ScriptList from '@/components/crm/scripts/ScriptList.vue';
 import CRMForm from '@/components/crm/CRMForm.vue';
 import { useCRMStore } from '@/stores/crm/crmStore';
 import { useActionButton } from '@/stores/layout/actionButton';
@@ -106,8 +122,9 @@ const actionButton = useActionButton();
 const crmStore = useCRMStore();
 const crmName = ref('');
 
-// Active tab state (leads, tags, settings) - initialize based on route
-const activeTab = ref<'leads' | 'tags' | 'settings'>(
+// Active tab state (leads, tags, scripts, settings) - initialize based on route or query param
+const activeTab = ref<'leads' | 'tags' | 'scripts' | 'settings'>(
+  route.query.tab === 'scripts' ? 'scripts' :
   route.name === 'CRMTags' ? 'tags' : 
   route.name === 'CRMEdit' ? 'settings' : 
   'leads'
@@ -175,6 +192,17 @@ function updateActionButton(tab: string) {
         title: 'Criar Tag',
         variant: 'primary',
         onClick: () => document.querySelector('.tag-form-trigger')?.dispatchEvent(new Event('click')),
+      },
+      {
+        icon: () => h(Icon, { icon: 'mdi:plus' }),
+      }
+    );
+  } else if (tab === 'scripts') {
+    actionButton.component = createActionButton(
+      {
+        title: 'Criar Script',
+        variant: 'primary',
+        onClick: () => router.push({ name: 'ScriptForm', params: { crmId } }),
       },
       {
         icon: () => h(Icon, { icon: 'mdi:plus' }),

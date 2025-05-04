@@ -164,6 +164,7 @@ def delete_crm_service(crm_id: str, user_data):
             raise HTTPException(status_code=403, detail="You don't have permission to delete this CRM")
         
         from services.crm_lead_service import get_crm_leads_service, delete_lead_service
+        from services.script_service import delete_crm_scripts_service
         
         leads = get_crm_leads_service(crm_id, user_data)
         
@@ -182,6 +183,8 @@ def delete_crm_service(crm_id: str, user_data):
         
         print(f"CRM {crm_id} deletion: {deleted_leads_count} leads deleted successfully, {failed_leads_count} leads failed to delete")
         
+        scripts_result = delete_crm_scripts_service(crm_id, user_data)
+        
         # Delete the CRM
         doc_ref.delete()
         
@@ -189,7 +192,9 @@ def delete_crm_service(crm_id: str, user_data):
             "success": True,
             "crm_id": crm_id,
             "leads_deleted": deleted_leads_count,
-            "leads_failed": failed_leads_count
+            "leads_failed": failed_leads_count,
+            "scripts_deleted": scripts_result.get("deleted_count", 0),
+            "scripts_failed": scripts_result.get("failed_count", 0)
         }
     except HTTPException as e:
         raise e
