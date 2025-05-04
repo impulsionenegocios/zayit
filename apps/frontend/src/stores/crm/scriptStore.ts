@@ -2,12 +2,10 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { Script, ScriptCreatePayload, ScriptUpdatePayload } from '@/types/script.types';
 import * as crmService from '@/services/crmService';
-import { useToast } from '@/composables/useToast';
 
 export const useScriptStore = defineStore('scripts', () => {
   const scripts = ref<Script[]>([]);
   const isLoading = ref(false);
-  const toast = useToast();
 
   const sortedScripts = computed(() => {
     return [...scripts.value].sort(
@@ -27,7 +25,6 @@ export const useScriptStore = defineStore('scripts', () => {
       return response.data;
     } catch (error) {
       console.error('Error fetching scripts:', error);
-      toast.error('Error fetching scripts');
       return [];
     } finally {
       isLoading.value = false;
@@ -41,7 +38,6 @@ export const useScriptStore = defineStore('scripts', () => {
       return response.data;
     } catch (error) {
       console.error(`Error fetching script ${scriptId}:`, error);
-      toast.error('Error fetching script');
       return null;
     } finally {
       isLoading.value = false;
@@ -53,11 +49,9 @@ export const useScriptStore = defineStore('scripts', () => {
     try {
       const response = await crmService.createScript(crmId, script);
       await fetchScripts(crmId); // Refresh the list
-      toast.success('Script created successfully');
       return response.data;
     } catch (error) {
       console.error('Error creating script:', error);
-      toast.error('Error creating script');
       return null;
     } finally {
       isLoading.value = false;
@@ -74,11 +68,9 @@ export const useScriptStore = defineStore('scripts', () => {
         scripts.value[index] = response.data as Script;
       }
       
-      toast.success('Script updated successfully');
       return response.data;
     } catch (error) {
       console.error(`Error updating script ${scriptId}:`, error);
-      toast.error('Error updating script');
       return null;
     } finally {
       isLoading.value = false;
@@ -90,11 +82,9 @@ export const useScriptStore = defineStore('scripts', () => {
     try {
       await crmService.deleteScript(crmId, scriptId);
       scripts.value = scripts.value.filter((script) => script.id !== scriptId);
-      toast.success('Script deleted successfully');
       return true;
     } catch (error) {
       console.error(`Error deleting script ${scriptId}:`, error);
-      toast.error('Error deleting script');
       return false;
     } finally {
       isLoading.value = false;

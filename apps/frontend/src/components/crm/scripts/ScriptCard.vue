@@ -1,7 +1,7 @@
 <!-- /home/ubuntu/repos/zayit/apps/frontend/src/components/crm/scripts/ScriptCard.vue -->
 <template>
   <div
-    class="bg-surface rounded-lg shadow-sm border border-border hover:shadow-md transition-shadow p-4 flex flex-col h-full"
+    class="bg-card rounded-lg shadow-sm border-[1px] border-gray-700  hover:shadow-md transition-shadow p-4 flex flex-col h-full"
   >
     <div class="flex justify-between items-start mb-2">
       <div>
@@ -15,29 +15,18 @@
       <div class="flex space-x-2">
         <button
           @click="onEdit"
-          class="text-primary hover:text-primary-600 transition-colors"
+          class="text-primary hover:text-primary-600 transition-colors cursor-pointer hover:bg-zayit-blue rounded-full px-[3px] py-1"
           title="Editar"
         >
           <Icon icon="mdi:pencil" class="w-5 h-5" />
         </button>
         <button
           @click="confirmDelete"
-          class="text-danger hover:text-danger-600 transition-colors"
+          class="text-danger hover:text-danger-600 transition-colors cursor-pointer hover:bg-zayit-danger rounded-full px-[3px] py-1r"
           title="Excluir"
         >
           <Icon icon="mdi:delete" class="w-5 h-5" />
         </button>
-      </div>
-    </div>
-
-    <div class="mt-2 flex-grow">
-      <p class="text-sm text-muted line-clamp-3">{{ script.content }}</p>
-    </div>
-
-    <div class="mt-3 pt-3 border-t border-border text-xs text-muted">
-      <div class="flex justify-between">
-        <span>Criado: {{ formatDate(script.created_at) }}</span>
-        <span>Atualizado: {{ formatDate(script.updated_at) }}</span>
       </div>
     </div>
   </div>
@@ -46,10 +35,12 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import { useRouter } from 'vue-router';
-import { useConfirm } from '@/composables/useConfirm';
+import { useModal } from '@/composables/useModal';
 import { useScriptStore } from '@/stores/crm/scriptStore';
 import type { Script } from '@/types/script.types';
-import { formatDate } from '@/utils/formatters';
+import { formatDate } from '@/utils/dateFormatter';
+import { useToast } from '@/composables/useToast';
+import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
 
 const props = defineProps<{
   script: Script;
@@ -57,12 +48,13 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const confirm = useConfirm();
+const modal = useModal();
 const scriptStore = useScriptStore();
+const toast = useToast();
 
 const onEdit = () => {
   router.push({
-    name: 'ScriptForm',
+    name: 'ScriptEdit',
     params: {
       crmId: props.crmId,
       scriptId: props.script.id,
@@ -71,16 +63,16 @@ const onEdit = () => {
 };
 
 const confirmDelete = async () => {
-  const result = await confirm.show({
+  const result = await modal.open(ConfirmModal,{
     title: 'Excluir Script',
-    message: `Tem certeza que deseja excluir o script "${props.script.name}"?`,
-    confirmText: 'Excluir',
-    cancelText: 'Cancelar',
-    confirmVariant: 'danger',
+    props: {
+      message: `Tem certeza que deseja excluir o script "${props.script.name}"?`,
+    },
   });
 
-  if (result) {
-    await scriptStore.deleteScript(props.crmId, props.script.id);
-  }
+  if(!result) return;
+  await scriptStore.deleteScript(props.crmId, props.script.id);
+  toast[result ? 'success' : 'error'](result ? `Script "${props.script.name}" Excluído.` : 'Falha ao deletar o script');
 };
+
 </script>

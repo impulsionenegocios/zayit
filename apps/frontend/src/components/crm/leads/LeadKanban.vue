@@ -7,7 +7,7 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Search leads..."
+            placeholder="Pesquisar leads..."
             class="pl-9 pr-4 py-2 rounded-lg bg-card border border-white/10 text-white placeholder-gray-400 w-60"
           />
           <Icon icon="mdi:magnify" class="absolute left-3 top-2.5 text-gray-400" />

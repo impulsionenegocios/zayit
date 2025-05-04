@@ -49,7 +49,10 @@ export function useScriptForm(scriptId?: string) {
 
     loading.value = true;
     try {
+      console.log('Loading script for editing, ID:', scriptId);
+      console.log('CRM ID:', crmId);
       const script = await scriptStore.fetchScriptById(crmId, scriptId);
+      console.log('Script loaded:', script);
       
       if (script) {
         setValues({
@@ -57,11 +60,20 @@ export function useScriptForm(scriptId?: string) {
           type: script.type || '',
           content: script.content || '',
         });
+      } else {
+        toast.error('Script não encontrado');
+        router.push({ 
+          name: 'CRMScripts', 
+          params: { crmId }
+        });
       }
     } catch (err) {
-      toast.error('Error loading script');
-      console.error(err);
-      router.push({ name: 'CRMManagement', params: { crmId } });
+      console.error('Error loading script:', err);
+      toast.error('Erro ao carregar script');
+      router.push({ 
+        name: 'CRMScripts', 
+        params: { crmId }
+      });
     } finally {
       loading.value = false;
     }
@@ -72,17 +84,21 @@ export function useScriptForm(scriptId?: string) {
 
     try {
       if (isEditing.value && scriptId) {
+        console.log('Updating script:', scriptId, values);
         await scriptStore.updateScript(crmId, scriptId, {
           name: values.name,
           type: values.type,
           content: values.content,
         });
+        toast.success('Script atualizado com sucesso');
       } else {
+        console.log('Creating new script:', values);
         await scriptStore.createScript(crmId, {
           name: values.name,
           type: values.type,
           content: values.content,
         });
+        toast.success('Script criado com sucesso');
 
         resetForm({
           values: {
@@ -94,13 +110,12 @@ export function useScriptForm(scriptId?: string) {
       }
       
       router.push({ 
-        name: 'CRMManagement', 
-        params: { crmId },
-        query: { tab: 'scripts' }
+        name: 'CRMScripts', 
+        params: { crmId }
       });
     } catch (err) {
-      toast.error('Error saving script');
-      console.error(err);
+      console.error('Error saving script:', err);
+      toast.error('Erro ao salvar script');
     } finally {
       loading.value = false;
     }
@@ -108,14 +123,20 @@ export function useScriptForm(scriptId?: string) {
 
   const cancel = () => {
     router.push({ 
-      name: 'CRMManagement', 
-      params: { crmId },
-      query: { tab: 'scripts' }
+      name: 'CRMScripts', 
+      params: { crmId }
     });
   };
 
   onMounted(() => {
-    if (scriptId) {
+    // Verificar se o scriptId está vindo tanto das props quanto da rota
+    const routeScriptId = route.params.scriptId as string;
+    const effectiveScriptId = scriptId || routeScriptId;
+    
+    console.log('Component mounted with scriptId from props:', scriptId);
+    console.log('Component mounted with scriptId from route:', routeScriptId);
+    
+    if (effectiveScriptId) {
       loadScriptForEditing();
     }
   });

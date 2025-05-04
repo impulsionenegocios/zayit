@@ -1,7 +1,13 @@
 <!-- /home/ubuntu/repos/zayit/apps/frontend/src/components/crm/scripts/ScriptForm.vue -->
 <template>
   <div class="bg-surface rounded-lg shadow p-6">
-    <form @submit.prevent="save" class="space-y-6">
+    <!-- Loading state -->
+    <div v-if="loading" class="flex justify-center items-center py-12">
+      <Icon icon="mdi:loading" class="w-8 h-8 text-primary animate-spin" />
+      <span class="ml-2">Carregando script...</span>
+    </div>
+    
+    <form v-else @submit.prevent="save" class="space-y-6">
       <!-- Basic Information -->
       <FormSection title="Informações do Script">
         <FormGrid :cols="{ base: 1, md: 2 }" :gap=4>
@@ -42,7 +48,7 @@
             id="content"
             placeholder="Conteúdo do script"
             :rows="6"
-            :error="!!contentError"
+            :error="contentError"
             @blur="blurContent"
           />
         </FormControl>
@@ -71,6 +77,8 @@
 <script setup lang="ts">
 import { useScriptForm } from '@/composables/crm/useScriptForm';
 import { Icon } from '@iconify/vue';
+import { onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
 import FormSection from '@/components/ui/forms/FormSection.vue';
 import FormGrid from '@/components/ui/forms/FormGrid.vue';
@@ -79,9 +87,19 @@ import BaseInput from '@/components/ui/forms/BaseInput.vue';
 import BaseTextarea from '@/components/ui/forms/BaseTextarea.vue';
 import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
 
+const route = useRoute();
 const props = defineProps<{
   scriptId?: string;
 }>();
+
+// Obtenha o scriptId da rota se não foi passado como prop
+const scriptIdFromRoute = route.params.scriptId as string | undefined;
+const effectiveScriptId = props.scriptId || scriptIdFromRoute;
+
+console.log('ScriptForm component initializing with:');
+console.log('- scriptId from props:', props.scriptId);
+console.log('- scriptId from route:', scriptIdFromRoute);
+console.log('- effective scriptId:', effectiveScriptId);
 
 // Use our script form composable
 const {
@@ -106,5 +124,10 @@ const {
   loading,
   isEditing,
   cancel,
-} = useScriptForm(props.scriptId);
+} = useScriptForm(effectiveScriptId);
+
+onMounted(() => {
+  console.log('ScriptForm component mounted');
+  console.log('Current route:', route.name, route.params);
+});
 </script>

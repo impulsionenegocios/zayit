@@ -1,61 +1,32 @@
 <!-- /home/ubuntu/repos/zayit/apps/frontend/src/components/crm/scripts/ScriptList.vue -->
 <template>
-  <div>
-    <!-- Header with actions -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-      <div>
-        <h2 class="text-xl font-semibold">Scripts</h2>
-        <p class="text-muted text-sm mt-1">
-          Gerencie scripts para interação com leads
-        </p>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <!-- View toggle -->
-        <div class="flex items-center bg-surface border border-border rounded-md">
-          <button
-            @click="viewMode = 'list'"
-            class="p-2 rounded-l-md"
-            :class="viewMode === 'list' ? 'bg-primary text-white' : 'text-muted hover:text-primary'"
-            title="Visualização em lista"
-          >
-            <Icon icon="mdi:format-list-bulleted" class="w-5 h-5" />
-          </button>
-          <button
-            @click="viewMode = 'grid'"
-            class="p-2 rounded-r-md"
-            :class="viewMode === 'grid' ? 'bg-primary text-white' : 'text-muted hover:text-primary'"
-            title="Visualização em grade"
-          >
-            <Icon icon="mdi:grid" class="w-5 h-5" />
-          </button>
-        </div>
-
-        <!-- Search -->
-        <div class="relative">
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Buscar scripts..."
-            class="pl-9 pr-4 py-2 rounded-md border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary w-full sm:w-64"
-          />
-          <Icon
-            icon="mdi:magnify"
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted w-4 h-4"
-          />
-        </div>
-
-        <!-- Add new script button -->
-        <DefaultButton
-          variant="primary"
-          size="md"
-          @click="onAddNew"
-          class="whitespace-nowrap"
-        >
-          <Icon icon="mdi:plus" class="mr-1" />
-          Novo Script
-        </DefaultButton>
-      </div>
+  <div class="relative px-6"> 
+    <!-- Barra de ações -->
+    <div class="absolute right-4 top-4">
+      <button
+        @click="viewMode = 'list'"
+        class="px-8 py-2 cursor-pointer font-medium text-sm transition-all duration-500 rounded-l-xl"
+        :class="
+          viewMode === 'list'
+            ? 'bg-zayit-blue text-white border-zayit-blue border'
+            : 'bg-surface border border-zayit-blue text-white hover:bg-zayit-pink hover:border-zayit-pink hover:text-white'
+        "
+      >
+        <Icon icon="mdi:format-list-bulleted" class="mr-2" />
+        Lista
+      </button>
+      <button
+        @click="viewMode = 'grid'"
+        class="px-8 py-2 cursor-pointer font-medium text-sm transition-all duration-500 rounded-r-xl"
+        :class="
+          viewMode === 'grid'
+            ? 'bg-zayit-blue text-white border-zayit-blue border'
+            : 'bg-surface border border-zayit-blue text-white hover:bg-zayit-pink hover:border-zayit-pink hover:text-white'
+        "
+      >
+        <Icon icon="mdi:grid" class="mr-2" />
+        Cards
+      </button> 
     </div>
 
     <!-- Loading state -->
@@ -64,12 +35,12 @@
     </div>
 
     <!-- Empty state -->
-    <div v-else-if="filteredScripts.length === 0" class="bg-surface rounded-lg shadow p-8 text-center">
+    <div v-else-if="scripts.length === 0" class="bg-surface rounded-lg shadow p-8 text-center">
       <div class="flex flex-col items-center">
         <Icon icon="mdi:script-text-outline" class="w-16 h-16 text-muted mb-4" />
         <h3 class="text-lg font-medium mb-2">Nenhum script encontrado</h3>
         <p class="text-muted mb-6">
-          {{ searchQuery ? 'Nenhum script corresponde à sua busca.' : 'Você ainda não criou nenhum script para este CRM.' }}
+          Você ainda não criou nenhum script para este CRM.
         </p>
         <DefaultButton variant="primary" size="md" @click="onAddNew">
           <Icon icon="mdi:plus" class="mr-1" />
@@ -78,80 +49,46 @@
       </div>
     </div>
 
-    <!-- List view -->
-    <div v-else-if="viewMode === 'list'" class="bg-surface rounded-lg shadow overflow-hidden">
-      <table class="min-w-full divide-y divide-border">
-        <thead class="bg-surface-variant">
-          <tr>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider"
-            >
-              Nome
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider"
-            >
-              Tipo
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider"
-            >
-              Conteúdo
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider"
-            >
-              Data de Criação
-            </th>
-            <th scope="col" class="relative px-6 py-3">
-              <span class="sr-only">Ações</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-surface divide-y divide-border">
-          <tr v-for="script in filteredScripts" :key="script.id" class="hover:bg-surface-variant/20">
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium">{{ script.name }}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700"
-              >
-                {{ script.type }}
-              </span>
-            </td>
-            <td class="px-6 py-4">
-              <div class="text-sm text-muted truncate max-w-xs">{{ script.content }}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-muted">
-              {{ formatDate(script.created_at) }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <div class="flex justify-end space-x-3">
-                <button
-                  @click="onEdit(script.id)"
-                  class="text-primary hover:text-primary-600 transition-colors"
-                  title="Editar"
-                >
-                  <Icon icon="mdi:pencil" class="w-5 h-5" />
-                </button>
-                <button
-                  @click="confirmDelete(script)"
-                  class="text-danger hover:text-danger-600 transition-colors"
-                  title="Excluir"
-                >
-                  <Icon icon="mdi:delete" class="w-5 h-5" />
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- Table view using BaseTable -->
+    <BaseTable
+      v-else-if="viewMode === 'list'"
+      :items="scripts"
+      :loading="isLoading"
+      :columns="tableColumns"
+      @bulkDelete="handleBulkDelete"
+    >
+      <!-- Célula personalizada para o tipo -->
+      <template #cell:type="{ item }">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700">
+          {{ item.type }}
+        </span>
+      </template>
+
+      <!-- Célula personalizada para data de criação -->
+      <template #cell:created_at="{ item }">
+        {{ formatDate(item.created_at) }}
+      </template>
+
+      <!-- Ações por linha -->
+      <template #actions="{ item }">
+        <div class="flex justify-end space-x-3">
+          <button
+            @click="onEdit(item.id)"
+            class="text-primary hover:text-primary-600 transition-colors"
+            title="Editar"
+          >
+            <Icon icon="mdi:pencil" class="w-5 h-5" />
+          </button>
+          <button
+            @click="confirmDelete(item)"
+            class="text-danger hover:text-danger-600 transition-colors"
+            title="Excluir"
+          >
+            <Icon icon="mdi:delete" class="w-5 h-5" />
+          </button>
+        </div> 
+      </template>
+    </BaseTable>
 
     <!-- Grid view -->
     <div
@@ -159,7 +96,7 @@
       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
     >
       <ScriptCard
-        v-for="script in filteredScripts"
+        v-for="script in scripts"
         :key="script.id"
         :script="script"
         :crmId="crmId"
@@ -172,41 +109,41 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
-import { useConfirm } from '@/composables/useConfirm';
+import { useModal } from '@/composables/useModal';
 import { useScriptStore } from '@/stores/crm/scriptStore';
-import { formatDate } from '@/utils/formatters';
+import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
+import { formatDate } from '@/utils/dateFormatter';
 import type { Script } from '@/types/script.types';
 import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
 import ScriptCard from './ScriptCard.vue';
+import { useToast } from '@/composables/useToast';
+import BaseTable from '@/components/layout/BaseTable.vue';
 
 const route = useRoute();
 const router = useRouter();
 const scriptStore = useScriptStore();
-const confirm = useConfirm();
+const modal = useModal();
+const toast = useToast();
 
 const crmId = computed(() => route.params.crmId as string);
 const viewMode = ref<'list' | 'grid'>('grid');
-const searchQuery = ref('');
 
 // Get scripts from store
-const { scripts, isLoading } = scriptStore;
+const scripts = computed(() => scriptStore.sortedScripts);
+const isLoading = computed(() => scriptStore.isLoading);
 
-// Filter scripts based on search query
-const filteredScripts = computed(() => {
-  if (!searchQuery.value) return scripts.value;
-  
-  const query = searchQuery.value.toLowerCase();
-  return scripts.value.filter(
-    (script) =>
-      script.name.toLowerCase().includes(query) ||
-      script.type.toLowerCase().includes(query) ||
-      script.content.toLowerCase().includes(query)
-  );
-});
+// Define table columns for BaseTable
+const tableColumns = [
+  { key: 'name', label: 'Nome' },
+  { key: 'type', label: 'Tipo' },
+  { key: 'created_at', label: 'Data de Criação' }
+];
 
 // Load scripts on mount
 onMounted(async () => {
+  console.log('CRM ID:', crmId.value);
   await scriptStore.fetchScripts(crmId.value);
+  console.log('Scripts after fetch:', scriptStore.scripts);
 });
 
 // Watch for CRM ID changes to reload scripts
@@ -214,7 +151,9 @@ watch(
   () => crmId.value,
   async (newCrmId) => {
     if (newCrmId) {
+      console.log('CRM ID changed to:', newCrmId);
       await scriptStore.fetchScripts(newCrmId);
+      console.log('Scripts after CRM change:', scriptStore.scripts);
     }
   }
 );
@@ -239,16 +178,37 @@ const onEdit = (scriptId: string) => {
 
 // Delete confirmation
 const confirmDelete = async (script: Script) => {
-  const result = await confirm.show({
+  const result = await modal.open(ConfirmModal, {
     title: 'Excluir Script',
-    message: `Tem certeza que deseja excluir o script "${script.name}"?`,
-    confirmText: 'Excluir',
-    cancelText: 'Cancelar',
-    confirmVariant: 'danger',
+    props: {
+      message: `Tem certeza que deseja excluir o script "${script.name}"?`,
+    },
+    size: 'sm',
   });
 
-  if (result) {
-    await scriptStore.deleteScript(crmId.value, script.id);
+  if(!result) return;
+  await scriptStore.deleteScript(crmId.value, script.id);
+  toast[result ? 'success' : 'error'](result ? `Script "${script.name}" Excluído.` : 'Falha ao deletar o script');
+};
+
+// Bulk delete handler
+const handleBulkDelete = async (ids: (string | number)[]) => {
+  const result = await modal.open(ConfirmModal, {
+    title: 'Excluir Scripts',
+    props: {
+      message: `Tem certeza que deseja excluir ${ids.length} scripts selecionados?`,
+    },
+    size: 'sm',
+  });
+
+  if (!result) return;
+
+  let successCount = 0;
+  for (const id of ids) {
+    const success = await scriptStore.deleteScript(crmId.value, id.toString());
+    if (success) successCount++;
   }
+
+  toast.success(`${successCount} scripts excluídos com sucesso`);
 };
 </script>
