@@ -3,6 +3,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useToast } from '@/composables/useToast';
 import { useForm, useField } from 'vee-validate';
 import { useScriptStore } from '@/stores/crm/scriptStore';
+import { validatePlaceholders } from '@/utils/placeholderUtils';
 
 export function useScriptForm(scriptId?: string) {
   const route = useRoute();
@@ -14,6 +15,19 @@ export function useScriptForm(scriptId?: string) {
   
   const loading = ref(false);
   const isEditing = computed(() => !!scriptId);
+
+  const validateContent = (value: string): string | boolean => {
+    if (!value || value.trim() === '') {
+      return 'O conteúdo é obrigatório';
+    }
+    
+    const { isValid, error } = validatePlaceholders(value);
+    if (!isValid) {
+      return error || 'Erro de validação de placeholders';
+    }
+    
+    return true;
+  };
 
   const { handleSubmit, setValues, resetForm } = useForm({
     initialValues: {
@@ -42,7 +56,7 @@ export function useScriptForm(scriptId?: string) {
     errorMessage: contentError,
     handleBlur: blurContent,
     meta: contentMeta,
-  } = useField<string>('content', 'required');
+  } = useField<string>('content', validateContent);
 
   async function loadScriptForEditing() {
     if (!scriptId) return;

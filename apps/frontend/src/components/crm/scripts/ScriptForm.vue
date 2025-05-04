@@ -43,6 +43,13 @@
           :error="contentError"
           :touched="contentMeta.touched"
         >
+          <!-- Placeholder buttons and formatting tools -->
+          <PlaceholderButtons textareaId="content" />
+          
+          <!-- WhatsApp formatting tools -->
+          <WhatsAppFormatter textareaId="content" />
+          
+          <!-- Content textarea -->
           <BaseTextarea
             v-model="content"
             id="content"
@@ -51,6 +58,15 @@
             :error="contentError"
             @blur="blurContent"
           />
+          
+          <!-- Live preview -->
+          <div v-if="content" class="mt-3">
+            <div class="text-sm text-white/70 mb-1">Preview:</div>
+            <div 
+              class="p-3 bg-card border border-white/10 rounded min-h-[100px] text-white whatsapp-preview"
+              v-html="formattedPreview"
+            ></div>
+          </div>
         </FormControl>
       </FormSection>
 
@@ -77,8 +93,9 @@
 <script setup lang="ts">
 import { useScriptForm } from '@/composables/crm/useScriptForm';
 import { Icon } from '@iconify/vue';
-import { onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { formatWhatsAppPreview } from '@/utils/placeholderUtils';
 
 import FormSection from '@/components/ui/forms/FormSection.vue';
 import FormGrid from '@/components/ui/forms/FormGrid.vue';
@@ -86,6 +103,8 @@ import FormControl from '@/components/ui/forms/FormControl.vue';
 import BaseInput from '@/components/ui/forms/BaseInput.vue';
 import BaseTextarea from '@/components/ui/forms/BaseTextarea.vue';
 import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
+import PlaceholderButtons from '@/components/ui/editors/PlaceholderButtons.vue';
+import WhatsAppFormatter from '@/components/ui/editors/WhatsAppFormatter.vue';
 
 const route = useRoute();
 const props = defineProps<{
@@ -129,5 +148,10 @@ const {
 onMounted(() => {
   console.log('ScriptForm component mounted');
   console.log('Current route:', route.name, route.params);
+});
+
+// Formatted preview for WhatsApp messages
+const formattedPreview = computed(() => {
+  return formatWhatsAppPreview(content.value);
 });
 </script>

@@ -68,7 +68,7 @@
               <button
                 class="ml-2 text-green-700 cursor-pointer bg-green-400 hover:bg-white/10 transition-colors p-1.5 rounded-full"
                 title="Send WhatsApp message"
-                @click="openWhatsApp(lead.phone)"
+                @click="openWhatsAppModal(lead.phone)"
               >
                 <Icon icon="mdi:whatsapp" />
               </button>
@@ -135,7 +135,7 @@
 
           <button
             class="btn-outline hover:bg-black/60 transition-all duration-500 cursor-pointer rounded-lg p-3 h-auto text-left flex items-center"
-            @click="openWhatsApp(lead.phone)"
+            @click="openWhatsAppModal(lead.phone)"
           >
             <Icon icon="mdi:whatsapp" class="mr-2 text-zayit-blue" />
             <span>WhatsApp</span>
@@ -170,11 +170,13 @@ import { useRouter, useRoute } from 'vue-router';
 import { useLeadStore } from '@/stores/crm/lead';
 import { useToast } from '@/composables/useToast';
 import { useModal } from '@/composables/useModal';
+import { useTagList } from '@/composables/crm/useTagList';
 import { Icon } from '@iconify/vue';
 import * as crmService from '@/services/crmService'; 
 import * as commentService from '@/services/commentService';
 import type { Lead, LeadStatusType } from '@/types/lead.types';
 import ConfirmModal from '@/components/ui/modals/ConfirmModal.vue';
+import WhatsAppScriptModal from '@/components/crm/scripts/WhatsAppScriptModal.vue';
 import LeadTags from './LeadTags.vue';
 import DefaultButton from '@/components/ui/buttons/DefaultButton.vue';
 import ContactHistory from '../contacts/ContactHistory.vue';
@@ -192,6 +194,7 @@ const crmId = route.params.crmId as string;
 const clientStore = useLeadStore();
 const toast = useToast();
 const modal = useModal();
+const { tags, fetchTags } = useTagList(crmId);
 
 // Data
 const lead = ref<Lead>({
@@ -227,6 +230,7 @@ onMounted(async () => {
   if (result) {
     lead.value = result;
     await loadComments();
+    await fetchTags();
   } else {
     toast.error('Falha ao carregar lead');
     router.push({ name: 'CRMLeadList', params: { crmId } });
@@ -276,9 +280,22 @@ async function confirmDelete() {
   }
 }
 
+function openWhatsAppModal(phone: string) {
+  modal.open(WhatsAppScriptModal, {
+    title: 'Enviar Mensagem via WhatsApp',
+    props: {
+      lead: lead.value,
+      tags: tags.value,
+      crmId: crmId,
+      phone: phone,
+    },
+    size: 'md',
+  });
+}
+
+// Keep this function for backward compatibility
 function openWhatsApp(phone: string) {
-  const cleanPhone = phone.replace(/\D/g, '');
-  window.open(`https://wa.me/${cleanPhone}`, '_blank');
+  openWhatsAppModal(phone);
 }
 
 function sendEmail() {

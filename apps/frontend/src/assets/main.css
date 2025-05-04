@@ -29,3 +29,54 @@
   --gradient-success: linear-gradient(to bottom, #36d869, #cbffdb); /* verde */
   --tw-ring-color: theme('colors.zayit-blue');
 }
+
+/* WhatsApp preview styling */
+.whatsapp-preview strong {
+  font-weight: bold;
+}
+
+.whatsapp-preview em {
+  font-style: italic;
+}
+
+.whatsapp-preview del {
+  text-decoration: line-through;
+}
+
+.whatsapp-preview code {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+.whatsapp-preview blockquote {
+  border-left: 4px solid var(--color-zayit-blue);
+  padding-left: 8px;
+  margin: 8px 0;
+  color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(111, 75, 219, 0.1);
+  padding: 8px;
+  border-radius: 0 4px 4px 0;
+}
+
+.whatsapp-preview ul, .whatsapp-preview ol {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.whatsapp-preview ul {
+  list-style-type: disc;
+}
+
+.whatsapp-preview ol {
+  list-style-type: decimal;
+}
+
+.whatsapp-preview li {
+  margin-bottom: 4px;
+}
+
+.whatsapp-preview br {
+  margin-bottom: 8px;
+}

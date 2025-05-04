@@ -1,39 +1,52 @@
 <!-- src/components/ui/modals/BaseModal.vue -->
 <template>
   <div
-    :class="[
-      'rounded-lg shadow-lg bg-card p-6 w-full custom-scroll relative max-h-[80%] overflow-auto',
-      sizeClass,
-    ]"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+    @click="!persistent && $emit('close')"
   >
-    <!-- Header -->
-    <div class="flex justify-between items-start mb-4">
-      <h2 v-if="props?.title" class="text-lg font-bold">{{ props?.title }}</h2>
-      <button
-        v-if="!persistent"
-        @click="$emit('close')"
-        class="text-gray-500 hover:text-gray-700 text-xl absolute z-[90] right-8 top-4 cursor-pointer"
-      >
-        ✕
-      </button>
-    </div>
+    <div
+      class="bg-card rounded-lg shadow-xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+      :class="[sizeClass]"
+      @click.stop
+    >
+      <!-- Header -->
+      <div class="flex justify-between items-center p-4 border-b border-white/10">
+        <h2 v-if="title" class="text-lg font-semibold text-white">{{ title }}</h2>
+        <button
+          v-if="!persistent"
+          @click="$emit('close')"
+          class="text-white/60 hover:text-white transition-colors"
+        >
+          <Icon icon="mdi:close" class="w-5 h-5" />
+        </button>
+      </div>
 
-    <!-- Body -->
-    <div class="text-sm text-gray-700">
-      <slot />
-    </div>
+      <!-- Content -->
+      <div class="p-4 overflow-y-auto">
+        <slot></slot>
+      </div>
 
-    <!-- Footer -->
+      <!-- Footer (optional) -->
+      <div v-if="$slots.footer || showFooter" class="p-4 border-t border-white/10">
+        <slot name="footer"></slot>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { Icon } from '@iconify/vue';
 
 const props = defineProps<{
   title?: string | null;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   persistent?: boolean;
+  showFooter?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: 'close'): void;
 }>();
 
 const sizeClass = computed(() => {
