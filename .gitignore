@@ -19,7 +19,7 @@ pnpm-lock.yaml
 # Docker
 *.log
 *.env
-
+*.env.production
 # Vite build
 apps/frontend/dist/
 
