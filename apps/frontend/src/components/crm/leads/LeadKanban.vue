@@ -280,7 +280,10 @@ const board = computed(() => {
       obj[lead.statusId].push(lead);
     } else if (lead.status) {
       // Fallback para compatibilidade com leads antigos que não têm statusId
-      const statusObj = statuses.value.find(s => s.name.toLowerCase() === lead.status.toLowerCase());
+      const statusObj = statuses.value.find(
+  (s) => s.name.toLowerCase() === lead.status.name.toLowerCase()
+);
+
       if (statusObj) {
         obj[statusObj.id].push(lead);
       }
@@ -359,22 +362,20 @@ async function onDragEnd(evt: any) {
   const item: Lead = evt.item.__draggable_context.element;
   const newStatusId = (evt.to as HTMLElement).dataset.status;
   const oldStatusId = item.statusId;
-  const oldStatus = item.status;
+  const oldStatus = item.status; // LeadStatus
 
   if (!item || !newStatusId || item.statusId === newStatusId) return;
 
-  // Encontra o objeto de status correspondente ao ID
   const newStatusObj = statuses.value.find(s => s.id === newStatusId);
   if (!newStatusObj) return;
 
-  // Atualiza o lead com o novo status
   item.statusId = newStatusId;
-  item.status = newStatusObj.name;
+  item.status = newStatusObj; // ✅ atribuindo objeto, não string
 
   try {
-    const success = await leadStore.updateLead(crmId, item.id, { 
+    const success = await leadStore.updateLead(crmId, item.id, {
       status: newStatusObj.name,
-      statusId: newStatusId 
+      statusId: newStatusId,
     });
 
     if (success) {

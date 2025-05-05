@@ -22,7 +22,7 @@
     >
       <li
         v-for="option in options"
-        :key="option.value"
+        :key="String(option.value)"
         @click="selectOption(option)"
         class="px-4 py-2 cursor-pointer hover:bg-zayit-blue text-white"
       >
@@ -40,7 +40,7 @@ import { ref, computed } from 'vue';
 
 type SelectOption = {
   label: string;
-  value: string | number;
+  value: string | number | null;
 };
 
 const props = defineProps<{

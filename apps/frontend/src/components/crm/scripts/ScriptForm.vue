@@ -45,7 +45,7 @@
         >
           <!-- Placeholder buttons and formatting tools -->
           <PlaceholderButtons textareaId="content" />
-          
+           
           <!-- WhatsApp formatting tools -->
           <WhatsAppFormatter textareaId="content" />
           

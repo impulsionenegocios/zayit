@@ -1,9 +1,4 @@
 // src/types/lead.types.ts
-
-// ————————————————————————————————————————————
-// Domain models (vindos do back-end)
-// ————————————————————————————————————————————
-
 export interface Tag {
   id: string;
   name: string;
@@ -36,7 +31,7 @@ export interface Lead {
   birthDate?: string;
   source?: LeadSourceType;
   sourceId?: string;
-  status: LeadStatusType;
+  status: LeadStatus;
   statusId?: string;
   tags: Tag[];
   created_at: string;

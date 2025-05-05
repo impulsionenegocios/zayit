@@ -12,9 +12,13 @@
           <h3 class="text-white font-medium">{{ lead.name }}</h3>
           <span
             class="text-xs font-semibold px-2 py-0.5 rounded-full"
-            :class="statusClasses[lead.status]"
+            :style="{
+  backgroundColor: lead.status.color + '33', // fundo translúcido (~20%)
+  color: lead.status.color // cor do texto
+}"
+
           >
-            {{ formatStatus(lead.status) }}
+            {{ formatStatus(lead.status.name) }}
           </span>
         </div>
       </div>

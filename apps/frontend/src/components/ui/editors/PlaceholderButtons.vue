@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="flex gap-2 flex-wrap mb-3">
-      <div class="text-sm text-white/70 mb-1 w-full">Campos Dinâmicos:</div>
+      <div class="text-sm text-white/70 mb-1 w-full">Campos Dinâmicos: <br> Para estilizar os campos dinamicos utilize os formatadores antes de aplicar o campo</div>
       <!-- Basic placeholders -->
       <DefaultButton
         v-for="placeholder in basicPlaceholders"

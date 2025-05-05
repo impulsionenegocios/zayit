@@ -61,10 +61,13 @@ export function replacePlaceholders(content: string, lead: Lead, tags: Tag[]): s
   
   let result = content;
   
+  // Substituir {{name}} pelo nome do lead
   result = result.replace(/{{name}}/g, lead.name || '');
   
+  // Substituir {{source}} pela fonte do lead
   result = result.replace(/{{source}}/g, lead.source || '');
   
+  // Substituir {{tag:ID}} pelo nome da tag correspondente
   const tagRegex = /{{tag:([^}]+)}}/g;
   const tagMatches = Array.from(result.matchAll(tagRegex));
   
@@ -143,4 +146,18 @@ export function formatWhatsAppPreview(text: string): string {
   }
   
   return formatted;
+}
+
+/**
+ * Extrai todos os IDs de tags utilizados nos placeholders de um script
+ * @param content O conteúdo do script com placeholders
+ * @returns Array de IDs de tags encontrados
+ */
+export function extractTagIds(content: string): string[] {
+  if (!content) return [];
+  
+  const tagRegex = /{{tag:([^}]+)}}/g;
+  const tagMatches = Array.from(content.matchAll(tagRegex));
+  
+  return tagMatches.map(match => match[1].trim());
 }
