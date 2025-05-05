@@ -17,17 +17,13 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: apps/frontend/Dockerfile
-    volumes:
-      - ./apps/frontend:/app/apps/frontend   # Mapeia a pasta correta
-      - /app/apps/frontend/node_modules       # Garante que os node_modules internos não sejam sobrescritos
+      dockerfile: apps/frontend/Dockerfile.prod
     ports:
-      - "3030:5173"   # Mapeia a porta 5173 do container para 3000 no host
-    # Não precisa de command aqui, pois o CMD do Dockerfile já chama 'pnpm run dev'
+      - "3030:80"
     networks:
       - app-network
     env_file:
-      - .env  
+      - .env.production
 
 networks:
   app-network:
