@@ -133,7 +133,7 @@ export default [
                   },
                 ],
               },
-
+              // Scripts
               {
                 path: 'scripts',
                 meta: { breadcrumb: 'Scripts' },
@@ -164,7 +164,22 @@ export default [
                 name: 'CRMEdit',
                 component: () => import('@/pages/crm/CRMManagementPage.vue'),
               },
+          // relatórios
+              
             ],
+            
+          },          
+        ],
+      },
+      {
+        path: 'reports',
+        meta: { breadcrumb: 'Relatórios' },
+        children: [
+          {
+            path: 'teste',
+            name: 'teste',
+            component: () => import('@/components/reports/metaAds/teste.vue'),
+            props: true,
           },
         ],
       },
