@@ -132,8 +132,15 @@ const { tags, fetchTags } = useTagList(crmId);
 
 // Mock lead for preview purposes
 const mockLead = ref({
+  id: 'mock-id',
   name: 'Nome do Cliente',
+  email: 'email@example.com',
+  phone: '(00) 00000-0000',
   source: 'Fonte do Lead',
+  status: 'lead',
+  tags: [],
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString()
 });
 
 console.log('ScriptForm component initializing with:');

@@ -2,7 +2,7 @@
   <section class="p-8 space-y-10 bg-surface min-h-screen">
     <h1 class="text-2xl text-white font-bold">🧩 Campos de Formulário</h1>
 
-    <FormGrid cols="2" gap="4">
+    <FormGrid :cols="2" :gap="4">
       <DocBlock
         title="BaseInput"
         description="Campo de input básico para textos ou números."

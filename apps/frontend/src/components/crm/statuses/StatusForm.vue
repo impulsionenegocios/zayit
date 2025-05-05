@@ -1,10 +1,10 @@
 <template>
   <div class="space-y-4">
-    <FormControl label="Nome do Status" :error="errors.name">
+    <FormControl label="Nome do Status" :error="errors.name ? errors.name : ''">
       <BaseInput v-model="form.name" placeholder="Digite o nome do status" :error="!!errors.name" />
     </FormControl>
 
-    <FormControl label="Cor" :error="errors.color">
+    <FormControl label="Cor" :error="errors.color ? errors.color : ''">
       <div class="flex items-center space-x-2">
         <div
           class="w-8 h-8 rounded-full border border-gray-600"
@@ -12,28 +12,29 @@
         ></div>
         <BaseInput
           v-model="form.color"
-          type="color"
+          type="text"
           class="w-12 h-8 p-0 bg-transparent"
+          :style="{ appearance: 'none', backgroundColor: form.color }"
           :error="!!errors.color"
         />
       </div>
     </FormControl>
 
-    <FormControl label="Ordem" :error="errors.order">
+    <FormControl label="Ordem" :error="errors.order ? errors.order : ''">
       <BaseInput
-        v-model.number="form.order"
-        type="number"
+        v-model="form.order"
+        type="text"
         min="0"
         placeholder="Ordem de exibição"
         :error="!!errors.order"
       />
     </FormControl>
 
-    <FormControl label="Descrição" :error="errors.description">
+    <FormControl label="Descrição" :error="errors.description ? errors.description : ''">
       <BaseTextarea
         v-model="form.description"
         placeholder="Digite uma descrição para este status"
-        :error="!!errors.description"
+        :error="errors.description ? errors.description : ''"
       />
     </FormControl>
 
@@ -81,10 +82,10 @@ const suggestedOrder = computed(() => {
   return Math.max(...statuses.value.map(s => s.order)) + 1;
 });
 
-const form = reactive<StatusCreatePayload>({
+const form = reactive<Omit<StatusCreatePayload, 'order'> & { order: string }>({
   name: props.status?.name || '',
   color: props.status?.color || '#3B82F6',
-  order: props.status?.order || 0,
+  order: String(props.status?.order || 0),
   description: props.status?.description || '',
 });
 
@@ -112,14 +113,14 @@ const validateForm = () => {
     isValid = false;
   }
 
-  if (form.order < 0) {
+  if (Number(form.order) < 0) {
     errors.order = 'A ordem deve ser um número positivo';
     isValid = false;
   }
 
   // Check if the order is already in use by another status (only for new statuses)
   if (!isEditing.value) {
-    const orderExists = statuses.value.some(s => s.order === form.order);
+    const orderExists = statuses.value.some(s => s.order === Number(form.order));
     if (orderExists) {
       errors.order = 'Esta ordem já está em uso. Sugerimos usar ' + suggestedOrder.value;
     }
@@ -137,13 +138,16 @@ const handleSubmit = async () => {
       const payload: StatusUpdatePayload = {
         name: form.name,
         color: form.color,
-        order: form.order,
+        order: Number(form.order),
         description: form.description,
       };
       await updateStatus(props.crmId, props.status.id, payload);
       toast.success('Status atualizado com sucesso!');
     } else {
-      await createStatus(props.crmId, form);
+      await createStatus(props.crmId, {
+        ...form,
+        order: Number(form.order)
+      });
       toast.success('Status criado com sucesso!');
     }
     emit('success');
@@ -164,7 +168,7 @@ const cancel = () => {
 onMounted(async () => {
   await fetchStatuses();
   if (!isEditing.value) {
-    form.order = suggestedOrder.value;
+    form.order = String(suggestedOrder.value);
   }
 });
 

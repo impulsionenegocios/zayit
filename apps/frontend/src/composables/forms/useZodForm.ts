@@ -1,10 +1,16 @@
 import { reactive, ref, toRaw } from 'vue';
 import { z } from 'zod';
 
-export function useZodForm<T extends z.ZodRawShape>(
+export function useZodForm<T extends z.ZodRawShape, TOutput = z.infer<z.ZodObject<T>>>(
   schema: z.ZodObject<T>,
-  defaultValues?: Partial<z.infer<typeof schema>>,
-) {
+  defaultValues?: Partial<TOutput>,
+): {
+  form: any;
+  errors: any;
+  isSubmitting: any;
+  validate: () => boolean;
+  handleSubmit: (callback: (data: any) => Promise<void> | void) => Promise<void>;
+} {
   type FormData = z.infer<typeof schema>;
 
   const form = reactive<FormData>({

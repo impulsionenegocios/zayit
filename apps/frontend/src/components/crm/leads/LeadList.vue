@@ -145,9 +145,9 @@
             <td class="px-6 py-4 whitespace-nowrap">
               <span
                 class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
-                :class="statusClasses[lead.status]"
+                :class="statusClasses[lead.status as keyof typeof statusClasses]"
               >
-                {{ formatStatus(lead.status) }}
+                {{ formatStatus(lead.status as string) }}
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
@@ -307,7 +307,7 @@ const filteredLeads = computed(() => {
 
   // Apply status filter
   if (statusFilter.value !== 'all') {
-    result = result.filter((l) => l.status === statusFilter.value);
+    result = result.filter((l) => l.status as string === statusFilter.value);
   }
   
   // Apply search filter

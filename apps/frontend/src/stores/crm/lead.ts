@@ -28,7 +28,7 @@ export const useLeadStore = defineStore('lead', () => {
       lost: [],
     };
     leads.value.forEach((lead) => {
-      result[lead.status].push(lead);
+      result[lead.status as keyof typeof result].push(lead);
     });
     return result;
   });
@@ -37,7 +37,7 @@ export const useLeadStore = defineStore('lead', () => {
     const statuses: LeadStatusType[] = ['lead', 'opportunity', 'client', 'lost'];
     return statuses.map((status) => ({
       status,
-      leads: leads.value.filter((lead) => lead.status === status),
+      leads: leads.value.filter((lead) => lead.status as string === status),
     }));
   });
 
@@ -103,7 +103,7 @@ export const useLeadStore = defineStore('lead', () => {
     const idx = leads.value.findIndex((l) => l.id === id);
     if (idx === -1) return false;
     const original = leads.value[idx].status;
-    leads.value[idx].status = newStatus;
+    leads.value[idx].status = newStatus as string;
     dragInProgress.value = true;
     try {
       const result = await updateLead(crmId, id, { status: newStatus });

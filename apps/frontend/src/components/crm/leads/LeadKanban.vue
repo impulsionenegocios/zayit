@@ -281,7 +281,7 @@ const board = computed(() => {
     } else if (lead.status) {
       // Fallback para compatibilidade com leads antigos que não têm statusId
       const statusObj = statuses.value.find(
-  (s) => s.name.toLowerCase() === lead.status.name.toLowerCase()
+  (s) => s.name.toLowerCase() === (typeof lead.status === 'string' ? lead.status.toLowerCase() : (lead.status as any)?.name?.toLowerCase())
 );
 
       if (statusObj) {
@@ -370,7 +370,7 @@ async function onDragEnd(evt: any) {
   if (!newStatusObj) return;
 
   item.statusId = newStatusId;
-  item.status = newStatusObj; // ✅ atribuindo objeto, não string
+  item.status = newStatusObj.name as any; // Convertendo para string compatível com o tipo Lead
 
   try {
     const success = await leadStore.updateLead(crmId, item.id, {

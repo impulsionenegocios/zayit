@@ -7,7 +7,8 @@
     "lib": ["ES2020", "DOM"], // isso resolve o erro de Object.assign e Promise
     "moduleResolution": "Node",
     "strict": true,
-    "rootDir": "./src",
+    "composite": true,
+    "allowSyntheticDefaultImports": true,
     "outDir": "./dist",
     "esModuleInterop": true,
     "skipLibCheck": true,

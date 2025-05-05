@@ -31,7 +31,7 @@ export interface Lead {
   birthDate?: string;
   source?: LeadSourceType;
   sourceId?: string;
-  status: LeadStatus;
+  status: LeadStatusType;
   statusId?: string;
   tags: Tag[];
   created_at: string;

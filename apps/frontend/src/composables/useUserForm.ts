@@ -1,6 +1,17 @@
 // src/composables/forms/useUserForm.ts
 import { ref, reactive } from 'vue';
-import { userFormSchema, type UserFormData } from '@shared/schemas/user';
+import { z } from 'zod';
+
+const userFormSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+  email: z.string().email("Email inválido"),
+});
+
+type UserFormData = {
+  name: string;
+  email: string;
+  [key: string]: any;
+};
 
 export function useUserForm() {
   const form = reactive<UserFormData>({
