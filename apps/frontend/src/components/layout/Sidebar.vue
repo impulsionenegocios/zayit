@@ -22,7 +22,7 @@
         <router-link to="/">
           <img
             class="h-12 cursor-pointer"
-            src="@/assets/images/logo-dark.png"
+            src="@/assets/images/logo.png"
             alt="Voltar ao início"
           />
         </router-link>
