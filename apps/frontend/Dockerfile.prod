@@ -10,7 +10,7 @@ COPY . .
 
 # Vai até o frontend
 WORKDIR /app/apps/frontend
-
+COPY apps/frontend/.env.production .env.production
 # Instala dependências e builda com modo production
 RUN pnpm install
 RUN pnpm run build
