@@ -7,7 +7,7 @@ services:
       - ./apps/backend:/app/apps/backend      # <-- Agora está mapeando para o mesmo do WORKDIR
       - ./apps/backend/static:/app/apps/backend/static
     env_file:
-      - .env
+      - .env.production
     ports:
       - "8090:8000"
     networks:
