@@ -153,7 +153,7 @@ export function useLeadForm(leadIdParam?: string) {
       });
       
       if (!lead.statusId && lead.status) {
-        const matchingStatus = statuses.value.find(s => s.name.toLowerCase() === lead.status.toLowerCase());
+        const matchingStatus = statuses.value.find(s => s.name.toLowerCase() === (typeof lead.status === 'string' ? lead.status.toLowerCase() : (lead.status as any).name?.toLowerCase() || ''));
         if (matchingStatus) {
           statusId.value = matchingStatus.id;
         } else if (statuses.value.length > 0) {

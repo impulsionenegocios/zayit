@@ -14,7 +14,7 @@ export const useClientesStore = defineStore('clientes', {
       this.carregando = true;
       try {
         const res = await getClientes();
-        this.lista = res.data;
+        this.lista = res;
       } catch (error) {
         console.error('Erro ao buscar clientes:', error);
       } finally {
@@ -25,7 +25,7 @@ export const useClientesStore = defineStore('clientes', {
     async selecionarCliente(id: string) {
       try {
         const res = await getClientePorId(id);
-        this.clienteSelecionado = res.data;
+        this.clienteSelecionado = res;
       } catch (error) {
         console.error('Erro ao carregar cliente:', error);
       }

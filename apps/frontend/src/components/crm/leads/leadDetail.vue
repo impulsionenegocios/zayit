@@ -16,9 +16,9 @@
               <div class="flex items-center text-gray-400 mt-1">
                 <span
                   class="px-2 py-0.5 text-sm rounded-full mr-2"
-                  :class="statusClasses[lead.status]"
+                  :class="statusClasses[lead.status as keyof typeof statusClasses]"
                 >
-                  {{ formatStatus(lead.status) }}
+                  {{ formatStatus(lead.status as string) }}
                 </span>
                 <span class="text-sm">Criado {{ formatDate(lead.created_at) }}</span>
               </div>
@@ -202,7 +202,7 @@ const lead = ref<Lead>({
   name: '',
   email: '',
   phone: '',
-  status: 'lead',
+  status: 'lead' as string,
   tags: [],
   created_at: '',
   updated_at: '',

@@ -13,12 +13,12 @@
           <span
             class="text-xs font-semibold px-2 py-0.5 rounded-full"
             :style="{
-  backgroundColor: lead.status.color + '33', // fundo translúcido (~20%)
-  color: lead.status.color // cor do texto
+  backgroundColor: (typeof lead.status === 'string' ? '#3B82F6' : (lead.status as any).color) + '33', // fundo translúcido (~20%)
+  color: typeof lead.status === 'string' ? '#3B82F6' : (lead.status as any).color // cor do texto
 }"
 
           >
-            {{ formatStatus(lead.status.name) }}
+            {{ formatStatus(typeof lead.status === 'string' ? lead.status : (lead.status as any).name) }}
           </span>
         </div>
       </div>

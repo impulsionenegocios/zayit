@@ -1,14 +1,14 @@
 <template>
   <div class="space-y-4">
-    <FormControl label="Nome da Fonte" :error="errors.name">
+    <FormControl label="Nome da Fonte" :error="errors.name ? errors.name : ''">
       <BaseInput v-model="form.name" placeholder="Digite o nome da fonte" :error="!!errors.name" />
     </FormControl>
 
-    <FormControl label="Descrição" :error="errors.description">
+    <FormControl label="Descrição" :error="errors.description ? errors.description : ''">
       <BaseTextarea
         v-model="form.description"
         placeholder="Digite uma descrição para esta fonte"
-        :error="!!errors.description"
+        :error="errors.description ? errors.description : ''"
       />
     </FormControl>
 

@@ -12,6 +12,5 @@
 </template>
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
-import { userFormSchema } from '@shared/schemas/user';
 const auth = useAuthStore();
 </script>
